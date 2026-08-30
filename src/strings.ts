@@ -9,6 +9,10 @@ export const APP_STRINGS = {
     BTN_CLOSE_ARIA_LABEL: 'Close sidebar',
     LABEL_DARK_MODE: 'Dark Mode',
     SWITCH_THEME_ARIA_LABEL: 'Toggle dark mode',
+    BTN_LOGIN_TEXT: 'Sign In',
+    BTN_LOGIN_ARIA_LABEL: 'Navigate to login page',
+    BTN_LOGOUT_TEXT: 'Sign Out',
+    BTN_LOGOUT_ARIA_LABEL: 'Sign out of application',
   },
   HEADER: {
     BTN_OPEN_SIDEBAR_ARIA_LABEL: 'Open sidebar',

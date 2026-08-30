@@ -1,11 +1,12 @@
-import { memo } from 'react';
-import { Cuboid, X } from 'lucide-react';
+import { memo, useCallback } from 'react';
+import { Cuboid, X, LogIn, LogOut } from 'lucide-react';
 import { APP_STRINGS } from '@/strings';
 import { getVisibleViews } from '@/views/views';
 import type { ViewDefinition } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
 import { UserBadge } from '@/components/UserBadge';
+import { Button } from '@/components/Button';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
@@ -66,8 +67,19 @@ const SidebarNavItem = memo(({ view, isActive, onSelect }: { view: ViewDefinitio
 
 // Main sidebar container rendering header, view navigation, user identity badge, and theme switch
 export const Sidebar = memo(({ isOpen, onClose, darkMode, onToggleDarkMode, activeViewId, onSelectView }: SidebarProps) => {
-  const { isAuthenticated, username } = useAuth();
+  const { isAuthenticated, username, logout } = useAuth();
   const visibleViews = getVisibleViews(isAuthenticated);
+
+  const handleLogout = useCallback(() => {
+    logout();
+    window.location.hash = APP_STRINGS.VIEWS.HOMEPAGE.NAV_HASH;
+    onClose();
+  }, [logout, onClose]);
+
+  const handleGoToLogin = useCallback(() => {
+    window.location.hash = APP_STRINGS.VIEWS.LOGIN.NAV_HASH;
+    onClose();
+  }, [onClose]);
 
   return (
     <>
@@ -86,6 +98,26 @@ export const Sidebar = memo(({ isOpen, onClose, darkMode, onToggleDarkMode, acti
         </nav>
         <div className="shrink-0 space-y-3 border-t border-slate-200 p-4 dark:border-slate-800">
           {isAuthenticated && <UserBadge username={username} />}
+          {!isAuthenticated ? (
+            <Button
+              onClick={handleGoToLogin}
+              icon={LogIn}
+              aria-label={APP_STRINGS.SIDEBAR.BTN_LOGIN_ARIA_LABEL}
+              className="w-full"
+            >
+              {APP_STRINGS.SIDEBAR.BTN_LOGIN_TEXT}
+            </Button>
+          ) : (
+            <Button
+              onClick={handleLogout}
+              variant="danger"
+              icon={LogOut}
+              aria-label={APP_STRINGS.SIDEBAR.BTN_LOGOUT_ARIA_LABEL}
+              className="w-full"
+            >
+              {APP_STRINGS.SIDEBAR.BTN_LOGOUT_TEXT}
+            </Button>
+          )}
           <ThemeSwitch darkMode={darkMode} onToggle={onToggleDarkMode} />
         </div>
       </aside>

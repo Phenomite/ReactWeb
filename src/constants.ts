@@ -2,12 +2,12 @@ import type { UserCredentialRecord } from '@/types';
 
 // Extensible client-side credential registry for authorized users
 export const AUTH_USER_REGISTRY: Record<string, UserCredentialRecord> = {
-  root: {
-    id: 'usr_root',
-    username: 'root',
-    displayName: 'Root Administrator',
+  admin: {
+    id: 'usr_admin',
+    username: 'admin',
+    displayName: 'Admin',
     saltHex: '87b880683d1e1c14f6358c000f55dbd4',
-    hashHex: 'e23843d507eb99332c5cc8501b3d92ea9f4879326731e8344595efa2e81eedf0',
+    hashHex: 'e22f996854f8d016166257a91a47df5da5d7708dc49e4e05914675568f48f4d9',
     iterations: 100000,
     role: 'admin',
   },

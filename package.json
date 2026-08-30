@@ -8,6 +8,7 @@
     "lint": "tsc --noEmit",
     "build": "pnpm run lint && vite build",
     "preview": "vite preview",
+    "auth:hash": "node scripts/generate-user-hash.js",
     "md:lint": "markdownlint-cli2 \"*.md\""
   },
   "dependencies": {

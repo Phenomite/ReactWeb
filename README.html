@@ -414,6 +414,10 @@ code {
 <td style="text-align:left">Locally preview the production build output</td>
 </tr>
 <tr>
+<td style="text-align:left"><code>pnpm run auth:hash</code></td>
+<td style="text-align:left">Generate random salt and PBKDF2 hash for a password</td>
+</tr>
+<tr>
 <td style="text-align:left"><code>pnpm run md:lint</code></td>
 <td style="text-align:left">Lint all markdown files with markdownlint-cli2</td>
 </tr>
@@ -458,7 +462,8 @@ code {
         Navigation->>User: Renders unlocked DebugView & reveals Admin navigation
     end
 </div></code></pre>
-<h3 id="1-credential-verification-srclibcryptots">1. Credential Verification (<code>src/lib/crypto.ts</code>)</h3>
+<h3 id="considerations">Considerations</h3>
+<h4 id="1-credential-verification-srclibcryptots">1. Credential Verification (<code>src/lib/crypto.ts</code>)</h4>
 <ul>
 <li><strong>PBKDF2 Key Derivation</strong>: Passwords are mathematically derived using PBKDF2-HMAC-SHA256 with 100,000 iterations
 and per-user cryptographic salts.</li>
@@ -468,7 +473,7 @@ user enumeration via timing analysis.</li>
 <li><strong>Constant-Time Comparison</strong>: Byte buffers are compared using bitwise XOR (<code>constantTimeEqual</code>) to prevent
 early-exit timing leaks during hash comparisons.</li>
 </ul>
-<h3 id="2-tamper-proof-session-management">2. Tamper-Proof Session Management</h3>
+<h4 id="2-tamper-proof-session-management">2. Tamper-Proof Session Management</h4>
 <ul>
 <li><strong>Cryptographic Signatures</strong>: Upon successful verification, an <code>AuthSession</code> object is generated with a SHA-256
 signature binding identity fields, credentials, and timestamps:
@@ -479,12 +484,42 @@ before authenticating. Any tampering or expiration purges the session.</li>
 <li><strong>Multi-Tab Synchronization</strong>: <code>AuthProvider</code> listens for window <code>storage</code> events to synchronize authentication
 state across browser tabs in real-time.</li>
 </ul>
-<h3 id="3-protected-routing--dynamic-navigation">3. Protected Routing &amp; Dynamic Navigation</h3>
+<h4 id="3-protected-routing--dynamic-navigation">3. Protected Routing &amp; Dynamic Navigation</h4>
 <ul>
 <li><strong>Anchor Hash Routing</strong>: Views route via anchor hashes (e.g. <code>#homepage</code>, <code>#settings</code>, <code>#login</code>, <code>#debug</code>).</li>
 <li><strong>Dynamic View Exposure</strong>: Authenticated state unlocks protected views such as <code>#debug</code> (<code>requiresAuth: true</code>) in the
 sidebar navigation. Direct hash navigation to protected views when unauthenticated renders an unauthorized banner.</li>
 </ul>
+<h3 id="adding-new-users">Adding New Users</h3>
+<p>To register a new user in the client-side credential registry (<code>AUTH_USER_REGISTRY</code> in <code>src/constants.ts</code>),
+generate a unique 16-byte cryptographic salt and derive the PBKDF2-HMAC-SHA256 hash using 100,000 iterations.</p>
+<h4 id="12-run-the-hash-generation-command">1/2: Run the Hash Generation Command</h4>
+<p>Execute the credential hashing utility using <code>pnpm</code>, passing the desired password as an argument:</p>
+<pre class="hljs"><code><div>pnpm auth:<span class="hljs-built_in">hash</span> -- <span class="hljs-string">&quot;&lt;PASSWORD&gt;&quot;</span>
+</div></code></pre>
+<p>The command outputs a JSON object containing the generated <code>saltHex</code> and <code>hashHex</code>:</p>
+<pre class="hljs"><code><div><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;saltHex&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;3d20ec6d0b3760e268f68921d27a80f7&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;hashHex&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;f09eb45c8184758639b5c1910a4d382838103538d78439823aa6511266f1ec22&quot;</span>
+<span class="hljs-punctuation">}</span>
+</div></code></pre>
+<h4 id="22-add-the-user-record-to-srcconstantsts">2/2: Add the User Record to <code>src/constants.ts</code></h4>
+<p>Open <code>src/constants.ts</code> and add the new user record to <code>AUTH_USER_REGISTRY</code>:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">AUTH_USER_REGISTRY</span>: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-title class_">UserCredentialRecord</span>&gt; = {
+  <span class="hljs-comment">// Existing users...</span>
+  <span class="hljs-attr">alice</span>: {
+    <span class="hljs-attr">id</span>: <span class="hljs-string">&#x27;usr_alice&#x27;</span>,
+    <span class="hljs-attr">username</span>: <span class="hljs-string">&#x27;alice&#x27;</span>,
+    <span class="hljs-attr">displayName</span>: <span class="hljs-string">&#x27;Alice Cooper&#x27;</span>,
+    <span class="hljs-attr">saltHex</span>: <span class="hljs-string">&#x27;value-from-output&#x27;</span>,
+    <span class="hljs-attr">hashHex</span>: <span class="hljs-string">&#x27;value-from-output&#x27;</span>,
+    <span class="hljs-attr">iterations</span>: <span class="hljs-number">100000</span>,
+    <span class="hljs-attr">role</span>: <span class="hljs-string">&#x27;user&#x27;</span>,
+  },
+};
+</div></code></pre>
+<p>Ensure the record key in <code>AUTH_USER_REGISTRY</code> is the lowercase normalized username (e.g. <code>alice</code>) so that
+<code>verifyCredentials</code> matches user input during sign-in.</p>
 
 </body>
 </html>

@@ -23,6 +23,8 @@ Tailwind CSS v4, Lucide React icons, and TypeScript.
 ReactWeb/
 ├── public/
 │   └── vite.svg               # Application favicon
+├── scripts/
+│   └── generate-user-hash.js  # CLI utility to generate random salts and PBKDF2 hashes
 ├── src/
 │   ├── components/            # Reusable UI components
 │   │   ├── Button.tsx         # Accessible interactive button with variant & tactile feedback
@@ -76,6 +78,7 @@ Use `pnpm` to run scripts:
 | `pnpm run lint` | Type-check and lint whole TypeScript codebase with `tsc --noEmit` |
 | `pnpm build` | Run TypeScript lint check and build production assets into `dist/` |
 | `pnpm preview` | Locally preview the production build output |
+| `pnpm run auth:hash` | Generate random salt and PBKDF2 hash for a password |
 | `pnpm run md:lint` | Lint all markdown files with `markdownlint-cli2` |
 
 ---
@@ -104,13 +107,12 @@ Use `pnpm` to run scripts:
 2. **Aside Sidebar (Container 2)**:
    - Fixed width of `w-72` on desktop viewports and a collapsible drawer overlay on mobile.
    - Houses the view navigation buttons without extra section headings.
-   - Dynamically exposes `#debug` when authenticated. Login is accessed via the header action button.
-   - Pinned at the bottom is an accessible on/off switch toggle for dark mode.
+   - Dynamically exposes `#debug` when authenticated.
+   - Pinned at the bottom are the user badge (when authenticated), Sign In/Out button, and dark mode switch.
 
 3. **Main Header (Container 3)**:
    - Top section of the main container matching the sidebar header height (`h-16`).
-   - Displays the active view title, mobile sidebar toggle button, and theme toggle.
-   - Displays a Login button when unauthenticated, and a Logout button when authenticated, next to the theme toggle.
+   - Displays the active view title, mobile sidebar toggle button, and theme mode toggle button.
 
 4. **Main Body Section (Container 4)**:
    - Primary content area (`flex-1 overflow-y-auto p-6`) rendering the active view component.
