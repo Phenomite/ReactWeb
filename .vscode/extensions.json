@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "oderwat.indent-rainbow",
+        "editorconfig.editorconfig",
+        "google.google-antigravity",
+        "davidanson.vscode-markdownlint"
+    ]
+}
