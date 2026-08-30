@@ -440,7 +440,7 @@ code {
     AuthContext->>Crypto: verifyCredentials(username, password)
 
     rect rgb(240, 248, 255)
-        Note over Crypto: 1. Normalize username & lookup in registry
+        Note over Crypto: 1. findUserByUsername (case-insensitive search)
         Note over Crypto: 2. Fallback to dummy salt if user not found
         Note over Crypto: 3. Derive key via PBKDF2-HMAC-SHA256 (100k iters)
         Note over Crypto: 4. Constant-time byte equality comparison
@@ -453,10 +453,10 @@ code {
         LoginView->>User: Displays invalid credentials alert
     else Valid Credentials
         AuthContext->>Crypto: createSession(user)
-        Crypto->>Crypto: generateSessionSignature(user, issuedAt, expiresAt, displayName)
-        Crypto-->>AuthContext: AuthSession { username, displayName, issuedAt, expiresAt, signature }
+        Crypto->>Crypto: generateSessionSignature(user, issuedAt, expiresAt, displayName, role)
+        Crypto-->>AuthContext: AuthSession { username, displayName, role, issuedAt, expiresAt, signature }
         AuthContext->>Storage: setItem("app_auth_session", JSON.stringify(session))
-        AuthContext->>AuthContext: setIsAuthenticated(true), setUsername(displayName)
+        AuthContext->>AuthContext: setIsAuthenticated(true), setUsername(name), setRole(role)
         AuthContext-->>LoginView: true
         LoginView->>Navigation: Navigate to #debug
         Navigation->>User: Renders unlocked DebugView & reveals Admin navigation
@@ -465,6 +465,9 @@ code {
 <h3 id="considerations">Considerations</h3>
 <h4 id="1-credential-verification-srclibcryptots">1. Credential Verification (<code>src/lib/crypto.ts</code>)</h4>
 <ul>
+<li><strong>Array-Based Registry &amp; Resilient Search</strong>: <code>AUTH_USER_REGISTRY</code> is structured as a <code>UserCredentialRecord[]</code> array.
+Lookups use <code>findUserByUsername</code>, performing case-insensitive, whitespace-trimmed matching that fully supports
+usernames containing digits, underscores, dashes, emails, and symbols (e.g. <code>user_123</code>, <code>admin@domain.com</code>).</li>
 <li><strong>PBKDF2 Key Derivation</strong>: Passwords are mathematically derived using PBKDF2-HMAC-SHA256 with 100,000 iterations
 and per-user cryptographic salts.</li>
 <li><strong>Timing Attack Mitigation</strong>: Credential verification executes dummy key derivation (<code>DUMMY_SALT_HEX</code> and
@@ -476,11 +479,11 @@ early-exit timing leaks during hash comparisons.</li>
 <h4 id="2-tamper-proof-session-management">2. Tamper-Proof Session Management</h4>
 <ul>
 <li><strong>Cryptographic Signatures</strong>: Upon successful verification, an <code>AuthSession</code> object is generated with a SHA-256
-signature binding identity fields, credentials, and timestamps:
-<code>user.username:displayName:saltHex:hashHex:issuedAt:expiresAt</code>.</li>
+signature binding identity fields, roles, credentials, and timestamps:
+<code>user.username:displayName:role:saltHex:hashHex:issuedAt:expiresAt</code>.</li>
 <li><strong>Expiration &amp; Validation</strong>: Sessions are valid for 7 days (<code>AUTH_SESSION_DURATION_MS = 604,800,000 ms</code>). On startup
-and cross-tab storage events, <code>validateSession</code> verifies data structure, temporal bounds, and signature integrity
-before authenticating. Any tampering or expiration purges the session.</li>
+and cross-tab storage events, <code>validateSession</code> verifies data structure, role consistency, temporal bounds, and
+signature integrity before authenticating. Any tampering or expiration purges the session.</li>
 <li><strong>Multi-Tab Synchronization</strong>: <code>AuthProvider</code> listens for window <code>storage</code> events to synchronize authentication
 state across browser tabs in real-time.</li>
 </ul>
@@ -504,22 +507,22 @@ generate a unique 16-byte cryptographic salt and derive the PBKDF2-HMAC-SHA256 h
 <span class="hljs-punctuation">}</span>
 </div></code></pre>
 <h4 id="22-add-the-user-record-to-srcconstantsts">2/2: Add the User Record to <code>src/constants.ts</code></h4>
-<p>Open <code>src/constants.ts</code> and add the new user record to <code>AUTH_USER_REGISTRY</code>:</p>
-<pre class="hljs"><code><div><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">AUTH_USER_REGISTRY</span>: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-title class_">UserCredentialRecord</span>&gt; = {
+<p>Open <code>src/constants.ts</code> and append the new user record to <code>AUTH_USER_REGISTRY</code>:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">AUTH_USER_REGISTRY</span>: <span class="hljs-title class_">UserCredentialRecord</span>[] = [
   <span class="hljs-comment">// Existing users...</span>
-  <span class="hljs-attr">alice</span>: {
+  {
     <span class="hljs-attr">id</span>: <span class="hljs-string">&#x27;usr_alice&#x27;</span>,
-    <span class="hljs-attr">username</span>: <span class="hljs-string">&#x27;alice&#x27;</span>,
+    <span class="hljs-attr">username</span>: <span class="hljs-string">&#x27;alice_99@domain.com&#x27;</span>,
     <span class="hljs-attr">displayName</span>: <span class="hljs-string">&#x27;Alice Cooper&#x27;</span>,
     <span class="hljs-attr">saltHex</span>: <span class="hljs-string">&#x27;value-from-output&#x27;</span>,
     <span class="hljs-attr">hashHex</span>: <span class="hljs-string">&#x27;value-from-output&#x27;</span>,
     <span class="hljs-attr">iterations</span>: <span class="hljs-number">100000</span>,
     <span class="hljs-attr">role</span>: <span class="hljs-string">&#x27;user&#x27;</span>,
   },
-};
+];
 </div></code></pre>
-<p>Ensure the record key in <code>AUTH_USER_REGISTRY</code> is the lowercase normalized username (e.g. <code>alice</code>) so that
-<code>verifyCredentials</code> matches user input during sign-in.</p>
+<p>The registry fully supports usernames containing numbers, symbols, and special characters (e.g. <code>user_123</code>,
+<code>admin@domain.com</code>, <code>ops-lead+01</code>). Matching is case-insensitive and whitespace-trimmed during sign-in.</p>
 
 </body>
 </html>

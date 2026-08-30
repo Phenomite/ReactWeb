@@ -29,10 +29,10 @@ ReactWeb/
 │   ├── components/            # Reusable UI components
 │   │   ├── Button.tsx         # Accessible interactive button with variant & tactile feedback
 │   │   ├── Card.tsx           # Standard surface card container with heading & icon badge
-│   │   ├── Header.tsx         # Main header with matching height, theme toggle & auth button
+│   │   ├── Header.tsx         # Main header with matching height, view title & theme mode toggle
 │   │   ├── InputField.tsx     # Accessible form input with icon prefix & dark focus styles
 │   │   ├── ThemeSwitch.tsx    # Accessible dark mode toggle switch control
-│   │   └── UserBadge.tsx      # Authenticated user identity badge with shield icon
+│   │   └── UserBadge.tsx      # Authenticated user identity badge with shield icon & role pill
 │   ├── context/               # React Context providers & hooks
 │   │   └── AuthContext.tsx    # AuthProvider & useAuth hook implementation
 │   ├── hooks/                 # Reusable custom React hooks
@@ -108,7 +108,7 @@ Use `pnpm` to run scripts:
    - Fixed width of `w-72` on desktop viewports and a collapsible drawer overlay on mobile.
    - Houses the view navigation buttons without extra section headings.
    - Dynamically exposes `#debug` when authenticated.
-   - Pinned at the bottom are the user badge (when authenticated), Sign In/Out button, and dark mode switch.
+   - Pinned at the bottom are the user badge (with role pill), full-width Sign In/Out button, and dark mode switch.
 
 3. **Main Header (Container 3)**:
    - Top section of the main container matching the sidebar header height (`h-16`).
@@ -134,9 +134,11 @@ Use `pnpm` to run scripts:
    - The default landing route is `#homepage`.
    - Client-side cryptographic verification uses PBKDF2-HMAC-SHA256 (100,000 iterations) via Web Crypto API.
    - Credential verification uses constant-time byte comparisons and dummy key derivation to mitigate timing attacks.
-   - Supports an extensible user registry (`AUTH_USER_REGISTRY`) with `root` configured as the primary administrator.
+   - Supports an extensible array-based user registry (`AUTH_USER_REGISTRY` of `UserCredentialRecord[]`).
+   - Lookups use `findUserByUsername` supporting case-insensitive matching, numbers, and symbols.
    - Signing in via `#login` unlocks and exposes the `#debug` view in the sidebar.
-   - Sessions are signed with cryptographic SHA-256 signatures, preventing users from forging boolean flags in storage.
+   - Sessions are signed with cryptographic SHA-256 signatures over 5 identity/temporal parameters,
+     preventing users from forging boolean flags or modifying identities in storage.
    - Sessions are valid for 7 days (`AUTH_SESSION_DURATION_MS = 604,800,000 ms`).
 
 ---

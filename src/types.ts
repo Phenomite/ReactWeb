@@ -11,10 +11,14 @@ export interface UserCredentialRecord {
   role: string;
 }
 
+// Extensible user registry format (array list or dictionary map)
+export type UserRegistry = UserCredentialRecord[] | Record<string, UserCredentialRecord>;
+
 // Signed session token stored in localStorage
 export interface AuthSession {
   username: string;
   displayName: string;
+  role: string;
   issuedAt: number;
   expiresAt: number;
   signature: string;
@@ -24,6 +28,7 @@ export interface AuthSession {
 export interface AuthContextType {
   isAuthenticated: boolean;
   username: string | null;
+  role: string | null;
   login: (name: string, pass: string) => Promise<boolean>;
   logout: () => void;
 }

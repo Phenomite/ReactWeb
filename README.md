@@ -56,7 +56,7 @@ sequenceDiagram
     AuthContext->>Crypto: verifyCredentials(username, password)
 
     rect rgb(240, 248, 255)
-        Note over Crypto: 1. Normalize username & lookup in registry
+        Note over Crypto: 1. findUserByUsername (case-insensitive search)
         Note over Crypto: 2. Fallback to dummy salt if user not found
         Note over Crypto: 3. Derive key via PBKDF2-HMAC-SHA256 (100k iters)
         Note over Crypto: 4. Constant-time byte equality comparison
@@ -69,10 +69,10 @@ sequenceDiagram
         LoginView->>User: Displays invalid credentials alert
     else Valid Credentials
         AuthContext->>Crypto: createSession(user)
-        Crypto->>Crypto: generateSessionSignature(user, issuedAt, expiresAt, displayName)
-        Crypto-->>AuthContext: AuthSession { username, displayName, issuedAt, expiresAt, signature }
+        Crypto->>Crypto: generateSessionSignature(user, issuedAt, expiresAt, displayName, role)
+        Crypto-->>AuthContext: AuthSession { username, displayName, role, issuedAt, expiresAt, signature }
         AuthContext->>Storage: setItem("app_auth_session", JSON.stringify(session))
-        AuthContext->>AuthContext: setIsAuthenticated(true), setUsername(displayName)
+        AuthContext->>AuthContext: setIsAuthenticated(true), setUsername(name), setRole(role)
         AuthContext-->>LoginView: true
         LoginView->>Navigation: Navigate to #debug
         Navigation->>User: Renders unlocked DebugView & reveals Admin navigation
@@ -83,6 +83,9 @@ sequenceDiagram
 
 #### 1. Credential Verification (`src/lib/crypto.ts`)
 
+- **Array-Based Registry & Resilient Search**: `AUTH_USER_REGISTRY` is structured as a `UserCredentialRecord[]` array.
+  Lookups use `findUserByUsername`, performing case-insensitive, whitespace-trimmed matching that fully supports
+  usernames containing digits, underscores, dashes, emails, and symbols (e.g. `user_123`, `admin@domain.com`).
 - **PBKDF2 Key Derivation**: Passwords are mathematically derived using PBKDF2-HMAC-SHA256 with 100,000 iterations
   and per-user cryptographic salts.
 - **Timing Attack Mitigation**: Credential verification executes dummy key derivation (`DUMMY_SALT_HEX` and
@@ -94,11 +97,11 @@ sequenceDiagram
 #### 2. Tamper-Proof Session Management
 
 - **Cryptographic Signatures**: Upon successful verification, an `AuthSession` object is generated with a SHA-256
-  signature binding identity fields, credentials, and timestamps:
-  `user.username:displayName:saltHex:hashHex:issuedAt:expiresAt`.
+  signature binding identity fields, roles, credentials, and timestamps:
+  `user.username:displayName:role:saltHex:hashHex:issuedAt:expiresAt`.
 - **Expiration & Validation**: Sessions are valid for 7 days (`AUTH_SESSION_DURATION_MS = 604,800,000 ms`). On startup
-  and cross-tab storage events, `validateSession` verifies data structure, temporal bounds, and signature integrity
-  before authenticating. Any tampering or expiration purges the session.
+  and cross-tab storage events, `validateSession` verifies data structure, role consistency, temporal bounds, and
+  signature integrity before authenticating. Any tampering or expiration purges the session.
 - **Multi-Tab Synchronization**: `AuthProvider` listens for window `storage` events to synchronize authentication
   state across browser tabs in real-time.
 
@@ -132,22 +135,22 @@ The command outputs a JSON object containing the generated `saltHex` and `hashHe
 
 #### 2/2: Add the User Record to `src/constants.ts`
 
-Open `src/constants.ts` and add the new user record to `AUTH_USER_REGISTRY`:
+Open `src/constants.ts` and append the new user record to `AUTH_USER_REGISTRY`:
 
 ```typescript
-export const AUTH_USER_REGISTRY: Record<string, UserCredentialRecord> = {
+export const AUTH_USER_REGISTRY: UserCredentialRecord[] = [
   // Existing users...
-  alice: {
+  {
     id: 'usr_alice',
-    username: 'alice',
+    username: 'alice_99@domain.com',
     displayName: 'Alice Cooper',
     saltHex: 'value-from-output',
     hashHex: 'value-from-output',
     iterations: 100000,
     role: 'user',
   },
-};
+];
 ```
 
-Ensure the record key in `AUTH_USER_REGISTRY` is the lowercase normalized username (e.g. `alice`) so that
-`verifyCredentials` matches user input during sign-in.
+The registry fully supports usernames containing numbers, symbols, and special characters (e.g. `user_123`,
+`admin@domain.com`, `ops-lead+01`). Matching is case-insensitive and whitespace-trimmed during sign-in.

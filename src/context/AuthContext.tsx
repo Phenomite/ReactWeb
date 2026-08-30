@@ -9,6 +9,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
 
   // Verifies stored session signature on mount and cross-tab storage events
   const syncSession = useCallback(async () => {
@@ -17,6 +18,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const valid = await validateSession(raw);
     setIsAuthenticated(Boolean(valid));
     setUsername(valid ? valid.displayName || valid.username : null);
+    setRole(valid ? valid.role || null : null);
     if (!valid && raw) localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY_SESSION);
   }, []);
 
@@ -34,6 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(AUTH_CONFIG.STORAGE_KEY_SESSION, JSON.stringify(session));
     setIsAuthenticated(true);
     setUsername(session.displayName || session.username);
+    setRole(session.role || null);
     return true;
   }, []);
 
@@ -41,10 +44,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     setIsAuthenticated(false);
     setUsername(null);
+    setRole(null);
     localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY_SESSION);
   }, []);
 
-  const value = useMemo(() => ({ isAuthenticated, username, login, logout }), [isAuthenticated, username, login, logout]);
+  const value = useMemo(() => ({ isAuthenticated, username, role, login, logout }), [isAuthenticated, username, role, login, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

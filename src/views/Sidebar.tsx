@@ -58,7 +58,7 @@ const SidebarNavItem = memo(({ view, isActive, onSelect }: { view: ViewDefinitio
       </div>
       {view.requiresAuth && (
         <span className="rounded-md bg-purple-100 px-1.5 py-0.5 text-[10px] font-semibold text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">
-          Admin
+          ADMIN
         </span>
       )}
     </button>
@@ -67,7 +67,7 @@ const SidebarNavItem = memo(({ view, isActive, onSelect }: { view: ViewDefinitio
 
 // Main sidebar container rendering header, view navigation, user identity badge, and theme switch
 export const Sidebar = memo(({ isOpen, onClose, darkMode, onToggleDarkMode, activeViewId, onSelectView }: SidebarProps) => {
-  const { isAuthenticated, username, logout } = useAuth();
+  const { isAuthenticated, username, role, logout } = useAuth();
   const visibleViews = getVisibleViews(isAuthenticated);
 
   const handleLogout = useCallback(() => {
@@ -97,7 +97,7 @@ export const Sidebar = memo(({ isOpen, onClose, darkMode, onToggleDarkMode, acti
           ))}
         </nav>
         <div className="shrink-0 space-y-3 border-t border-slate-200 p-4 dark:border-slate-800">
-          {isAuthenticated && <UserBadge username={username} />}
+          {isAuthenticated && <UserBadge username={username} role={role} />}
           {!isAuthenticated ? (
             <Button
               onClick={handleGoToLogin}

@@ -1,8 +1,8 @@
 import type { UserCredentialRecord } from '@/types';
 
 // Extensible client-side credential registry for authorized users
-export const AUTH_USER_REGISTRY: Record<string, UserCredentialRecord> = {
-  admin: {
+export const AUTH_USER_REGISTRY: UserCredentialRecord[] = [
+  {
     id: 'usr_admin',
     username: 'admin',
     displayName: 'Admin',
@@ -10,8 +10,8 @@ export const AUTH_USER_REGISTRY: Record<string, UserCredentialRecord> = {
     hashHex: 'e22f996854f8d016166257a91a47df5da5d7708dc49e4e05914675568f48f4d9',
     iterations: 100000,
     role: 'admin',
-  },
-};
+  }
+];
 
 // Fallback salt and iteration count used to simulate derivation on unknown usernames
 export const DUMMY_SALT_HEX = 'e0d1b4c798a2f356417b809cfdae1234';
