@@ -1,5 +1,7 @@
-import { Menu, Moon, Sun } from 'lucide-react';
+import { memo } from 'react';
+import { Menu, Moon, Sun, ShieldCheck } from 'lucide-react';
 import { APP_STRINGS } from '../strings';
+import { useAuth } from '../lib/auth';
 
 interface HeaderProps {
   activeViewTitle: string;
@@ -8,12 +10,14 @@ interface HeaderProps {
   onOpenSidebar: () => void;
 }
 
-export const Header = ({
+export const Header = memo(({
   activeViewTitle,
   darkMode,
   onToggleDarkMode,
   onOpenSidebar,
 }: HeaderProps) => {
+  const { isAuthenticated, username } = useAuth();
+
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 dark:border-slate-800 dark:bg-slate-900">
       <div className="flex items-center gap-3">
@@ -30,7 +34,14 @@ export const Header = ({
         </span>
       </div>
 
-      <div className="flex items-center">
+      <div className="flex items-center gap-3">
+        {isAuthenticated && (
+          <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
+            <ShieldCheck className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+            <span>{username || APP_STRINGS.header.userBadge}</span>
+          </span>
+        )}
+
         <button
           type="button"
           onClick={onToggleDarkMode}
@@ -46,4 +57,6 @@ export const Header = ({
       </div>
     </header>
   );
-};
+});
+
+Header.displayName = 'Header';

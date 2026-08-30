@@ -4,8 +4,9 @@ import { Header } from './components/Header';
 import { MainContent } from './components/MainContent';
 import { APP_STRINGS } from './strings';
 import { getViewByHash, DEFAULT_VIEW, type ViewDefinition } from './views';
+import { AuthProvider } from './lib/auth';
 
-export function App() {
+function AppLayout() {
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem(APP_STRINGS.theme.storageKey);
@@ -24,7 +25,7 @@ export function App() {
     return DEFAULT_VIEW;
   });
 
-  // Ensure default anchor is set to #homepage on initial load if empty
+  // Assigns default window location hash on initial load if unset
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (!window.location.hash || window.location.hash === '#') {
@@ -34,7 +35,7 @@ export function App() {
     }
   }, []);
 
-  // Listen to browser hash changes (e.g. back/forward or programmatic navigation)
+  // Subscribes to window hashchange events to synchronize active view state
   useEffect(() => {
     const handleHashChange = () => {
       setActiveView(getViewByHash(window.location.hash));
@@ -46,7 +47,7 @@ export function App() {
     };
   }, []);
 
-  // Apply dark mode class to root HTML
+  // Synchronizes the root document element classList and localStorage with darkMode state
   useEffect(() => {
     const root = document.documentElement;
     if (darkMode) {
@@ -58,9 +59,17 @@ export function App() {
     }
   }, [darkMode]);
 
-  const toggleDarkMode = () => {
+  const toggleDarkMode = useCallback(() => {
     setDarkMode((prev) => !prev);
-  };
+  }, []);
+
+  const handleOpenSidebar = useCallback(() => {
+    setSidebarOpen(true);
+  }, []);
+
+  const handleCloseSidebar = useCallback(() => {
+    setSidebarOpen(false);
+  }, []);
 
   const handleSelectView = useCallback((view: ViewDefinition) => {
     if (window.location.hash !== view.hash) {
@@ -73,30 +82,38 @@ export function App() {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-50 text-slate-900 transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100">
-      {/* Container 1 & 2: Aside Sidebar (w-72 with Cuboid icon heading and view navigation) */}
+      {/* Sidebar aside (w-72) with heading, view list, and theme toggle */}
       <Sidebar
         isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
+        onClose={handleCloseSidebar}
         darkMode={darkMode}
         onToggleDarkMode={toggleDarkMode}
         activeViewId={activeView.id}
         onSelectView={handleSelectView}
       />
 
-      {/* Main Container */}
+      {/* Main container column */}
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        {/* Container 3: Main Header (height lines up with aside header) */}
+        {/* Main header matching sidebar heading height (h-16) */}
         <Header
           activeViewTitle={activeView.title}
           darkMode={darkMode}
           onToggleDarkMode={toggleDarkMode}
-          onOpenSidebar={() => setSidebarOpen(true)}
+          onOpenSidebar={handleOpenSidebar}
         />
 
-        {/* Container 4: Main Body Section */}
+        {/* Primary body view container */}
         <MainContent activeView={activeView} />
       </div>
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <AuthProvider>
+      <AppLayout />
+    </AuthProvider>
   );
 }
 

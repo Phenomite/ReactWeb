@@ -1,10 +1,11 @@
+import { memo } from 'react';
 import type { ViewDefinition } from '../views';
 
 interface MainContentProps {
   activeView: ViewDefinition;
 }
 
-export const MainContent = ({ activeView }: MainContentProps) => {
+export const MainContent = memo(({ activeView }: MainContentProps) => {
   const ActiveComponent = activeView.component;
 
   return (
@@ -12,4 +13,6 @@ export const MainContent = ({ activeView }: MainContentProps) => {
       <ActiveComponent />
     </main>
   );
-};
+});
+
+MainContent.displayName = 'MainContent';
