@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { APP_STRINGS } from '@/constants';
+import { APP_STRINGS } from '@/strings';
 import { cn } from '@/lib/utils';
 
 interface ThemeSwitchProps {

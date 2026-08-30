@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Cuboid, X } from 'lucide-react';
-import { APP_STRINGS } from '@/constants';
+import { APP_STRINGS } from '@/strings';
 import { getVisibleViews } from '@/views/views';
 import type { ViewDefinition } from '@/types';
 import { useAuth } from '@/context/AuthContext';

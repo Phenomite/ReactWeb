@@ -1,6 +1,6 @@
 import { memo, useCallback } from 'react';
 import { Menu, Moon, Sun, ShieldCheck, LogOut, LogIn } from 'lucide-react';
-import { APP_STRINGS } from '@/constants';
+import { APP_STRINGS } from '@/strings';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/Button';
 

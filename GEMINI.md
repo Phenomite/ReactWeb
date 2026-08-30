@@ -5,7 +5,7 @@ Tailwind CSS v4, Lucide React icons, and TypeScript.
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Framework**: [React 19](https://react.dev/) (`react`, `react-dom`)
 - **Bundler & Build Tool**: [Vite 8](https://vite.dev/) (`vite`, `@vitejs/plugin-react`)
@@ -17,7 +17,7 @@ Tailwind CSS v4, Lucide React icons, and TypeScript.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 ReactWeb/
@@ -48,7 +48,8 @@ ReactWeb/
 │   │   └── views.ts           # Aggregated view registry & navigation lookup helpers
 │   ├── vite-env.d.ts          # Vite client type definitions
 │   ├── App.tsx                # 4-container layout, custom hooks integration
-│   ├── constants.ts           # Centralized constants & user registry
+│   ├── constants.ts           # Centralized system constants & user registry
+│   ├── strings.ts             # Centralized application site string constants
 │   ├── index.css              # Tailwind CSS v4 import & root styles
 │   ├── main.tsx               # React root DOM mount
 │   └── types.ts               # Shared TypeScript interfaces & types
@@ -63,7 +64,7 @@ ReactWeb/
 
 ---
 
-## 🚀 Available Scripts
+## Available Scripts
 
 Use `pnpm` to run scripts:
 
@@ -78,7 +79,7 @@ Use `pnpm` to run scripts:
 
 ---
 
-## 🧭 Path Anchoring & Module Resolution
+## Path Anchoring & Module Resolution
 
 1. **Vite 8 Base & Alias Configuration**:
    - `vite.config.ts` sets `base: './'` for flexible hosting environments.
@@ -89,11 +90,11 @@ Use `pnpm` to run scripts:
 
 3. **Direct Imports & No Barrel Indirection**:
    - Avoid `index.ts` barrel files and compatibility re-exports.
-   - All modules import directly via `@/*` aliases (e.g. `@/context/AuthContext`, `@/constants`).
+   - All modules import directly via `@/*` aliases (e.g. `@/context/AuthContext`, `@/constants`, `@/strings`).
 
 ---
 
-## 📐 Layout Architecture (4 Containers)
+## Layout Architecture (4 Containers)
 
 1. **Top-Left Heading (Container 1)**:
    - Sidebar aside header featuring the `Cuboid` icon from `lucide-react` and app title.
@@ -115,7 +116,7 @@ Use `pnpm` to run scripts:
 
 ---
 
-## 🧭 Views & Anchor Routing Paradigm
+## Views & Anchor Routing Paradigm
 
 1. **Colocated Views**:
    - Create a view component in `src/views/` (e.g. `MyView.tsx`) exporting both the component and its `ViewDefinition` object.
@@ -137,7 +138,7 @@ Use `pnpm` to run scripts:
 
 ---
 
-## 🔘 Interactive Buttons & Accessibility (WCAG)
+## Interactive Buttons & Accessibility (WCAG)
 
 1. **Text Dragging**:
    - All sidebar buttons, headings, and toggle controls use `select-none` (`user-select: none`).
@@ -155,7 +156,7 @@ Use `pnpm` to run scripts:
 
 ---
 
-## ⚡ Performance & Code Hygiene
+## Performance & Code Hygiene
 
 1. **Strict TypeScript & Type Checking**:
    - Enabled maximum strict suite: `strict`, `noUncheckedIndexedAccess`, `noImplicitReturns`, `verbatimModuleSyntax`.
@@ -174,9 +175,10 @@ Use `pnpm` to run scripts:
    - Comments must describe the concrete runtime *behavior* of the code rather than subjective intents.
 
 5. **Strings & Component-First Naming Taxonomy**:
-   - Application strings and constants reside in `src/constants.ts`.
-   - All constant keys use uppercase format (`APP_STRINGS.SECTION.KEY`).
-   - Constants follow component-first prefixes:
+   - Application site UI strings reside in `src/strings.ts`.
+   - System configuration and auth registries reside in `src/constants.ts`.
+   - All string keys use uppercase format (`APP_STRINGS.SECTION.KEY`).
+   - Strings follow component-first prefixes:
      - `BTN_*`: Buttons and action triggers (`BTN_SUBMIT`, `BTN_LOGOUT`, `BTN_CLEAR_STORAGE`).
      - `LABEL_*`: Input and status labels (`LABEL_USERNAME`, `LABEL_DARK_MODE`, `LABEL_AUTH_ACTIVE`).
      - `INPUT_*`: Placeholders and field configurations (`INPUT_PLACEHOLDER_USERNAME`).
@@ -189,7 +191,7 @@ Use `pnpm` to run scripts:
 
 ---
 
-## 🎨 Styling & Conventions
+## Styling & Conventions
 
 1. **Tailwind CSS v4**:
    - Tailwind is integrated directly via the `@tailwindcss/vite` plugin in `vite.config.ts`.

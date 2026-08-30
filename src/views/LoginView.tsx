@@ -1,6 +1,6 @@
 import { useState, useCallback, memo, type SubmitEvent, type ChangeEvent } from 'react';
 import { ShieldCheck, LogIn, LogOut, ArrowRight, User, Key, CheckCircle2, AlertCircle, RotateCcw } from 'lucide-react';
-import { APP_STRINGS } from '@/constants';
+import { APP_STRINGS } from '@/strings';
 import { useAuth } from '@/context/AuthContext';
 import { Card } from '@/components/Card';
 import { InputField } from '@/components/InputField';

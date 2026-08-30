@@ -1,6 +1,6 @@
 import { useCallback, memo } from 'react';
 import { Bug, ShieldAlert, Cpu, Terminal, RefreshCw, LogOut, CheckCircle2 } from 'lucide-react';
-import { APP_STRINGS } from '@/constants';
+import { APP_STRINGS } from '@/strings';
 import { useAuth } from '@/context/AuthContext';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';

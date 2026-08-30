@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { APP_STRINGS } from '@/constants';
+import { THEME_CONFIG } from '@/constants';
 
-const { STORAGE_KEY, MODE_DARK, MODE_LIGHT, QUERY_PREFERS_DARK } = APP_STRINGS.THEME;
+const { STORAGE_KEY, MODE_DARK, MODE_LIGHT, QUERY_PREFERS_DARK } = THEME_CONFIG;
 
 // Detects initial theme from localStorage or OS system preference
 function getInitialTheme(): boolean {

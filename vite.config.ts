@@ -15,7 +15,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   build: {
-    target: 'esnext',
+    target: 'es2023',
     cssMinify: true,
     rollupOptions: {
       output: {

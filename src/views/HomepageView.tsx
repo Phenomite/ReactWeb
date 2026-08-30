@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Home } from 'lucide-react';
-import { APP_STRINGS } from '@/constants';
+import { APP_STRINGS } from '@/strings';
 import { Card } from '@/components/Card';
 import type { ViewDefinition } from '@/types';
 

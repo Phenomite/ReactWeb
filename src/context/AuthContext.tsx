@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, createContext, useContext, type ReactNode } from 'react';
 import type { AuthContextType } from '@/types';
-import { APP_STRINGS } from '@/constants';
+import { AUTH_CONFIG } from '@/constants';
 import { verifyCredentials, createSession, validateSession } from '@/lib/crypto';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -13,11 +13,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Verifies stored session signature on mount and cross-tab storage events
   const syncSession = useCallback(async () => {
     if (typeof window === 'undefined') return;
-    const raw = localStorage.getItem(APP_STRINGS.AUTH.STORAGE_KEY_SESSION);
+    const raw = localStorage.getItem(AUTH_CONFIG.STORAGE_KEY_SESSION);
     const valid = await validateSession(raw);
     setIsAuthenticated(Boolean(valid));
     setUsername(valid ? valid.displayName || valid.username : null);
-    if (!valid && raw) localStorage.removeItem(APP_STRINGS.AUTH.STORAGE_KEY_SESSION);
+    if (!valid && raw) localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY_SESSION);
   }, []);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const user = await verifyCredentials(name, pass);
     if (!user) return false;
     const session = await createSession(user);
-    localStorage.setItem(APP_STRINGS.AUTH.STORAGE_KEY_SESSION, JSON.stringify(session));
+    localStorage.setItem(AUTH_CONFIG.STORAGE_KEY_SESSION, JSON.stringify(session));
     setIsAuthenticated(true);
     setUsername(session.displayName || session.username);
     return true;
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     setIsAuthenticated(false);
     setUsername(null);
-    localStorage.removeItem(APP_STRINGS.AUTH.STORAGE_KEY_SESSION);
+    localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY_SESSION);
   }, []);
 
   const value = useMemo(() => ({ isAuthenticated, username, login, logout }), [isAuthenticated, username, login, logout]);
