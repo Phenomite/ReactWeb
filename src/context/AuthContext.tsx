@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, createContext, useContext, type ReactNode } from 'react';
-import type { AuthContextType } from '@/types/auth';
-import { APP_STRINGS } from '@/constants/strings';
+import type { AuthContextType } from '@/types';
+import { APP_STRINGS } from '@/constants';
 import { verifyCredentials, createSession, validateSession } from '@/lib/crypto';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

@@ -1,11 +1,10 @@
 import { useState, useCallback } from 'react';
-import { Sidebar } from '@/components/Sidebar';
+import { Sidebar } from '@/views/Sidebar';
 import { Header } from '@/components/Header';
-import { MainContent } from '@/components/MainContent';
 import { AuthProvider } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/useTheme';
 import { useHashRouting } from '@/hooks/useHashRouting';
-import type { ViewDefinition } from '@/types/views';
+import type { ViewDefinition } from '@/types';
 
 // Renders the 4-container application layout shell
 function AppLayout() {
@@ -20,6 +19,8 @@ function AppLayout() {
     navigateToView(view);
     setSidebarOpen(false);
   }, [navigateToView]);
+
+  const ActiveComponent = activeView.component;
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-50 text-slate-900 transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100">
@@ -44,7 +45,9 @@ function AppLayout() {
         />
 
         {/* Container 4: Main Body View Section */}
-        <MainContent activeView={activeView} />
+        <main className="flex-1 overflow-y-auto p-6 text-slate-800 dark:text-slate-200">
+          <ActiveComponent />
+        </main>
       </div>
     </div>
   );

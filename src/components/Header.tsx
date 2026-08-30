@@ -1,7 +1,8 @@
 import { memo, useCallback } from 'react';
 import { Menu, Moon, Sun, ShieldCheck, LogOut, LogIn } from 'lucide-react';
-import { APP_STRINGS } from '@/constants/strings';
+import { APP_STRINGS } from '@/constants';
 import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/Button';
 
 interface HeaderProps {
   activeViewTitle: string;
@@ -29,7 +30,7 @@ export const Header = memo(({ activeViewTitle, darkMode, onToggleDarkMode, onOpe
         <button
           type="button"
           onClick={onOpenSidebar}
-          className="flex h-9 w-9 cursor-pointer select-none items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-all duration-150 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-blue-600 active:scale-95 md:hidden dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
+          className="flex h-9 w-9 cursor-pointer select-none items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-blue-600 active:scale-95 md:hidden dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
           aria-label={APP_STRINGS.HEADER.BTN_OPEN_SIDEBAR_ARIA_LABEL}
         >
           <Menu className="h-5 w-5" aria-hidden="true" />
@@ -49,33 +50,21 @@ export const Header = memo(({ activeViewTitle, darkMode, onToggleDarkMode, onOpe
         <button
           type="button"
           onClick={onToggleDarkMode}
-          className="flex h-9 w-9 cursor-pointer select-none items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-all duration-150 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-blue-600 active:scale-95 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
+          className="flex h-9 w-9 cursor-pointer select-none items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-blue-600 active:scale-95 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
           aria-label={APP_STRINGS.HEADER.BTN_TOGGLE_THEME_ARIA_LABEL}
         >
-          {darkMode ? <Sun className="h-4 w-4 text-amber-400" aria-hidden="true" /> : <Moon className="h-4 w-4 text-slate-700 dark:text-slate-300" aria-hidden="true" />}
+          {darkMode ? <Sun className="h-4 w-4 text-amber-400" aria-hidden="true" /> : <Moon className="h-4 w-4 text-slate-700 dark:text-slate-300" />}
         </button>
 
         {/* Authentication action: Login when unauthenticated, Logout when authenticated */}
         {!isAuthenticated ? (
-          <button
-            type="button"
-            onClick={handleGoToLogin}
-            className="flex h-9 cursor-pointer select-none items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 text-xs font-medium text-blue-700 transition-all duration-150 hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-blue-600 active:scale-95 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-300"
-            aria-label={APP_STRINGS.HEADER.BTN_LOGIN_ARIA_LABEL}
-          >
-            <LogIn className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="hidden xs:inline">{APP_STRINGS.HEADER.BTN_LOGIN_TEXT}</span>
-          </button>
+          <Button onClick={handleGoToLogin} icon={LogIn} aria-label={APP_STRINGS.HEADER.BTN_LOGIN_ARIA_LABEL}>
+            {APP_STRINGS.HEADER.BTN_LOGIN_TEXT}
+          </Button>
         ) : (
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="flex h-9 cursor-pointer select-none items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 text-xs font-medium text-rose-700 transition-all duration-150 hover:bg-rose-100 focus-visible:outline-2 focus-visible:outline-rose-600 active:scale-95 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300"
-            aria-label={APP_STRINGS.HEADER.BTN_LOGOUT_ARIA_LABEL}
-          >
-            <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="hidden xs:inline">{APP_STRINGS.HEADER.BTN_LOGOUT_TEXT}</span>
-          </button>
+          <Button onClick={handleLogout} variant="danger" icon={LogOut} aria-label={APP_STRINGS.HEADER.BTN_LOGOUT_ARIA_LABEL}>
+            {APP_STRINGS.HEADER.BTN_LOGOUT_TEXT}
+          </Button>
         )}
       </div>
     </header>

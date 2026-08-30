@@ -1,5 +1,5 @@
-import type { UserCredentialRecord, AuthSession } from '@/types/auth';
-import { AUTH_USER_REGISTRY, DUMMY_SALT_HEX, DUMMY_ITERATIONS, AUTH_SESSION_DURATION_MS } from '@/constants/auth';
+import type { UserCredentialRecord, AuthSession } from '@/types';
+import { AUTH_USER_REGISTRY, DUMMY_SALT_HEX, DUMMY_ITERATIONS, AUTH_SESSION_DURATION_MS } from '@/constants';
 
 // Converts a hex string into a Uint8Array byte buffer
 export function hexToBytes(hex: string): Uint8Array {
@@ -37,31 +37,65 @@ export async function verifyCredentials(
   return user && constantTimeEqual(derived, hexToBytes(user.hashHex)) ? user : null;
 }
 
-// Generates a SHA-256 signature for session verification
-export async function generateSessionSignature(user: UserCredentialRecord, issuedAt: number, expiresAt: number): Promise<string> {
-  const payload = `${user.username}:${user.saltHex}:${user.hashHex}:${issuedAt}:${expiresAt}`;
+// Generates a SHA-256 signature binding username, displayName, credentials, issuedAt, and expiresAt
+export async function generateSessionSignature(
+  user: UserCredentialRecord,
+  issuedAt: number,
+  expiresAt: number,
+  displayName: string
+): Promise<string> {
+  const payload = `${user.username}:${displayName}:${user.saltHex}:${user.hashHex}:${issuedAt}:${expiresAt}`;
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload));
   return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Constructs an AuthSession object signed with a 7-day expiration timestamp
+// Constructs a tamper-proof AuthSession object signed with user identity, display name, and expiration
 export async function createSession(user: UserCredentialRecord, durationMs = AUTH_SESSION_DURATION_MS): Promise<AuthSession> {
   const issuedAt = Date.now();
   const expiresAt = issuedAt + durationMs;
-  const signature = await generateSessionSignature(user, issuedAt, expiresAt);
-  return { username: user.username, displayName: user.displayName, issuedAt, expiresAt, signature };
+  const displayName = user.displayName || user.username;
+  const signature = await generateSessionSignature(user, issuedAt, expiresAt, displayName);
+  return Object.freeze({ username: user.username, displayName, issuedAt, expiresAt, signature });
 }
 
-// Validates session signature and expiration to prevent localStorage tampering
+// Validates session signature, user integrity, and expiration to prevent any localStorage tampering
 export async function validateSession(sessionJson: string | null, registry = AUTH_USER_REGISTRY): Promise<AuthSession | null> {
   if (!sessionJson) return null;
   try {
     const s = JSON.parse(sessionJson) as AuthSession;
-    if (!s?.username || !s?.signature || !s?.expiresAt || !s?.issuedAt || Date.now() >= s.expiresAt) return null;
+    const now = Date.now();
+
+    // Verify presence and strict types of all session properties
+    if (
+      typeof s?.username !== 'string' ||
+      typeof s?.displayName !== 'string' ||
+      typeof s?.signature !== 'string' ||
+      typeof s?.issuedAt !== 'number' ||
+      typeof s?.expiresAt !== 'number' ||
+      Number.isNaN(s.issuedAt) ||
+      Number.isNaN(s.expiresAt)
+    ) {
+      return null;
+    }
+
+    // Verify timestamp bounds: not expired, issued not in future, and validity within max duration
+    if (now >= s.expiresAt || s.issuedAt > now + 60000 || s.expiresAt <= s.issuedAt || s.expiresAt > s.issuedAt + AUTH_SESSION_DURATION_MS + 1000) {
+      return null;
+    }
+
+    // Look up registered user identity
     const user = registry[s.username.trim().toLowerCase()];
-    if (!user) return null;
-    const expected = await generateSessionSignature(user, s.issuedAt, s.expiresAt);
-    return constantTimeEqual(hexToBytes(s.signature), hexToBytes(expected)) ? s : null;
+    if (!user || user.username !== s.username) return null;
+
+    // Verify displayName matches registry definition
+    const expectedDisplayName = user.displayName || user.username;
+    if (s.displayName !== expectedDisplayName) return null;
+
+    // Cryptographically verify signature over all 4 fields (username, displayName, issuedAt, expiresAt)
+    const expectedSig = await generateSessionSignature(user, s.issuedAt, s.expiresAt, expectedDisplayName);
+    if (!constantTimeEqual(hexToBytes(s.signature), hexToBytes(expectedSig))) return null;
+
+    return Object.freeze({ username: user.username, displayName: expectedDisplayName, issuedAt: s.issuedAt, expiresAt: s.expiresAt, signature: s.signature });
   } catch {
     return null;
   }

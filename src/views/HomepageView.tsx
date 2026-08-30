@@ -1,14 +1,19 @@
 import { memo } from 'react';
-import { APP_STRINGS } from '@/constants/strings';
+import { Home } from 'lucide-react';
+import { APP_STRINGS } from '@/constants';
+import { Card } from '@/components/Card';
+import type { ViewDefinition } from '@/types';
 
 // Renders the default homepage landing view card
 export const HomepageView = memo(() => (
-  <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-    <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
-      {APP_STRINGS.VIEWS.HOMEPAGE.HEADING_PAGE}
-    </h2>
-    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-      {APP_STRINGS.VIEWS.HOMEPAGE.TXT_DESCRIPTION}
-    </p>
-  </div>
+  <Card heading={APP_STRINGS.VIEWS.HOMEPAGE.HEADING_PAGE} description={APP_STRINGS.VIEWS.HOMEPAGE.TXT_DESCRIPTION} />
 ));
+
+// Colocated Homepage view routing metadata
+export const homepageView: ViewDefinition = {
+  id: APP_STRINGS.VIEWS.HOMEPAGE.NAV_ID,
+  title: APP_STRINGS.VIEWS.HOMEPAGE.NAV_TITLE,
+  hash: APP_STRINGS.VIEWS.HOMEPAGE.NAV_HASH,
+  icon: Home,
+  component: HomepageView,
+};

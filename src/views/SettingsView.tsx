@@ -1,14 +1,19 @@
 import { memo } from 'react';
-import { APP_STRINGS } from '@/constants/strings';
+import { Settings } from 'lucide-react';
+import { APP_STRINGS } from '@/constants';
+import { Card } from '@/components/Card';
+import type { ViewDefinition } from '@/types';
 
 // Renders the settings preferences view card
 export const SettingsView = memo(() => (
-  <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-    <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
-      {APP_STRINGS.VIEWS.SETTINGS.HEADING_PAGE}
-    </h2>
-    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-      {APP_STRINGS.VIEWS.SETTINGS.TXT_DESCRIPTION}
-    </p>
-  </div>
+  <Card heading={APP_STRINGS.VIEWS.SETTINGS.HEADING_PAGE} description={APP_STRINGS.VIEWS.SETTINGS.TXT_DESCRIPTION} />
 ));
+
+// Colocated Settings view routing metadata
+export const settingsView: ViewDefinition = {
+  id: APP_STRINGS.VIEWS.SETTINGS.NAV_ID,
+  title: APP_STRINGS.VIEWS.SETTINGS.NAV_TITLE,
+  hash: APP_STRINGS.VIEWS.SETTINGS.NAV_HASH,
+  icon: Settings,
+  component: SettingsView,
+};

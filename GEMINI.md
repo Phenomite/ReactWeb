@@ -1,4 +1,4 @@
-# AGENTS.md
+# GEMINI.md
 
 This repository contains a modern React web application scaffolded with Vite 8, React 19,
 Tailwind CSS v4, Lucide React icons, and TypeScript.
@@ -24,14 +24,13 @@ ReactWeb/
 ├── public/
 │   └── vite.svg               # Application favicon
 ├── src/
-│   ├── components/            # Modular UI components
-│   │   ├── Sidebar.tsx        # Aside sidebar (w-72), Cuboid heading & theme switch
+│   ├── components/            # Reusable UI components
+│   │   ├── Button.tsx         # Accessible interactive button with variant & tactile feedback
+│   │   ├── Card.tsx           # Standard surface card container with heading & icon badge
 │   │   ├── Header.tsx         # Main header with matching height, theme toggle & auth button
-│   │   └── MainContent.tsx    # Main body section container
-│   ├── constants/             # Centralized constants & view definitions
-│   │   ├── auth.ts            # Extensible user credential registry & salts
-│   │   ├── strings.ts         # Centralized application string constants
-│   │   └── views.ts           # Centralized views array & navigation helpers
+│   │   ├── InputField.tsx     # Accessible form input with icon prefix & dark focus styles
+│   │   ├── ThemeSwitch.tsx    # Accessible dark mode toggle switch control
+│   │   └── UserBadge.tsx      # Authenticated user identity badge with shield icon
 │   ├── context/               # React Context providers & hooks
 │   │   └── AuthContext.tsx    # AuthProvider & useAuth hook implementation
 │   ├── hooks/                 # Reusable custom React hooks
@@ -39,23 +38,23 @@ ReactWeb/
 │   │   └── useHashRouting.ts  # URL hash routing & navigation synchronization
 │   ├── lib/                   # Libraries & helper utilities
 │   │   ├── crypto.ts          # Pure PBKDF2-HMAC-SHA256 & constant-time crypto
-│   │   └── utils.ts           # Class merge utility (cn helper)
-│   ├── types/                 # Shared TypeScript interfaces & types
-│   │   ├── auth.ts            # Auth context & user credential record types
-│   │   └── views.ts           # View definitions & navigation types
-│   ├── views/                 # Pure view components
-│   │   ├── HomepageView.tsx   # Default landing view (#homepage)
-│   │   ├── SettingsView.tsx   # Settings view (#settings)
-│   │   ├── DebugView.tsx      # Protected diagnostics view (#debug)
-│   │   └── LoginView.tsx      # Authentication view (#login) with reset action
+│   │   └── utils.ts           # Class merge utility (cn helper with clsx & twMerge)
+│   ├── views/                 # View components & layout views
+│   │   ├── HomepageView.tsx   # Default landing view (#homepage) & view metadata
+│   │   ├── SettingsView.tsx   # Settings view (#settings) & view metadata
+│   │   ├── DebugView.tsx      # Protected diagnostics view (#debug) & view metadata
+│   │   ├── LoginView.tsx      # Authentication view (#login) & view metadata
+│   │   ├── Sidebar.tsx        # Aside sidebar view (w-72), Cuboid heading & navigation
+│   │   └── views.ts           # Aggregated view registry & navigation lookup helpers
 │   ├── vite-env.d.ts          # Vite client type definitions
 │   ├── App.tsx                # 4-container layout, custom hooks integration
+│   ├── constants.ts           # Centralized constants & user registry
 │   ├── index.css              # Tailwind CSS v4 import & root styles
-│   └── main.tsx               # React root DOM mount
+│   ├── main.tsx               # React root DOM mount
+│   └── types.ts               # Shared TypeScript interfaces & types
 ├── .editorconfig              # Editor configuration
 ├── .markdownlint.yaml         # Markdownlint configuration (120 char max line length)
-├── AGENTS.md                  # Project instructions & guidelines
-├── gemini.md                  # Symlink/hardlink to AGENTS.md
+├── GEMINI.md                  # Project instructions & guidelines
 ├── index.html                 # HTML entry point
 ├── package.json               # Package dependencies & scripts
 ├── tsconfig.json              # Consolidated TypeScript configuration with @/* paths
@@ -78,6 +77,21 @@ Use `pnpm` to run scripts:
 
 ---
 
+## 🧭 Path Anchoring & Module Resolution
+
+1. **Vite 8 Base & Alias Configuration**:
+   - `vite.config.ts` sets `base: './'` for flexible hosting environments.
+   - Resolves `@` using `new URL('./src', import.meta.url).pathname` without importing `node:url` or `path`.
+
+2. **TypeScript Path Anchoring**:
+   - `tsconfig.json` uses `"paths": { "@/*": ["./src/*"] }` without deprecated `baseUrl`.
+
+3. **Direct Imports & No Barrel Indirection**:
+   - Avoid `index.ts` barrel files and compatibility re-exports.
+   - All modules import directly via `@/*` aliases (e.g. `@/context/AuthContext`, `@/constants`).
+
+---
+
 ## 📐 Layout Architecture (4 Containers)
 
 1. **Top-Left Heading (Container 1)**:
@@ -87,7 +101,7 @@ Use `pnpm` to run scripts:
 2. **Aside Sidebar (Container 2)**:
    - Fixed width of `w-72` on desktop viewports and a collapsible drawer overlay on mobile.
    - Houses the view navigation buttons without extra section headings.
-   - Dynamically hides `#login` and exposes `#debug` when authenticated.
+   - Dynamically exposes `#debug` when authenticated. Login is accessed via the header action button.
    - Pinned at the bottom is an accessible on/off switch toggle for dark mode.
 
 3. **Main Header (Container 3)**:
@@ -102,13 +116,13 @@ Use `pnpm` to run scripts:
 
 ## 🧭 Views & Anchor Routing Paradigm
 
-1. **Adding New Views**:
-   - Create a view component in `src/views/` using named exports (e.g. `export const MyView = memo(...)`).
-   - Add view metadata and strings to `src/constants/strings.ts`.
-   - Register the view in `src/constants/views.ts` within the `APP_VIEWS` array with its title, hash, and icon.
+1. **Colocated Views**:
+   - Create a view component in `src/views/` (e.g. `MyView.tsx`) exporting both the component and its `ViewDefinition` object.
+   - Register the view definition in `src/views/views.ts` within the `APP_VIEWS` array.
    - For protected views, set `requiresAuth: true`.
    - For guest-only views, set `hideWhenAuth: true`.
-   - The view automatically appears in the sidebar and routes via its anchor.
+   - To hide standalone views (such as Login) from the sidebar list, set `hideInSidebar: true`.
+   - Registered views route via their anchor hash (e.g. `#homepage`, `#login`, `#debug`).
 
 2. **Anchor Routing & Authentication**:
    - The active view is synchronized with the browser's URL hash (e.g. `#homepage`).
@@ -116,8 +130,9 @@ Use `pnpm` to run scripts:
    - Client-side cryptographic verification uses PBKDF2-HMAC-SHA256 (100,000 iterations) via Web Crypto API.
    - Credential verification uses constant-time byte comparisons and dummy key derivation to mitigate timing attacks.
    - Supports an extensible user registry (`AUTH_USER_REGISTRY`) with `root` configured as the primary administrator.
-   - Signing in via `#login` unlocks and exposes the `#debug` view in the sidebar while hiding `#login`.
+   - Signing in via `#login` unlocks and exposes the `#debug` view in the sidebar.
    - Sessions are signed with cryptographic SHA-256 signatures, preventing users from forging boolean flags in storage.
+   - Sessions are valid for 7 days (`AUTH_SESSION_DURATION_MS = 604,800,000 ms`).
 
 ---
 
@@ -153,8 +168,19 @@ Use `pnpm` to run scripts:
    - Use standard ASCII hyphens (`-`) exclusively in comments and text (never em-dashes `—` or en-dashes `–`).
    - Comments must describe the concrete runtime *behavior* of the code rather than subjective intents.
 
-4. **Strings**:
-   - All text constants, titles, descriptions, accessibility labels, and storage keys reside in `src/constants/strings.ts`.
+4. **Strings & Component-First Naming Taxonomy**:
+   - Application strings and constants reside in `src/constants.ts`.
+   - All constant keys use uppercase format (`APP_STRINGS.SECTION.KEY`).
+   - Constants follow component-first prefixes:
+     - `BTN_*`: Buttons and action triggers (`BTN_SUBMIT`, `BTN_LOGOUT`, `BTN_CLEAR_STORAGE`).
+     - `LABEL_*`: Input and status labels (`LABEL_USERNAME`, `LABEL_DARK_MODE`, `LABEL_AUTH_ACTIVE`).
+     - `INPUT_*`: Placeholders and field configurations (`INPUT_PLACEHOLDER_USERNAME`).
+     - `HEADING_*`: View headings and card titles (`HEADING_PAGE`, `HEADING_UNAUTHORIZED`).
+     - `TXT_*`: Instructional text, messages, and greetings (`TXT_DESCRIPTION`, `TXT_AUTH_NOTICE`).
+     - `NAV_*`: Navigation IDs, titles, and hash routes (`NAV_ID`, `NAV_TITLE`, `NAV_HASH`).
+     - `BADGE_*`: Default user badges (`BADGE_DEFAULT_USER`).
+     - `STORAGE_KEY_*`: Local storage keys (`STORAGE_KEY_SESSION`).
+   - Zero hardcoded usernames in generic UI strings; identities are dynamically resolved via `useAuth()`.
 
 ---
 
@@ -171,8 +197,8 @@ Use `pnpm` to run scripts:
    - All form inputs must specify explicit dark focus backgrounds (`dark:focus:bg-slate-900`) to prevent white-on-white.
    - Use standard `dark:` variant utilities (e.g., `dark:bg-slate-950 dark:text-slate-100`).
 
-3. **Class Merging**:
-   - Use the `cn(...)` utility in `src/lib/utils.ts` when combining conditional classes with external class names.
+3. **Class Merging (`cn` Utility)**:
+   - Use `cn(...)` from `@/lib/utils` combining `clsx` and `twMerge` for conditional classes and style overrides.
 
 4. **Icons**:
    - Prefer icons from `lucide-react`. Import individual icons to support optimal tree-shaking:
