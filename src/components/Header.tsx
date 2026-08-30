@@ -1,5 +1,5 @@
 import { memo, useCallback } from 'react';
-import { Menu, Moon, Sun, ShieldCheck, LogOut, LogIn } from 'lucide-react';
+import { Menu, Moon, Sun, LogOut, LogIn } from 'lucide-react';
 import { APP_STRINGS } from '@/strings';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/Button';
@@ -13,7 +13,7 @@ interface HeaderProps {
 
 // Renders the main top navigation bar matching the sidebar heading height (h-16)
 export const Header = memo(({ activeViewTitle, darkMode, onToggleDarkMode, onOpenSidebar }: HeaderProps) => {
-  const { isAuthenticated, username, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   const handleLogout = useCallback(() => {
     logout();
@@ -39,13 +39,6 @@ export const Header = memo(({ activeViewTitle, darkMode, onToggleDarkMode, onOpe
       </div>
 
       <div className="flex items-center gap-3">
-        {isAuthenticated && (
-          <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
-            <ShieldCheck className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" aria-hidden="true" />
-            <span>{username || APP_STRINGS.HEADER.BADGE_DEFAULT_USER}</span>
-          </span>
-        )}
-
         {/* Theme mode toggle button */}
         <button
           type="button"

@@ -109,7 +109,7 @@ Use `pnpm` to run scripts:
 
 3. **Main Header (Container 3)**:
    - Top section of the main container matching the sidebar header height (`h-16`).
-   - Displays the active view title, mobile sidebar toggle button, and authentication badge.
+   - Displays the active view title, mobile sidebar toggle button, and theme toggle.
    - Displays a Login button when unauthenticated, and a Logout button when authenticated, next to the theme toggle.
 
 4. **Main Body Section (Container 4)**:
