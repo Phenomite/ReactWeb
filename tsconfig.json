@@ -5,6 +5,7 @@
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
+    "preserveSymlinks": true,
 
     /* Bundler mode & Path anchoring */
     "moduleResolution": "bundler",
@@ -17,11 +18,18 @@
       "@/*": ["./src/*"]
     },
 
-    /* Linting */
+    /* Strict Type-Checking & Linting */
     "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true
   },
   "include": ["src", "vite.config.ts"]
 }

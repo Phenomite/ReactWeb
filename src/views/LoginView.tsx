@@ -1,4 +1,4 @@
-import { useState, useCallback, memo, type FormEvent, type ChangeEvent } from 'react';
+import { useState, useCallback, memo, type SubmitEvent, type ChangeEvent } from 'react';
 import { ShieldCheck, LogIn, LogOut, ArrowRight, User, Key, CheckCircle2, AlertCircle, RotateCcw } from 'lucide-react';
 import { APP_STRINGS } from '@/constants';
 import { useAuth } from '@/context/AuthContext';
@@ -19,7 +19,7 @@ export const LoginView = memo(() => {
   const handlePassChange = useCallback((e: ChangeEvent<HTMLInputElement>) => { setInputPass(e.target.value); setErrorMessage(null); }, []);
 
   // Submits credentials for PBKDF2 validation and redirects to debug on success
-  const handleSubmit = useCallback(async (e: FormEvent) => {
+  const handleSubmit = useCallback(async (e: SubmitEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage(null);

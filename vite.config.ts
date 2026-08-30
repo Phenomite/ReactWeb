@@ -20,13 +20,14 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Splits third-party modules into dedicated vendor chunks for caching
-        manualChunks(id: string) {
+        manualChunks(id: string): string | undefined {
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
             return 'vendor-react';
           }
           if (id.includes('node_modules/lucide-react')) {
             return 'vendor-icons';
           }
+          return undefined;
         },
       },
     },

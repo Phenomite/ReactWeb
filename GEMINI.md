@@ -11,7 +11,7 @@ Tailwind CSS v4, Lucide React icons, and TypeScript.
 - **Bundler & Build Tool**: [Vite 8](https://vite.dev/) (`vite`, `@vitejs/plugin-react`)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) via `@tailwindcss/vite`
 - **Icon Suite**: [Lucide React](https://lucide.dev/) (`lucide-react`)
-- **Language**: TypeScript (`strict` mode enabled, `@/*` path mapping)
+- **Language**: TypeScript (`strict` & `noUncheckedIndexedAccess` enabled, `@/*` path mapping)
 - **Package Manager**: [pnpm](https://pnpm.io/)
 - **Class Utilities**: `clsx`, `tailwind-merge`
 
@@ -71,7 +71,8 @@ Use `pnpm` to run scripts:
 | :--- | :--- |
 | `pnpm install` | Install all project dependencies |
 | `pnpm dev` | Launch the local Vite 8 development server with instant HMR |
-| `pnpm build` | Type-check with `tsc` and build production assets into `dist/` |
+| `pnpm run lint` | Type-check and lint whole TypeScript codebase with `tsc --noEmit` |
+| `pnpm build` | Run TypeScript lint check and build production assets into `dist/` |
 | `pnpm preview` | Locally preview the production build output |
 | `pnpm run md:lint` | Lint all markdown files with `markdownlint-cli2` |
 
@@ -156,19 +157,23 @@ Use `pnpm` to run scripts:
 
 ## ⚡ Performance & Code Hygiene
 
-1. **React Optimizations**:
+1. **Strict TypeScript & Type Checking**:
+   - Enabled maximum strict suite: `strict`, `noUncheckedIndexedAccess`, `noImplicitReturns`, `verbatimModuleSyntax`.
+   - Pre-build lint check (`pnpm run lint`) runs before every production bundle compilation.
+
+2. **React Optimizations**:
    - Wrap view components and layout containers in `React.memo`.
    - Wrap event handlers and navigation callbacks in `useCallback`.
    - Memoize context value objects in `src/context/AuthContext.tsx` with `useMemo`.
 
-2. **Bundle Optimization**:
+3. **Bundle Optimization**:
    - Configured `manualChunks` in `vite.config.ts` isolating `vendor-react` and `vendor-icons`.
 
-3. **Comment Standards**:
+4. **Comment Standards**:
    - Use standard ASCII hyphens (`-`) exclusively in comments and text (never em-dashes `—` or en-dashes `–`).
    - Comments must describe the concrete runtime *behavior* of the code rather than subjective intents.
 
-4. **Strings & Component-First Naming Taxonomy**:
+5. **Strings & Component-First Naming Taxonomy**:
    - Application strings and constants reside in `src/constants.ts`.
    - All constant keys use uppercase format (`APP_STRINGS.SECTION.KEY`).
    - Constants follow component-first prefixes:

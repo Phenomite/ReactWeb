@@ -12,7 +12,11 @@ export function hexToBytes(hex: string): Uint8Array {
 export function constantTimeEqual(a: Uint8Array, b: Uint8Array): boolean {
   if (a.length !== b.length) return false;
   let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+  for (let i = 0; i < a.length; i++) {
+    const byteA = a[i] ?? 0;
+    const byteB = b[i] ?? 0;
+    diff |= byteA ^ byteB;
+  }
   return diff === 0;
 }
 
@@ -29,7 +33,7 @@ export async function verifyCredentials(
   passInput: string,
   registry = AUTH_USER_REGISTRY
 ): Promise<UserCredentialRecord | null> {
-  const user = registry[userInput.trim().toLowerCase()] || null;
+  const user = registry[userInput.trim().toLowerCase()] ?? null;
   const salt = hexToBytes(user ? user.saltHex : DUMMY_SALT_HEX);
   const iters = user ? user.iterations : DUMMY_ITERATIONS;
   const derived = await deriveKey(passInput, salt, iters);
