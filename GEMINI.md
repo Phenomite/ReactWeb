@@ -58,6 +58,7 @@ ReactWeb/
 ├── GEMINI.md                  # Project instructions & guidelines
 ├── index.html                 # HTML entry point
 ├── package.json               # Package dependencies & scripts
+├── README.md                  # Project setup and quickstart guide
 ├── tsconfig.json              # Consolidated TypeScript configuration with @/* paths
 └── vite.config.ts             # Vite 8 configuration with React + Tailwind plugins
 ```
