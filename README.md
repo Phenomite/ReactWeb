@@ -1,6 +1,8 @@
-# React Web Application
+# Web Sloplication (ReactWeb)
 
 A modern React 19 web application built with Vite 8, Tailwind CSS v4, Lucide React icons, and TypeScript.
+
+Used to test agentic harnesses and models understanding of intent, behaviour, and design across multiple refactors.
 
 ## Prerequisites
 
