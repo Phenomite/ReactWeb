@@ -1,6 +1,6 @@
 # React Web Application
 
-A dummy ReactJS 19 webapp. Vite 8, Tailwind 4, Lucide 1, and TypeScript.
+A modern React 19 web application built with Vite 8, Tailwind CSS v4, Lucide React icons, and TypeScript.
 
 ## Prerequisites
 
@@ -31,3 +31,74 @@ A dummy ReactJS 19 webapp. Vite 8, Tailwind 4, Lucide 1, and TypeScript.
 | `pnpm build` | Run type-check and build production assets to `dist/` |
 | `pnpm preview` | Locally preview the production build output |
 | `pnpm run md:lint` | Lint all markdown files with markdownlint-cli2 |
+
+## Authentication Architecture
+
+The application implements a client-side cryptographic authentication system using the Web Crypto API.
+
+### Authentication Flow Diagram
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant LoginView as LoginView
+    participant AuthContext as AuthProvider
+    participant Crypto as crypto.ts (Web Crypto)
+    participant Storage as localStorage
+    participant Navigation as HashRouter / Views
+
+    User->>LoginView: Submits username & password
+    LoginView->>AuthContext: login(username, password)
+    AuthContext->>Crypto: verifyCredentials(username, password)
+
+    rect rgb(240, 248, 255)
+        Note over Crypto: 1. Normalize username & lookup in registry
+        Note over Crypto: 2. Fallback to dummy salt if user not found
+        Note over Crypto: 3. Derive key via PBKDF2-HMAC-SHA256 (100k iters)
+        Note over Crypto: 4. Constant-time byte equality comparison
+    end
+
+    Crypto-->>AuthContext: UserCredentialRecord (or null)
+
+    alt Invalid Credentials
+        AuthContext-->>LoginView: false
+        LoginView->>User: Displays invalid credentials alert
+    else Valid Credentials
+        AuthContext->>Crypto: createSession(user)
+        Crypto->>Crypto: generateSessionSignature(user, issuedAt, expiresAt, displayName)
+        Crypto-->>AuthContext: AuthSession { username, displayName, issuedAt, expiresAt, signature }
+        AuthContext->>Storage: setItem("app_auth_session", JSON.stringify(session))
+        AuthContext->>AuthContext: setIsAuthenticated(true), setUsername(displayName)
+        AuthContext-->>LoginView: true
+        LoginView->>Navigation: Navigate to #debug
+        Navigation->>User: Renders unlocked DebugView & reveals Admin navigation
+    end
+```
+
+### 1. Credential Verification (`src/lib/crypto.ts`)
+
+- **PBKDF2 Key Derivation**: Passwords are mathematically derived using PBKDF2-HMAC-SHA256 with 100,000 iterations
+  and per-user cryptographic salts.
+- **Timing Attack Mitigation**: Credential verification executes dummy key derivation (`DUMMY_SALT_HEX` and
+  `DUMMY_ITERATIONS`) on invalid or non-existent usernames. This guarantees uniform execution duration, preventing
+  user enumeration via timing analysis.
+- **Constant-Time Comparison**: Byte buffers are compared using bitwise XOR (`constantTimeEqual`) to prevent
+  early-exit timing leaks during hash comparisons.
+
+### 2. Tamper-Proof Session Management
+
+- **Cryptographic Signatures**: Upon successful verification, an `AuthSession` object is generated with a SHA-256
+  signature binding identity fields, credentials, and timestamps:
+  `user.username:displayName:saltHex:hashHex:issuedAt:expiresAt`.
+- **Expiration & Validation**: Sessions are valid for 7 days (`AUTH_SESSION_DURATION_MS = 604,800,000 ms`). On startup
+  and cross-tab storage events, `validateSession` verifies data structure, temporal bounds, and signature integrity
+  before authenticating. Any tampering or expiration purges the session.
+- **Multi-Tab Synchronization**: `AuthProvider` listens for window `storage` events to synchronize authentication
+  state across browser tabs in real-time.
+
+### 3. Protected Routing & Dynamic Navigation
+
+- **Anchor Hash Routing**: Views route via anchor hashes (e.g. `#homepage`, `#settings`, `#login`, `#debug`).
+- **Dynamic View Exposure**: Authenticated state unlocks protected views such as `#debug` (`requiresAuth: true`) in the
+  sidebar navigation. Direct hash navigation to protected views when unauthenticated renders an unauthorized banner.
