@@ -2,8 +2,14 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
-// Configures Vite plugins and production build chunking
+// Configures Vite plugins, base path, resolve aliases, and build chunking
 export default defineConfig({
+  base: './',
+  resolve: {
+    alias: {
+      '@': new URL('./src', import.meta.url).pathname,
+    },
+  },
   plugins: [
     react(),
     tailwindcss(),
