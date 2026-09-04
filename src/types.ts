@@ -45,3 +45,41 @@ export interface ViewDefinition {
   hideInSidebar?: boolean;
 }
 
+// Toast notification message format
+export type ToastType = 'info' | 'success' | 'warning' | 'error';
+
+export interface ToastMessage {
+  id: string;
+  title: string;
+  description?: string | undefined;
+  type: ToastType;
+  durationMs?: number | undefined;
+}
+
+// Toast notification context state and triggers
+export interface ToastContextType {
+  toasts: ToastMessage[];
+  showToast: (title: string, options?: { description?: string; type?: ToastType; durationMs?: number }) => string;
+  dismissToast: (id: string) => void;
+}
+
+// Curated accent color identifiers
+export type AccentColor = 'blue' | 'violet' | 'emerald' | 'rose' | 'amber';
+
+export interface AccentOption {
+  id: AccentColor;
+  label: string;
+  colorHex: string;
+  activeClass: string;
+}
+
+// Command palette searchable action item
+export interface CommandItem {
+  id: string;
+  title: string;
+  category: string;
+  icon: ComponentType<{ className?: string }>;
+  action: () => void;
+  shortcut?: string;
+}
+

@@ -2,6 +2,7 @@ import { useCallback, memo } from 'react';
 import { Bug, ShieldAlert, Cpu, Terminal, RefreshCw, LogOut, CheckCircle2 } from 'lucide-react';
 import { APP_STRINGS } from '@/strings';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { cn } from '@/lib/utils';
@@ -18,10 +19,19 @@ const MetricRow = ({ label, value, isLast = false, valueClassName }: { label: st
 // Protected view displaying runtime environment diagnostics and application state
 export const DebugView = memo(() => {
   const { isAuthenticated, username, logout } = useAuth();
+  const { showToast } = useToast();
 
   const handleGoToLogin = useCallback(() => { window.location.hash = APP_STRINGS.VIEWS.LOGIN.NAV_HASH; }, []);
-  const handleLogout = useCallback(() => { logout(); window.location.hash = APP_STRINGS.VIEWS.HOMEPAGE.NAV_HASH; }, [logout]);
-  const handleClearStorage = useCallback(() => { localStorage.clear(); window.location.reload(); }, []);
+  const handleLogout = useCallback(() => {
+    logout();
+    showToast(APP_STRINGS.TOAST.TXT_LOGGED_OUT, { type: 'info' });
+    window.location.hash = APP_STRINGS.VIEWS.HOMEPAGE.NAV_HASH;
+  }, [logout, showToast]);
+  const handleClearStorage = useCallback(() => {
+    localStorage.clear();
+    showToast(APP_STRINGS.TOAST.TXT_STORAGE_CLEARED, { type: 'info' });
+    window.location.reload();
+  }, [showToast]);
 
   if (!isAuthenticated) {
     return (
