@@ -2,6 +2,7 @@ import { useState, useCallback, memo, type SubmitEvent, type ChangeEvent } from 
 import { ShieldCheck, LogIn, LogOut, ArrowRight, User, Key, CheckCircle2, AlertCircle, RotateCcw } from 'lucide-react';
 import { APP_STRINGS } from '@/strings';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 import { Card } from '@/components/Card';
 import { InputField } from '@/components/InputField';
 import { Button } from '@/components/Button';
@@ -10,6 +11,7 @@ import type { ViewDefinition } from '@/types';
 // Renders the authentication form and active user session card
 export const LoginView = memo(() => {
   const { isAuthenticated, username, login, logout } = useAuth();
+  const { showToast } = useToast();
   const [inputUser, setInputUser] = useState('');
   const [inputPass, setInputPass] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -25,13 +27,26 @@ export const LoginView = memo(() => {
     setErrorMessage(null);
     const success = await login(inputUser, inputPass);
     setIsLoading(false);
-    if (success) window.location.hash = APP_STRINGS.VIEWS.DEBUG.NAV_HASH;
-    else setErrorMessage(APP_STRINGS.VIEWS.LOGIN.TXT_INVALID_CREDENTIALS);
-  }, [inputUser, inputPass, login]);
+    if (success) {
+      showToast(APP_STRINGS.TOAST.TXT_LOGGED_IN, { type: 'success' });
+      window.location.hash = APP_STRINGS.VIEWS.DEBUG.NAV_HASH;
+    } else {
+      setErrorMessage(APP_STRINGS.VIEWS.LOGIN.TXT_INVALID_CREDENTIALS);
+    }
+  }, [inputUser, inputPass, login, showToast]);
 
-  const handleLogout = useCallback(() => { logout(); window.location.hash = APP_STRINGS.VIEWS.HOMEPAGE.NAV_HASH; }, [logout]);
+  const handleLogout = useCallback(() => {
+    logout();
+    showToast(APP_STRINGS.TOAST.TXT_LOGGED_OUT, { type: 'info' });
+    window.location.hash = APP_STRINGS.VIEWS.HOMEPAGE.NAV_HASH;
+  }, [logout, showToast]);
+
   const handleGoToDebug = useCallback(() => { window.location.hash = APP_STRINGS.VIEWS.DEBUG.NAV_HASH; }, []);
-  const handleClearStorage = useCallback(() => { localStorage.clear(); window.location.reload(); }, []);
+  const handleClearStorage = useCallback(() => {
+    localStorage.clear();
+    showToast(APP_STRINGS.TOAST.TXT_STORAGE_CLEARED, { type: 'info' });
+    window.location.reload();
+  }, [showToast]);
 
   // Renders authenticated session status card
   if (isAuthenticated) {

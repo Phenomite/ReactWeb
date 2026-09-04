@@ -1,24 +1,66 @@
 import { useState, useCallback } from 'react';
 import { Sidebar } from '@/views/Sidebar';
 import { Header } from '@/components/Header';
+import { CommandPalette } from '@/components/CommandPalette';
+import { ShortcutsModal } from '@/components/ShortcutsModal';
+import { ToastContainer } from '@/components/ToastContainer';
 import { AuthProvider } from '@/context/AuthContext';
+import { AccentProvider, useAccent } from '@/context/AccentContext';
+import { ToastProvider, useToast } from '@/context/ToastContext';
 import { useTheme } from '@/hooks/useTheme';
 import { useHashRouting } from '@/hooks/useHashRouting';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { APP_STRINGS } from '@/strings';
 import type { ViewDefinition } from '@/types';
 
-// Renders the 4-container application layout shell
+// Renders the 4-container application layout shell with delight features
 function AppLayout() {
   const { darkMode, toggleDarkMode } = useTheme();
+  const { accent, setAccent } = useAccent();
+  const { showToast } = useToast();
   const { activeView, navigateToView } = useHashRouting();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [shortcutsModalOpen, setShortcutsModalOpen] = useState(false);
 
   const handleOpenSidebar = useCallback(() => setSidebarOpen(true), []);
   const handleCloseSidebar = useCallback(() => setSidebarOpen(false), []);
 
-  const handleSelectView = useCallback((view: ViewDefinition) => {
-    navigateToView(view);
-    setSidebarOpen(false);
-  }, [navigateToView]);
+  const handleOpenCommandPalette = useCallback(() => setCommandPaletteOpen(true), []);
+  const handleCloseCommandPalette = useCallback(() => setCommandPaletteOpen(false), []);
+
+  const handleOpenShortcuts = useCallback(() => setShortcutsModalOpen(true), []);
+  const handleCloseShortcuts = useCallback(() => setShortcutsModalOpen(false), []);
+
+  const handleToggleDarkMode = useCallback(() => {
+    toggleDarkMode();
+    showToast(
+      darkMode ? APP_STRINGS.TOAST.TXT_THEME_LIGHT : APP_STRINGS.TOAST.TXT_THEME_DARK,
+      { type: 'info' }
+    );
+  }, [darkMode, toggleDarkMode, showToast]);
+
+  const handleSelectView = useCallback(
+    (view: ViewDefinition) => {
+      navigateToView(view);
+      setSidebarOpen(false);
+    },
+    [navigateToView]
+  );
+
+  // Wire global keyboard shortcuts
+  useKeyboardShortcuts({
+    onToggleCommandPalette: useCallback(
+      () => setCommandPaletteOpen((prev) => !prev),
+      []
+    ),
+    onToggleShortcutsModal: useCallback(
+      () => setShortcutsModalOpen((prev) => !prev),
+      []
+    ),
+    onToggleDarkMode: handleToggleDarkMode,
+  });
 
   const ActiveComponent = activeView.component;
 
@@ -29,7 +71,7 @@ function AppLayout() {
         isOpen={sidebarOpen}
         onClose={handleCloseSidebar}
         darkMode={darkMode}
-        onToggleDarkMode={toggleDarkMode}
+        onToggleDarkMode={handleToggleDarkMode}
         activeViewId={activeView.id}
         onSelectView={handleSelectView}
       />
@@ -40,8 +82,10 @@ function AppLayout() {
         <Header
           activeViewTitle={activeView.title}
           darkMode={darkMode}
-          onToggleDarkMode={toggleDarkMode}
+          onToggleDarkMode={handleToggleDarkMode}
           onOpenSidebar={handleOpenSidebar}
+          onOpenCommandPalette={handleOpenCommandPalette}
+          onOpenShortcuts={handleOpenShortcuts}
         />
 
         {/* Container 4: Main Body View Section */}
@@ -49,6 +93,25 @@ function AppLayout() {
           <ActiveComponent />
         </main>
       </div>
+
+      {/* Global Command Palette Modal */}
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={handleCloseCommandPalette}
+        darkMode={darkMode}
+        onToggleDarkMode={handleToggleDarkMode}
+        currentAccent={accent}
+        onSelectAccent={setAccent}
+      />
+
+      {/* Global Keyboard Shortcuts Cheatsheet Modal */}
+      <ShortcutsModal
+        isOpen={shortcutsModalOpen}
+        onClose={handleCloseShortcuts}
+      />
+
+      {/* Floating Accessible Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 }
@@ -57,7 +120,11 @@ function AppLayout() {
 export function App() {
   return (
     <AuthProvider>
-      <AppLayout />
+      <AccentProvider>
+        <ToastProvider>
+          <AppLayout />
+        </ToastProvider>
+      </AccentProvider>
     </AuthProvider>
   );
 }

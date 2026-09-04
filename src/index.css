@@ -5,5 +5,64 @@
 @layer base {
   :root {
     color-scheme: light dark;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-soft: rgba(37, 99, 235, 0.1);
+    --accent-ring: rgba(37, 99, 235, 0.4);
   }
+
+  [data-accent="blue"] {
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-soft: rgba(37, 99, 235, 0.12);
+    --accent-ring: rgba(37, 99, 235, 0.4);
+  }
+
+  [data-accent="violet"] {
+    --accent: #7c3aed;
+    --accent-hover: #6d28d9;
+    --accent-soft: rgba(124, 58, 237, 0.12);
+    --accent-ring: rgba(124, 58, 237, 0.4);
+  }
+
+  [data-accent="emerald"] {
+    --accent: #059669;
+    --accent-hover: #047857;
+    --accent-soft: rgba(5, 150, 105, 0.12);
+    --accent-ring: rgba(5, 150, 105, 0.4);
+  }
+
+  [data-accent="rose"] {
+    --accent: #e11d48;
+    --accent-hover: #be123c;
+    --accent-soft: rgba(225, 29, 72, 0.12);
+    --accent-ring: rgba(225, 29, 72, 0.4);
+  }
+
+  [data-accent="amber"] {
+    --accent: #d97706;
+    --accent-hover: #b45309;
+    --accent-soft: rgba(217, 119, 6, 0.12);
+    --accent-ring: rgba(217, 119, 6, 0.4);
+  }
+}
+
+.bg-accent {
+  background-color: var(--accent);
+}
+
+.hover\:bg-accent-hover:hover {
+  background-color: var(--accent-hover);
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.border-accent {
+  border-color: var(--accent);
+}
+
+.bg-accent-soft {
+  background-color: var(--accent-soft);
 }
