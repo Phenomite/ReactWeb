@@ -12,10 +12,14 @@ import {
   Trash2,
   Palette,
   X,
+  Shield,
+  Download,
+  Sparkles,
 } from 'lucide-react';
 import { APP_STRINGS } from '@/strings';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
+import { useSecurityIncidents } from '@/context/SecurityIncidentContext';
 import { ACCENT_OPTIONS } from '@/constants';
 import { cn } from '@/lib/utils';
 import type { CommandItem, AccentColor } from '@/types';
@@ -40,6 +44,7 @@ export const CommandPalette = memo(({
 }: CommandPaletteProps) => {
   const { isAuthenticated, logout } = useAuth();
   const { showToast } = useToast();
+  const { exportSentinelLog, simulateThreatSignal } = useSecurityIncidents();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -89,6 +94,14 @@ export const CommandPalette = memo(({
         icon: Home,
         shortcut: 'G H',
         action: () => navigateTo(APP_STRINGS.VIEWS.HOMEPAGE.NAV_HASH),
+      },
+      {
+        id: 'nav-microsoft',
+        title: APP_STRINGS.VIEWS.MICROSOFT.NAV_TITLE,
+        category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_NAVIGATION,
+        icon: Shield,
+        shortcut: 'G M',
+        action: () => navigateTo(APP_STRINGS.VIEWS.MICROSOFT.NAV_HASH),
       },
       {
         id: 'nav-settings',
@@ -178,6 +191,28 @@ export const CommandPalette = memo(({
     }
 
     list.push({
+      id: 'action-export-sentinel',
+      title: 'Export Microsoft Sentinel Security Log',
+      category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_ACTIONS,
+      icon: Download,
+      action: () => {
+        exportSentinelLog();
+        onClose();
+      },
+    });
+
+    list.push({
+      id: 'action-simulate-threat',
+      title: 'Simulate Defender Security Alert',
+      category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_ACTIONS,
+      icon: Sparkles,
+      action: () => {
+        simulateThreatSignal();
+        onClose();
+      },
+    });
+
+    list.push({
       id: 'action-clear-storage',
       title: 'Reset Local Storage Cache',
       category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_ACTIONS,
@@ -198,6 +233,8 @@ export const CommandPalette = memo(({
     handleCopyUrl,
     logout,
     handleClearStorage,
+    exportSentinelLog,
+    simulateThreatSignal,
   ]);
 
   // Filter commands by search query

@@ -4,6 +4,7 @@ import { APP_STRINGS } from '@/strings';
 import { getVisibleViews } from '@/views/views';
 import type { ViewDefinition } from '@/types';
 import { useAuth } from '@/context/AuthContext';
+import { useSecurityIncidents } from '@/context/SecurityIncidentContext';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
 import { UserBadge } from '@/components/UserBadge';
 import { Button } from '@/components/Button';
@@ -37,7 +38,17 @@ const SidebarHeader = memo(({ onClose }: { onClose: () => void }) => (
 ));
 
 // Sidebar navigation button item with active state and badge
-const SidebarNavItem = memo(({ view, isActive, onSelect }: { view: ViewDefinition; isActive: boolean; onSelect: (v: ViewDefinition) => void }) => {
+const SidebarNavItem = memo(({
+  view,
+  isActive,
+  onSelect,
+  unresolvedCount,
+}: {
+  view: ViewDefinition;
+  isActive: boolean;
+  onSelect: (v: ViewDefinition) => void;
+  unresolvedCount?: number;
+}) => {
   const Icon = view.icon;
   return (
     <button
@@ -61,6 +72,11 @@ const SidebarNavItem = memo(({ view, isActive, onSelect }: { view: ViewDefinitio
           ADMIN
         </span>
       )}
+      {view.id === 'microsoft' && unresolvedCount !== undefined && unresolvedCount > 0 && (
+        <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">
+          {unresolvedCount}
+        </span>
+      )}
     </button>
   );
 });
@@ -68,6 +84,7 @@ const SidebarNavItem = memo(({ view, isActive, onSelect }: { view: ViewDefinitio
 // Main sidebar container rendering header, view navigation, user identity badge, and theme switch
 export const Sidebar = memo(({ isOpen, onClose, darkMode, onToggleDarkMode, activeViewId, onSelectView }: SidebarProps) => {
   const { isAuthenticated, username, role, logout } = useAuth();
+  const { unresolvedCount } = useSecurityIncidents();
   const visibleViews = getVisibleViews(isAuthenticated);
 
   const handleLogout = useCallback(() => {
@@ -93,7 +110,13 @@ export const Sidebar = memo(({ isOpen, onClose, darkMode, onToggleDarkMode, acti
         <SidebarHeader onClose={onClose} />
         <nav aria-label={APP_STRINGS.SIDEBAR.NAV_MAIN_ARIA_LABEL} className="flex-1 space-y-1 overflow-y-auto p-4">
           {visibleViews.map((view) => (
-            <SidebarNavItem key={view.id} view={view} isActive={activeViewId === view.id} onSelect={onSelectView} />
+            <SidebarNavItem
+              key={view.id}
+              view={view}
+              isActive={activeViewId === view.id}
+              onSelect={onSelectView}
+              unresolvedCount={unresolvedCount}
+            />
           ))}
         </nav>
         <div className="shrink-0 space-y-3 border-t border-slate-200 p-4 dark:border-slate-800">

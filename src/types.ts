@@ -83,3 +83,45 @@ export interface CommandItem {
   shortcut?: string;
 }
 
+// Security incident severity levels and lifecycle status
+export type IncidentSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info';
+export type IncidentStatus = 'active' | 'investigating' | 'resolved';
+
+// Client-side security incident telemetry record
+export interface SecurityIncident {
+  id: string;
+  title: string;
+  severity: IncidentSeverity;
+  status: IncidentStatus;
+  category: string;
+  source: string;
+  timestamp: number;
+  description: string;
+  recommendation: string;
+}
+
+// MSRC Vulnerability and CVE advisory record
+export interface MsrcAdvisory {
+  cveId: string;
+  title: string;
+  severity: 'Critical' | 'High' | 'Medium';
+  cvssScore: number;
+  affectedProduct: string;
+  publishedDate: string;
+  description: string;
+  mitigation: string;
+  kbArticle: string;
+  isZeroDay: boolean;
+}
+
+// Security incident context state and methods
+export interface SecurityIncidentContextType {
+  incidents: SecurityIncident[];
+  unresolvedCount: number;
+  logIncident: (incident: Omit<SecurityIncident, 'id' | 'timestamp'>) => void;
+  updateStatus: (id: string, status: IncidentStatus) => void;
+  simulateThreatSignal: () => void;
+  exportSentinelLog: () => void;
+}
+
+

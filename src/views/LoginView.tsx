@@ -3,6 +3,7 @@ import { ShieldCheck, LogIn, LogOut, ArrowRight, User, Key, CheckCircle2, AlertC
 import { APP_STRINGS } from '@/strings';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
+import { useSecurityIncidents } from '@/context/SecurityIncidentContext';
 import { Card } from '@/components/Card';
 import { InputField } from '@/components/InputField';
 import { Button } from '@/components/Button';
@@ -12,6 +13,7 @@ import type { ViewDefinition } from '@/types';
 export const LoginView = memo(() => {
   const { isAuthenticated, username, login, logout } = useAuth();
   const { showToast } = useToast();
+  const { logIncident } = useSecurityIncidents();
   const [inputUser, setInputUser] = useState('');
   const [inputPass, setInputPass] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -31,9 +33,18 @@ export const LoginView = memo(() => {
       showToast(APP_STRINGS.TOAST.TXT_LOGGED_IN, { type: 'success' });
       window.location.hash = APP_STRINGS.VIEWS.DEBUG.NAV_HASH;
     } else {
+      logIncident({
+        title: 'Authentication Attempt Rejected',
+        severity: 'medium',
+        status: 'active',
+        category: 'Identity & Access',
+        source: 'PBKDF2 Web Crypto Engine',
+        description: `Failed login attempt for username "${inputUser}" with invalid credentials.`,
+        recommendation: 'Verify user credentials or investigate potential brute-force activity.',
+      });
       setErrorMessage(APP_STRINGS.VIEWS.LOGIN.TXT_INVALID_CREDENTIALS);
     }
-  }, [inputUser, inputPass, login, showToast]);
+  }, [inputUser, inputPass, login, showToast, logIncident]);
 
   const handleLogout = useCallback(() => {
     logout();

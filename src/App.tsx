@@ -7,6 +7,7 @@ import { ToastContainer } from '@/components/ToastContainer';
 import { AuthProvider } from '@/context/AuthContext';
 import { AccentProvider, useAccent } from '@/context/AccentContext';
 import { ToastProvider, useToast } from '@/context/ToastContext';
+import { SecurityIncidentProvider } from '@/context/SecurityIncidentContext';
 import { useTheme } from '@/hooks/useTheme';
 import { useHashRouting } from '@/hooks/useHashRouting';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -122,7 +123,9 @@ export function App() {
     <AuthProvider>
       <AccentProvider>
         <ToastProvider>
-          <AppLayout />
+          <SecurityIncidentProvider>
+            <AppLayout />
+          </SecurityIncidentProvider>
         </ToastProvider>
       </AccentProvider>
     </AuthProvider>

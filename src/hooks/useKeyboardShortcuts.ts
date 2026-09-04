@@ -71,6 +71,9 @@ export function useKeyboardShortcuts({
         if (nextKey === 'h') {
           e.preventDefault();
           window.location.hash = APP_STRINGS.VIEWS.HOMEPAGE.NAV_HASH;
+        } else if (nextKey === 'm') {
+          e.preventDefault();
+          window.location.hash = APP_STRINGS.VIEWS.MICROSOFT.NAV_HASH;
         } else if (nextKey === 's') {
           e.preventDefault();
           window.location.hash = APP_STRINGS.VIEWS.SETTINGS.NAV_HASH;

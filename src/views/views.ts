@@ -1,11 +1,12 @@
 import { homepageView } from '@/views/HomepageView';
+import { microsoftView } from '@/views/MicrosoftView';
 import { settingsView } from '@/views/SettingsView';
 import { debugView } from '@/views/DebugView';
 import { loginView } from '@/views/LoginView';
 import type { ViewDefinition } from '@/types';
 
 // Central view registry aggregating all colocated view definitions
-export const APP_VIEWS: ViewDefinition[] = [homepageView, settingsView, debugView, loginView];
+export const APP_VIEWS: ViewDefinition[] = [homepageView, microsoftView, settingsView, debugView, loginView];
 
 export const DEFAULT_VIEW = homepageView;
 
