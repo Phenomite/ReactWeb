@@ -8,6 +8,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { AccentProvider, useAccent } from '@/context/AccentContext';
 import { ToastProvider, useToast } from '@/context/ToastContext';
 import { SecurityIncidentProvider } from '@/context/SecurityIncidentContext';
+import { HeaderSlotProvider } from '@/context/HeaderSlotContext';
 import { useTheme } from '@/hooks/useTheme';
 import { useHashRouting } from '@/hooks/useHashRouting';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -124,7 +125,9 @@ export function App() {
       <AccentProvider>
         <ToastProvider>
           <SecurityIncidentProvider>
-            <AppLayout />
+            <HeaderSlotProvider>
+              <AppLayout />
+            </HeaderSlotProvider>
           </SecurityIncidentProvider>
         </ToastProvider>
       </AccentProvider>

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, memo } from 'react';
+import { useState, useMemo, useCallback, useEffect, memo } from 'react';
 import {
   Shield,
   ShieldCheck,
@@ -22,6 +22,7 @@ import { TenantCard } from '@/components/TenantCard';
 import { TenantLeaderboardChart } from '@/components/TenantLeaderboardChart';
 import { TenantDetailModal } from '@/components/TenantDetailModal';
 import { useToast } from '@/context/ToastContext';
+import { useHeaderSlot } from '@/context/HeaderSlotContext';
 import { APP_STRINGS } from '@/strings';
 import { cn } from '@/lib/utils';
 import rawTenantsData from '@/data/tenants.json';
@@ -38,6 +39,7 @@ const ALL_TENANTS = rawTenantsData as TenantRecord[];
 // Renders the gamified Microsoft Secure Score multi-tenant leaderboard
 export const MicrosoftView = memo(() => {
   const { showToast } = useToast();
+  const { setHeaderSlot } = useHeaderSlot();
   const m = APP_STRINGS.VIEWS.MICROSOFT;
 
   // View state & tab selection
@@ -194,173 +196,194 @@ export const MicrosoftView = memo(() => {
     });
   }, [processedTenants, showToast, m.TXT_EXPORT_SUCCESS]);
 
+  // Synchronize view title and export button with main application header slot
+  useEffect(() => {
+    setHeaderSlot({
+      title: m.HEADING_PAGE,
+      actions: (
+        <Button onClick={handleExportData} icon={Download} variant="secondary" className="h-9 py-1 text-xs">
+          <span className="hidden sm:inline">{m.BTN_EXPORT_TENANTS}</span>
+          <span className="sm:hidden">Export</span>
+        </Button>
+      ),
+    });
+    return () => {
+      setHeaderSlot(null);
+    };
+  }, [setHeaderSlot, handleExportData, m.HEADING_PAGE, m.BTN_EXPORT_TENANTS]);
+
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <Card
-        heading={m.HEADING_PAGE}
-        description={m.TXT_DESCRIPTION}
-        icon={Shield}
-        headerRight={
+      {/* Side-by-Side Posture Overview (Left) & Top 4 Leaderboard (Right) */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+        {/* Left Column: Posture Overview (Vertically Aligned, Tight Height) */}
+        <div className="flex flex-col space-y-2.5 lg:col-span-5">
           <div className="flex items-center gap-2">
-            <Button onClick={handleExportData} icon={Download} variant="secondary">
-              {m.BTN_EXPORT_TENANTS}
-            </Button>
+            <Shield className="h-4 w-4 text-blue-500" aria-hidden="true" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              {m.HEADING_OVERVIEW_POSTURE}
+            </h3>
           </div>
-        }
-      />
 
-      {/* Gamification KPI Stats Grid */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {/* Metric 1: Global Average */}
-        <Card className="p-4">
-          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-            {m.HEADING_GLOBAL_AVERAGE}
-          </span>
-          <div className="mt-1 flex items-baseline gap-2">
-            <p className="text-2xl font-black text-slate-900 dark:text-white">
-              {globalKpis.avgScore}%
-            </p>
-            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-              Across 200 Tenants
-            </span>
+          <div className="flex flex-col space-y-2">
+            {/* Tile 1: Total Tenants */}
+            <Card className="flex items-center justify-between p-3 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
+              <div>
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                  {m.HEADING_MANAGED_COUNT}
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="font-mono text-xl font-black text-slate-900 dark:text-white">
+                  {ALL_TENANTS.length}
+                </span>
+              </div>
+            </Card>
+
+
+            {/* Tile 2: All Average */}
+            <Card className="flex items-center justify-between p-3 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
+              <div>
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                  {m.HEADING_GLOBAL_AVERAGE}
+                </span>
+                <p className="text-[10px] text-slate-400">
+                  Across 200 Managed Tenants
+                </p>
+              </div>
+              <div className="text-right">
+                <span className="font-mono text-xl font-black text-slate-900 dark:text-white">
+                  {globalKpis.avgScore}%
+                </span>
+              </div>
+            </Card>
+
+
+
+            {/* Tile 3: Full Security Stack Adoption */}
+            <Card className="flex items-center justify-between p-3 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
+              <div>
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                  {m.HEADING_FULL_TELEMETRY}
+                </span>
+                <p className="text-[10px] text-slate-400">
+                  {globalKpis.fullTelemetryCount} of {ALL_TENANTS.length} Full Stack
+                </p>
+              </div>
+              <div className="text-right">
+                <span className="font-mono text-xl font-black text-blue-600 dark:text-blue-400">
+                  {globalKpis.fullTelemetryPct}%
+                </span>
+              </div>
+            </Card>
+
+
           </div>
-        </Card>
-
-        {/* Metric 2: Champion (#1) */}
-        <Card className="p-4">
-          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-            {m.HEADING_TOP_TENANT}
-          </span>
-          <div className="mt-1 flex items-baseline gap-2 min-w-0">
-            <p className="truncate text-xl font-black text-amber-600 dark:text-amber-400">
-              {globalKpis.topTenant?.overallScore ?? 0}%
-            </p>
-            <span className="truncate text-xs font-semibold text-slate-700 dark:text-slate-300">
-              {globalKpis.topTenant?.name ?? 'None'}
-            </span>
-          </div>
-        </Card>
-
-        {/* Metric 3: Full Security Stack Adoption */}
-        <Card className="p-4">
-          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-            {m.HEADING_FULL_TELEMETRY}
-          </span>
-          <div className="mt-1 flex items-baseline gap-2">
-            <p className="text-2xl font-black text-blue-600 dark:text-blue-400">
-              {globalKpis.fullTelemetryPct}%
-            </p>
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-              ({globalKpis.fullTelemetryCount} Tenants)
-            </span>
-          </div>
-        </Card>
-
-        {/* Metric 4: Total Managed Tenants */}
-        <Card className="p-4">
-          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-            {m.HEADING_MANAGED_COUNT}
-          </span>
-          <div className="mt-1 flex items-baseline gap-2">
-            <p className="text-2xl font-black text-slate-900 dark:text-white">
-              {ALL_TENANTS.length}
-            </p>
-            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-              100% Monitored
-            </span>
-          </div>
-        </Card>
-      </div>
-
-      {/* Top 3 Podium Cards */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Trophy className="h-4 w-4 text-amber-500" aria-hidden="true" />
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            {m.HEADING_PODIUM}
-          </h3>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {ALL_TENANTS.slice(0, 3).map((tenant, idx) => {
-            const isFirst = idx === 0;
-            const isSecond = idx === 1;
+        {/* Right Column: Leaderboard Top 4 (Vertically Aligned Alongside Overview) */}
+        <div className="flex flex-col space-y-2.5 lg:col-span-7">
+          <div className="flex items-center gap-2">
+            <Trophy className="h-4 w-4 text-amber-500" aria-hidden="true" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              {m.HEADING_TOP_FOUR_LEADERBOARD}
+            </h3>
+          </div>
 
-            return (
-              <Card
-                key={tenant.id}
-                className={cn(
-                  'relative overflow-hidden p-5 transition-transform hover:scale-[1.01]',
-                  isFirst
-                    ? 'border-amber-300 bg-amber-50/40 dark:border-amber-800 dark:bg-amber-950/20 ring-1 ring-amber-400/40'
-                    : isSecond
-                      ? 'border-slate-300 bg-slate-100/50 dark:border-slate-700 dark:bg-slate-900/40'
-                      : 'border-orange-200 bg-orange-50/30 dark:border-orange-900/40 dark:bg-orange-950/20'
-                )}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1.5">
+          <div className="flex flex-col space-y-2">
+            {ALL_TENANTS.slice(0, 4).map((tenant, idx) => {
+              const isFirst = idx === 0;
+              const isSecond = idx === 1;
+              const isThird = idx === 2;
+
+              return (
+                <Card
+                  key={tenant.id}
+                  onClick={() => setInspectingTenant(tenant)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setInspectingTenant(tenant);
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Inspect posture for rank ${tenant.rank} leader ${tenant.name}`}
+                  className={cn(
+                    'group relative flex cursor-pointer select-none items-center justify-between overflow-hidden p-3 transition-all duration-200 hover:shadow-md active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-blue-600',
+                    isFirst
+                      ? 'border-amber-300 bg-amber-50/40 hover:border-amber-400 dark:border-amber-800 dark:bg-amber-950/20 ring-1 ring-amber-400/40'
+                      : isSecond
+                        ? 'border-slate-300 bg-slate-100/50 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900/40'
+                        : isThird
+                          ? 'border-orange-200 bg-orange-50/30 hover:border-orange-300 dark:border-orange-900/40 dark:bg-orange-950/20'
+                          : 'border-blue-200 bg-blue-50/20 hover:border-blue-300 dark:border-blue-900/30 dark:bg-blue-950/10'
+                  )}
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    {/* Rank badge */}
+                    <div className="shrink-0">
                       {isFirst ? (
-                        <span className="inline-flex items-center gap-1 rounded-md bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-800 dark:bg-amber-950/80 dark:text-amber-300">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-amber-100 px-2 py-1 text-xs font-black text-amber-800 shadow-2xs dark:bg-amber-950/80 dark:text-amber-300">
                           <Trophy className="h-3.5 w-3.5" aria-hidden="true" />
-                          Rank #1 Leader
+                          #1
                         </span>
                       ) : isSecond ? (
-                        <span className="inline-flex items-center gap-1 rounded-md bg-slate-200 px-2 py-0.5 text-xs font-black text-slate-800 dark:bg-slate-800 dark:text-slate-200">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-slate-200 px-2 py-1 text-xs font-black text-slate-800 shadow-2xs dark:bg-slate-800 dark:text-slate-200">
                           <Medal className="h-3.5 w-3.5" aria-hidden="true" />
-                          Rank #2 Runner Up
+                          #2
+                        </span>
+                      ) : isThird ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-orange-100 px-2 py-1 text-xs font-black text-orange-800 shadow-2xs dark:bg-orange-950/80 dark:text-orange-300">
+                          <Award className="h-3.5 w-3.5" aria-hidden="true" />
+                          #3
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-md bg-orange-100 px-2 py-0.5 text-xs font-black text-orange-800 dark:bg-orange-950/80 dark:text-orange-300">
-                          <Award className="h-3.5 w-3.5" aria-hidden="true" />
-                          Rank #3 Podium
+                        <span className="inline-flex items-center gap-1 rounded-md bg-blue-100 px-2 py-1 text-xs font-black text-blue-800 shadow-2xs dark:bg-blue-950/80 dark:text-blue-300">
+                          <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                          #4
                         </span>
                       )}
                     </div>
 
-                    <h4 className="truncate font-bold text-slate-900 dark:text-white">
-                      {tenant.name}
-                    </h4>
-                    <p className="font-mono text-[11px] text-slate-500 dark:text-slate-400">
-                      {tenant.domain}
-                    </p>
+                    {/* Tenant details */}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="truncate text-sm font-bold text-slate-900 transition-colors group-hover:text-accent dark:text-white">
+                          {tenant.name}
+                        </h4>
+                        <span className="hidden font-mono text-[10px] text-slate-400 sm:inline">
+                          {tenant.domain}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+                        <span className="font-mono text-[10px] text-slate-400 sm:hidden">{tenant.domain}</span>
+                        <span className="hidden sm:inline">{tenant.industry}</span>
+                        <span className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
+                          <ShieldCheck className="h-3 w-3 shrink-0" aria-hidden="true" />
+                          {[
+                            tenant.statusBubbles.sentinel,
+                            tenant.statusBubbles.mde,
+                            tenant.statusBubbles.mdi,
+                            tenant.statusBubbles.logAnalytics,
+                          ].filter(Boolean).length}
+                          /4 Telemetry
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="text-right">
-                    <span className="font-mono text-2xl font-black text-slate-900 dark:text-white">
+                  {/* Overall Score */}
+                  <div className="shrink-0 pl-3 text-right">
+                    <span className="font-mono text-xl font-black text-slate-900 dark:text-white">
                       {tenant.overallScore}%
                     </span>
-                    <p className="text-[10px] text-slate-400">Overall Score</p>
+                    <p className="text-[9.5px] font-medium text-slate-400">Overall Score</p>
                   </div>
-                </div>
-
-                {/* Status Bubbles count */}
-                <div className="mt-4 flex items-center justify-between border-t border-slate-200/60 pt-3 text-[11px] dark:border-slate-800">
-                  <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
-                    <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>
-                      {[
-                        tenant.statusBubbles.sentinel,
-                        tenant.statusBubbles.mde,
-                        tenant.statusBubbles.mdi,
-                        tenant.statusBubbles.logAnalytics,
-                      ].filter(Boolean).length}
-                      /4 Active Telemetry
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setInspectingTenant(tenant)}
-                    className="cursor-pointer font-bold text-accent hover:underline active:scale-95"
-                  >
-                    View &rarr;
-                  </button>
-                </div>
-              </Card>
-            );
-          })}
+                </Card>
+              );
+            })}
+          </div>
         </div>
       </div>
 

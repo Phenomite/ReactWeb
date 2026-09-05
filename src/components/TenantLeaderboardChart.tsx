@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { Trophy, BarChart3, PieChart, ShieldCheck } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { APP_STRINGS } from '@/strings';
@@ -19,11 +19,12 @@ export const TenantLeaderboardChart = memo(({
   onInspectTenant,
 }: TenantLeaderboardChartProps) => {
   const m = APP_STRINGS.VIEWS.MICROSOFT;
+  const [topLimit, setTopLimit] = useState<number>(30);
 
-  // Top 15 tenants by overall score for leaderboard bar chart
-  const topFifteen = useMemo(() => {
-    return [...tenants].sort((a, b) => b.overallScore - a.overallScore).slice(0, 15);
-  }, [tenants]);
+  // Directly slice the processed tenants to honor the active filter and sort order
+  const displayedTenants = useMemo(() => {
+    return tenants.slice(0, topLimit);
+  }, [tenants, topLimit]);
 
   // Distribution buckets across all 200 tenants
   const distribution = useMemo(() => {
@@ -77,84 +78,114 @@ export const TenantLeaderboardChart = memo(({
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-      {/* Chart 1: Top 15 Leaderboard Horizontal Bar Chart */}
+      {/* Chart 1: Leaderboard Horizontal Bar Chart */}
       <Card className="p-5 lg:col-span-2">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3 dark:border-slate-800">
           <div className="flex items-center gap-2">
             <Trophy className="h-4 w-4 text-amber-500" aria-hidden="true" />
             <h3 className="text-sm font-bold text-slate-900 dark:text-white">
               {m.HEADING_TOP_CHART}
             </h3>
+            <span className="rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+              {displayedTenants.length} of {tenants.length}
+            </span>
           </div>
-          <span className="text-xs text-slate-400">Click bar to inspect tenant</span>
+
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <label htmlFor="top-limit-select" className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                {m.LABEL_LIMIT_TOP}:
+              </label>
+              <select
+                id="top-limit-select"
+                value={topLimit}
+                onChange={(e) => setTopLimit(Number(e.target.value))}
+                aria-label="Adjust number of ranked tenants to display"
+                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-2xs dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+              >
+                <option value={10}>{m.OPT_LIMIT_10}</option>
+                <option value={20}>{m.OPT_LIMIT_20}</option>
+                <option value={30}>{m.OPT_LIMIT_30}</option>
+                <option value={50}>{m.OPT_LIMIT_50}</option>
+                <option value={1000}>{m.OPT_LIMIT_ALL}</option>
+              </select>
+            </div>
+            <span className="hidden text-xs text-slate-400 sm:inline">Click bar to inspect</span>
+          </div>
         </div>
 
         <div className="mt-4 space-y-2.5">
-          {topFifteen.map((tenant) => {
-            const isTopThree = tenant.rank <= 3;
-            return (
-              <div
-                key={tenant.id}
-                onClick={() => onInspectTenant(tenant)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onInspectTenant(tenant);
-                  }
-                }}
-                tabIndex={0}
-                role="button"
-                aria-label={`Inspect rank ${tenant.rank} tenant: ${tenant.name}, overall score ${tenant.overallScore}%`}
-                className="group flex cursor-pointer select-none items-center gap-3 rounded-lg p-1.5 transition-colors hover:bg-slate-100/80 dark:hover:bg-slate-800/60 focus-visible:outline-2 focus-visible:outline-blue-600"
-              >
-                {/* Rank indicator */}
-                <span
-                  className={cn(
-                    'w-6 shrink-0 text-center font-mono text-xs font-black',
-                    tenant.rank === 1 && 'text-amber-600 dark:text-amber-400',
-                    tenant.rank === 2 && 'text-slate-500 dark:text-slate-300',
-                    tenant.rank === 3 && 'text-orange-600 dark:text-orange-400',
-                    tenant.rank > 3 && 'text-slate-400 dark:text-slate-500'
-                  )}
+          {displayedTenants.length === 0 ? (
+            <div className="py-8 text-center text-xs text-slate-400">
+              {m.TXT_NO_TENANTS}
+            </div>
+          ) : (
+            displayedTenants.map((tenant) => {
+              const isTopThree = tenant.rank <= 3;
+              return (
+                <div
+                  key={tenant.id}
+                  onClick={() => onInspectTenant(tenant)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onInspectTenant(tenant);
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Inspect rank ${tenant.rank} tenant: ${tenant.name}, overall score ${tenant.overallScore}%`}
+                  className="group flex cursor-pointer select-none items-center gap-3 rounded-lg p-1.5 transition-colors hover:bg-slate-100/80 dark:hover:bg-slate-800/60 focus-visible:outline-2 focus-visible:outline-blue-600"
                 >
-                  #{tenant.rank}
-                </span>
-
-                {/* Name */}
-                <div className="w-36 sm:w-48 shrink-0 truncate text-xs font-semibold text-slate-800 group-hover:text-accent dark:text-slate-200">
-                  {tenant.name}
-                </div>
-
-                {/* Score Bar */}
-                <div className="relative h-5 flex-1 overflow-hidden rounded-md bg-slate-100 dark:bg-slate-800">
-                  <div
+                  {/* Rank indicator */}
+                  <span
                     className={cn(
-                      'h-full rounded-md transition-all duration-300',
-                      isTopThree
-                        ? 'bg-gradient-to-r from-amber-500 to-emerald-500'
-                        : 'bg-gradient-to-r from-blue-500 to-indigo-500'
+                      'w-6 shrink-0 text-center font-mono text-xs font-black',
+                      tenant.rank === 1 && 'text-amber-600 dark:text-amber-400',
+                      tenant.rank === 2 && 'text-slate-500 dark:text-slate-300',
+                      tenant.rank === 3 && 'text-orange-600 dark:text-orange-400',
+                      tenant.rank > 3 && 'text-slate-400 dark:text-slate-500'
                     )}
-                    style={{ width: `${tenant.overallScore}%` }}
-                  />
-                  <span className="absolute inset-y-0 right-2 flex items-center font-mono text-[10px] font-black text-slate-700 dark:text-slate-300">
-                    {tenant.overallScore}%
+                  >
+                    #{tenant.rank}
+                  </span>
+
+                  {/* Name */}
+                  <div className="w-36 shrink-0 truncate text-xs font-semibold text-slate-800 transition-colors group-hover:text-accent sm:w-48 dark:text-slate-200">
+                    {tenant.name}
+                  </div>
+
+                  {/* Score Bar */}
+                  <div className="relative h-5 flex-1 overflow-hidden rounded-md bg-slate-100 dark:bg-slate-800">
+                    <div
+                      className={cn(
+                        'h-full rounded-md transition-all duration-300',
+                        isTopThree
+                          ? 'bg-gradient-to-r from-amber-500 to-emerald-500'
+                          : 'bg-gradient-to-r from-blue-500 to-indigo-500'
+                      )}
+                      style={{ width: `${tenant.overallScore}%` }}
+                    />
+                    <span className="absolute inset-y-0 right-2 flex items-center font-mono text-[10px] font-black text-slate-700 dark:text-slate-300">
+                      {tenant.overallScore}%
+                    </span>
+                  </div>
+
+                  {/* Quick 4-bubble badge count */}
+                  <span className="hidden shrink-0 items-center gap-1 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-600 sm:inline-flex dark:bg-slate-800 dark:text-slate-400">
+                    <ShieldCheck className="h-3 w-3 text-emerald-500" aria-hidden="true" />
+                    {[
+                      tenant.statusBubbles.sentinel,
+                      tenant.statusBubbles.mde,
+                      tenant.statusBubbles.mdi,
+                      tenant.statusBubbles.logAnalytics,
+                    ].filter(Boolean).length}
+                    /4
                   </span>
                 </div>
-
-                {/* Quick 4-bubble badge count */}
-                <span className="hidden sm:inline-flex shrink-0 items-center gap-1 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-                  <ShieldCheck className="h-3 w-3 text-emerald-500" aria-hidden="true" />
-                  {[
-                    tenant.statusBubbles.sentinel,
-                    tenant.statusBubbles.mde,
-                    tenant.statusBubbles.mdi,
-                    tenant.statusBubbles.logAnalytics,
-                  ].filter(Boolean).length}
-                  /4
-                </span>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </Card>
 

@@ -112,7 +112,7 @@ const StatusBubble = memo(({ label, enabled, tooltipText }: StatusBubbleProps) =
   <span
     title={tooltipText}
     className={cn(
-      'inline-flex select-none items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold transition-colors',
+      'inline-flex select-none items-center gap-1 rounded-full border px-1.5 py-0.5 text-[9.5px] font-semibold transition-colors',
       enabled
         ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/70 dark:text-emerald-300'
         : 'border-slate-200 bg-slate-100/70 text-slate-400 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-500'
@@ -139,14 +139,14 @@ interface CategoryBarProps {
 }
 
 const CategoryBar = memo(({ label, subtitle, score, icon: Icon, colorClass }: CategoryBarProps) => (
-  <div className="space-y-1">
-    <div className="flex items-center justify-between text-[11px]">
-      <div className="flex items-center gap-1.5 min-w-0">
+  <div className="space-y-0.5">
+    <div className="flex items-center justify-between text-[10.5px]">
+      <div className="flex items-center gap-1 min-w-0">
         <Icon className="h-3 w-3 shrink-0 text-slate-400 dark:text-slate-500" aria-hidden="true" />
         <span className="truncate font-semibold text-slate-700 dark:text-slate-300">{label}</span>
-        <span className="truncate text-[10px] text-slate-400 dark:text-slate-500">({subtitle})</span>
+        <span className="truncate text-[9.5px] text-slate-400 dark:text-slate-500">({subtitle})</span>
       </div>
-      <span className="font-mono text-xs font-bold text-slate-900 dark:text-white">
+      <span className="font-mono text-[11px] font-bold text-slate-900 dark:text-white">
         {score}%
       </span>
     </div>
@@ -156,7 +156,7 @@ const CategoryBar = memo(({ label, subtitle, score, icon: Icon, colorClass }: Ca
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label={`${label} secure score: ${score}%`}
-      className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+      className="h-1 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
     >
       <div
         className={cn('h-full rounded-full transition-all duration-300', colorClass)}
@@ -175,20 +175,30 @@ export const TenantCard = memo(({ tenant, onInspect }: TenantCardProps) => {
 
   return (
     <Card
+      onClick={() => onInspect(tenant)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onInspect(tenant);
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={`Inspect posture for ${tenant.name}`}
       className={cn(
-        'group relative flex flex-col justify-between overflow-hidden p-5 transition-all duration-200 hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700',
+        'group relative flex cursor-pointer select-none flex-col justify-between overflow-hidden p-3.5 transition-all duration-200 hover:border-accent hover:shadow-md active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-blue-600',
         tenant.rank <= 3 && 'ring-1 ring-amber-400/40 dark:ring-amber-500/30'
       )}
     >
       {/* Top Header: Rank, Organization Info & Overall Score */}
       <div>
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start justify-between gap-2.5">
           <div className="space-y-1 min-w-0 flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {renderRankBadge(tenant.rank)}
               <span
                 className={cn(
-                  'rounded-md border px-1.5 py-0.2 text-[10px] font-bold tracking-tight',
+                  'rounded border px-1.5 py-0.2 text-[9.5px] font-bold tracking-tight',
                   tier.badgeClass
                 )}
               >
@@ -198,47 +208,51 @@ export const TenantCard = memo(({ tenant, onInspect }: TenantCardProps) => {
 
             <h3
               title={tenant.name}
-              className="truncate text-sm font-bold text-slate-900 dark:text-white"
+              className="truncate text-sm font-bold text-slate-900 transition-colors group-hover:text-accent dark:text-white"
             >
               {tenant.name}
             </h3>
 
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 dark:text-slate-400">
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[10.5px] text-slate-500 dark:text-slate-400">
               <span className="flex items-center gap-1 truncate font-mono text-[10px]">
-                <Globe className="h-3 w-3 shrink-0" aria-hidden="true" />
+                <Globe className="h-3 w-3 shrink-0 text-slate-400" aria-hidden="true" />
                 {tenant.domain}
               </span>
               <span className="flex items-center gap-1 truncate text-[10px]">
-                <Building2 className="h-3 w-3 shrink-0" aria-hidden="true" />
+                <Building2 className="h-3 w-3 shrink-0 text-slate-400" aria-hidden="true" />
                 {tenant.industry}
+              </span>
+              <span className="flex items-center gap-1 truncate text-[10px]">
+                <Users className="h-3 w-3 shrink-0 text-slate-400" aria-hidden="true" />
+                {tenant.seatCount.toLocaleString()} Users
               </span>
             </div>
           </div>
 
-          {/* Gamified Overall Score Circular/Pill Meter */}
+          {/* Gamified Overall Score Pill Meter */}
           <div className="flex shrink-0 flex-col items-end">
             <div
               className={cn(
-                'flex h-12 w-12 flex-col items-center justify-center rounded-xl border font-mono font-black shadow-2xs transition-transform group-hover:scale-105',
+                'flex h-11 w-11 flex-col items-center justify-center rounded-xl border font-mono font-black shadow-2xs transition-transform group-hover:scale-105',
                 tier.badgeClass
               )}
             >
-              <span className="text-sm leading-none">{tenant.overallScore}</span>
-              <span className="text-[9px] font-bold leading-tight opacity-75">%</span>
+              <span className="text-xs leading-none">{tenant.overallScore}</span>
+              <span className="text-[8.5px] font-bold leading-tight opacity-75">%</span>
             </div>
-            <span className="mt-1 text-[9px] font-medium text-slate-400 dark:text-slate-500">
+            <span className="mt-1 text-[8.5px] font-medium text-slate-400 dark:text-slate-500">
               Overall Score
             </span>
           </div>
         </div>
 
         {/* Status Bubbles Row: explicitly positioned ABOVE secure score categories */}
-        <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50/70 p-2.5 dark:border-slate-800/80 dark:bg-slate-900/60">
-          <div className="mb-1.5 flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+        <div className="mt-2.5 rounded-lg border border-slate-100 bg-slate-50/70 p-2 dark:border-slate-800/80 dark:bg-slate-900/60">
+          <div className="mb-1 flex items-center justify-between">
+            <span className="text-[9.5px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
               {m.LABEL_BUBBLES_SECTION}
             </span>
-            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-[9.5px] font-medium text-slate-500 dark:text-slate-400">
               {[
                 tenant.statusBubbles.sentinel,
                 tenant.statusBubbles.mde,
@@ -249,7 +263,7 @@ export const TenantCard = memo(({ tenant, onInspect }: TenantCardProps) => {
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-1">
             <StatusBubble
               label={m.LABEL_BUBBLE_SENTINEL}
               enabled={tenant.statusBubbles.sentinel}
@@ -290,7 +304,7 @@ export const TenantCard = memo(({ tenant, onInspect }: TenantCardProps) => {
         </div>
 
         {/* Secure Score Categories: Device, Identities, Apps, Data */}
-        <div className="mt-4 space-y-2.5">
+        <div className="mt-2.5 space-y-1.5">
           <CategoryBar
             label={m.CAT_DEVICE}
             subtitle={m.CAT_DEVICE_DESC}
@@ -320,19 +334,6 @@ export const TenantCard = memo(({ tenant, onInspect }: TenantCardProps) => {
             colorClass="bg-emerald-500 dark:bg-emerald-400"
           />
         </div>
-      </div>
-
-      {/* Card Action Footer */}
-      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-400 dark:border-slate-800">
-        <span>{tenant.seatCount.toLocaleString()} user seats</span>
-        <button
-          type="button"
-          onClick={() => onInspect(tenant)}
-          aria-label={`Inspect posture for ${tenant.name}`}
-          className="cursor-pointer font-semibold text-accent transition-colors hover:underline active:scale-95 focus-visible:outline-2 focus-visible:outline-blue-600"
-        >
-          {m.BTN_INSPECT_TENANT} &rarr;
-        </button>
       </div>
     </Card>
   );
