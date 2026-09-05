@@ -1,458 +1,710 @@
-import { useState, useMemo, memo } from 'react';
+import { useState, useMemo, useCallback, memo } from 'react';
 import {
   Shield,
-  ShieldAlert,
   ShieldCheck,
-  Flame,
+  Trophy,
+  BarChart3,
+  LayoutGrid,
+  List,
   Search,
   Download,
-  Sparkles,
-  Clock,
   Filter,
+  ArrowUpDown,
+  ArrowDown,
+  ArrowUp,
+  RotateCcw,
+  Award,
+  Medal,
 } from 'lucide-react';
-import { APP_STRINGS } from '@/strings';
-import { MSRC_CVE_DATASET } from '@/constants';
-import { useSecurityIncidents } from '@/context/SecurityIncidentContext';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
+import { TenantCard } from '@/components/TenantCard';
+import { TenantLeaderboardChart } from '@/components/TenantLeaderboardChart';
+import { TenantDetailModal } from '@/components/TenantDetailModal';
+import { useToast } from '@/context/ToastContext';
+import { APP_STRINGS } from '@/strings';
 import { cn } from '@/lib/utils';
+import rawTenantsData from '@/data/tenants.json';
 import type {
   ViewDefinition,
-  IncidentSeverity,
-  IncidentStatus,
-  MsrcAdvisory,
+  TenantRecord,
+  TenantSortField,
+  TenantSortOrder,
+  TenantScoreTier,
 } from '@/types';
 
-const SEVERITY_COLORS: Record<IncidentSeverity, { bg: string; text: string; border: string }> = {
-  critical: {
-    bg: 'bg-rose-50 dark:bg-rose-950/60',
-    text: 'text-rose-700 dark:text-rose-300',
-    border: 'border-rose-200 dark:border-rose-900/60',
-  },
-  high: {
-    bg: 'bg-amber-50 dark:bg-amber-950/60',
-    text: 'text-amber-700 dark:text-amber-300',
-    border: 'border-amber-200 dark:border-amber-900/60',
-  },
-  medium: {
-    bg: 'bg-blue-50 dark:bg-blue-950/60',
-    text: 'text-blue-700 dark:text-blue-300',
-    border: 'border-blue-200 dark:border-blue-900/60',
-  },
-  low: {
-    bg: 'bg-slate-100 dark:bg-slate-800',
-    text: 'text-slate-700 dark:text-slate-300',
-    border: 'border-slate-200 dark:border-slate-700',
-  },
-  info: {
-    bg: 'bg-emerald-50 dark:bg-emerald-950/60',
-    text: 'text-emerald-700 dark:text-emerald-300',
-    border: 'border-emerald-200 dark:border-emerald-900/60',
-  },
-};
+const ALL_TENANTS = rawTenantsData as TenantRecord[];
 
-const STATUS_OPTIONS: { id: IncidentStatus; label: string }[] = [
-  { id: 'active', label: 'Active' },
-  { id: 'investigating', label: 'Investigating' },
-  { id: 'resolved', label: 'Resolved' },
-];
-
-// Renders the unified Microsoft Security operations and MSRC radar view
+// Renders the gamified Microsoft Secure Score multi-tenant leaderboard
 export const MicrosoftView = memo(() => {
-  const {
-    incidents,
-    unresolvedCount,
-    updateStatus,
-    simulateThreatSignal,
-    exportSentinelLog,
-  } = useSecurityIncidents();
+  const { showToast } = useToast();
+  const m = APP_STRINGS.VIEWS.MICROSOFT;
 
-  const [activeTab, setActiveTab] = useState<'defender' | 'msrc'>('defender');
+  // View state & tab selection
+  const [activeTab, setActiveTab] = useState<'tiles' | 'charts' | 'table'>('tiles');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [telemetryFilter, setTelemetryFilter] = useState<string>('all');
+  const [selectedTier, setSelectedTier] = useState<TenantScoreTier>('all');
+  const [sortField, setSortField] = useState<TenantSortField>('overallScore');
+  const [sortOrder, setSortOrder] = useState<TenantSortOrder>('desc');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
 
-  // Defender filters
-  const [severityFilter, setSeverityFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  // Selected tenant for detailed modal inspection
+  const [inspectingTenant, setInspectingTenant] = useState<TenantRecord | null>(null);
 
-  // MSRC search and filters
-  const [cveQuery, setCveQuery] = useState('');
-  const [cveSeverity, setCveSeverity] = useState<string>('all');
-  const [cveProduct, setCveProduct] = useState<string>('all');
+  // Global KPI aggregates across all 200 tenants
+  const globalKpis = useMemo(() => {
+    if (ALL_TENANTS.length === 0) return { avgScore: 0, fullTelemetryCount: 0, fullTelemetryPct: 0, topTenant: null };
 
-  // Defender metrics
-  const kpiMetrics = useMemo(() => {
-    const active = incidents.filter((i) => i.status === 'active').length;
-    const criticalOrHigh = incidents.filter(
-      (i) => (i.severity === 'critical' || i.severity === 'high') && i.status !== 'resolved'
+    const totalScore = ALL_TENANTS.reduce((sum, t) => sum + t.overallScore, 0);
+    const avgScore = Number((totalScore / ALL_TENANTS.length).toFixed(1));
+
+    const fullTelemetryCount = ALL_TENANTS.filter(
+      (t) =>
+        t.statusBubbles.sentinel &&
+        t.statusBubbles.mde &&
+        t.statusBubbles.mdi &&
+        t.statusBubbles.logAnalytics
     ).length;
-    const resolved = incidents.filter((i) => i.status === 'resolved').length;
-    return { active, criticalOrHigh, resolved, total: incidents.length };
-  }, [incidents]);
 
-  // Filtered incidents
-  const filteredIncidents = useMemo(() => {
-    return incidents.filter((item) => {
-      if (severityFilter !== 'all' && item.severity !== severityFilter) return false;
-      if (statusFilter !== 'all' && item.status !== statusFilter) return false;
-      return true;
-    });
-  }, [incidents, severityFilter, statusFilter]);
+    const fullTelemetryPct = Number(((fullTelemetryCount / ALL_TENANTS.length) * 100).toFixed(0));
+    const topTenant = ALL_TENANTS[0] ?? null;
 
-  // Filtered MSRC Advisories
-  const filteredCves = useMemo(() => {
-    const q = cveQuery.trim().toLowerCase();
-    return MSRC_CVE_DATASET.filter((cve: MsrcAdvisory) => {
-      if (cveSeverity !== 'all' && cve.severity.toLowerCase() !== cveSeverity.toLowerCase()) {
-        return false;
-      }
-      if (cveProduct !== 'all' && !cve.affectedProduct.toLowerCase().includes(cveProduct.toLowerCase())) {
-        return false;
-      }
+    return { avgScore, fullTelemetryCount, fullTelemetryPct, topTenant };
+  }, []);
+
+  // Dynamic human-readable label for sort order toggle
+  const orderLabel = useMemo(() => {
+    if (sortField === 'name') {
+      return sortOrder === 'asc' ? m.BTN_SORT_ORDER_NAME_ASC : m.BTN_SORT_ORDER_NAME_DESC;
+    }
+    if (sortField === 'rank') {
+      return sortOrder === 'asc' ? m.BTN_SORT_ORDER_RANK_ASC : m.BTN_SORT_ORDER_RANK_DESC;
+    }
+    return sortOrder === 'desc' ? m.BTN_SORT_ORDER_DESC : m.BTN_SORT_ORDER_ASC;
+  }, [sortField, sortOrder, m]);
+
+  // Filtered & sorted tenant records
+  const processedTenants = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+
+    const filtered = ALL_TENANTS.filter((tenant) => {
+      // Search matching
       if (q) {
-        const matchesId = cve.cveId.toLowerCase().includes(q);
-        const matchesTitle = cve.title.toLowerCase().includes(q);
-        const matchesProduct = cve.affectedProduct.toLowerCase().includes(q);
-        const matchesDesc = cve.description.toLowerCase().includes(q);
-        if (!matchesId && !matchesTitle && !matchesProduct && !matchesDesc) {
+        const matchesName = tenant.name.toLowerCase().includes(q);
+        const matchesDomain = tenant.domain.toLowerCase().includes(q);
+        const matchesIndustry = tenant.industry.toLowerCase().includes(q);
+        const matchesRegion = tenant.region.toLowerCase().includes(q);
+        if (!matchesName && !matchesDomain && !matchesIndustry && !matchesRegion) {
           return false;
         }
       }
+
+      // Telemetry bubbles filter
+      if (telemetryFilter === 'full') {
+        const hasAll =
+          tenant.statusBubbles.sentinel &&
+          tenant.statusBubbles.mde &&
+          tenant.statusBubbles.mdi &&
+          tenant.statusBubbles.logAnalytics;
+        if (!hasAll) return false;
+      } else if (telemetryFilter === 'sentinel' && !tenant.statusBubbles.sentinel) {
+        return false;
+      } else if (telemetryFilter === 'mde' && !tenant.statusBubbles.mde) {
+        return false;
+      } else if (telemetryFilter === 'mdi' && !tenant.statusBubbles.mdi) {
+        return false;
+      } else if (telemetryFilter === 'logAnalytics' && !tenant.statusBubbles.logAnalytics) {
+        return false;
+      }
+
+      // Tier filter
+      if (selectedTier !== 'all') {
+        if (selectedTier === 'diamond' && tenant.overallScore < 90) return false;
+        if (selectedTier === 'gold' && (tenant.overallScore < 80 || tenant.overallScore >= 90)) return false;
+        if (selectedTier === 'silver' && (tenant.overallScore < 70 || tenant.overallScore >= 80)) return false;
+        if (selectedTier === 'bronze' && (tenant.overallScore < 50 || tenant.overallScore >= 70)) return false;
+        if (selectedTier === 'critical' && tenant.overallScore >= 50) return false;
+      }
+
       return true;
     });
-  }, [cveQuery, cveSeverity, cveProduct]);
+
+    // Sorting
+    filtered.sort((a, b) => {
+      let comparison = 0;
+      if (sortField === 'overallScore') {
+        comparison = a.overallScore - b.overallScore;
+      } else if (sortField === 'device') {
+        comparison = a.categories.device - b.categories.device;
+      } else if (sortField === 'identities') {
+        comparison = a.categories.identities - b.categories.identities;
+      } else if (sortField === 'apps') {
+        comparison = a.categories.apps - b.categories.apps;
+      } else if (sortField === 'data') {
+        comparison = a.categories.data - b.categories.data;
+      } else if (sortField === 'name') {
+        comparison = a.name.localeCompare(b.name);
+      } else if (sortField === 'rank') {
+        comparison = a.rank - b.rank;
+      }
+
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    return filtered;
+  }, [searchQuery, telemetryFilter, selectedTier, sortField, sortOrder]);
+
+  // Paginated records for tile and table views
+  const totalPages = Math.max(1, Math.ceil(processedTenants.length / pageSize));
+  const paginatedTenants = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return processedTenants.slice(start, start + pageSize);
+  }, [processedTenants, page, pageSize]);
+
+  // Reset page when filters change
+  const handleFilterChange = useCallback((setter: (val: any) => void, value: any) => {
+    setter(value);
+    setPage(1);
+  }, []);
+
+  const handleResetFilters = useCallback(() => {
+    setSearchQuery('');
+    setTelemetryFilter('all');
+    setSelectedTier('all');
+    setSortField('overallScore');
+    setSortOrder('desc');
+    setPage(1);
+  }, []);
+
+  // Export 200 tenants dataset as JSON
+  const handleExportData = useCallback(() => {
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(processedTenants, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute('href', dataStr);
+    downloadAnchor.setAttribute('download', 'microsoft-tenant-secure-scores.json');
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+
+    showToast(m.TXT_EXPORT_SUCCESS, {
+      type: 'success',
+      description: `Exported ${processedTenants.length} tenants with category scores and telemetry signals.`,
+    });
+  }, [processedTenants, showToast, m.TXT_EXPORT_SUCCESS]);
 
   return (
     <div className="space-y-6">
       {/* Top Banner */}
       <Card
-        heading={APP_STRINGS.VIEWS.MICROSOFT.HEADING_PAGE}
-        description={APP_STRINGS.VIEWS.MICROSOFT.TXT_DESCRIPTION}
+        heading={m.HEADING_PAGE}
+        description={m.TXT_DESCRIPTION}
         icon={Shield}
         headerRight={
           <div className="flex items-center gap-2">
-            <span
-              className={cn(
-                'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold',
-                unresolvedCount > 0
-                  ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
-                  : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-              )}
-            >
-              {unresolvedCount > 0 ? (
-                <ShieldAlert className="h-3.5 w-3.5" aria-hidden="true" />
-              ) : (
-                <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-              )}
-              <span>{unresolvedCount} Active Alerts</span>
-            </span>
+            <Button onClick={handleExportData} icon={Download} variant="secondary">
+              {m.BTN_EXPORT_TENANTS}
+            </Button>
           </div>
         }
       />
 
-      {/* Tab Navigation */}
+      {/* Gamification KPI Stats Grid */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {/* Metric 1: Global Average */}
+        <Card className="p-4">
+          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            {m.HEADING_GLOBAL_AVERAGE}
+          </span>
+          <div className="mt-1 flex items-baseline gap-2">
+            <p className="text-2xl font-black text-slate-900 dark:text-white">
+              {globalKpis.avgScore}%
+            </p>
+            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+              Across 200 Tenants
+            </span>
+          </div>
+        </Card>
+
+        {/* Metric 2: Champion (#1) */}
+        <Card className="p-4">
+          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            {m.HEADING_TOP_TENANT}
+          </span>
+          <div className="mt-1 flex items-baseline gap-2 min-w-0">
+            <p className="truncate text-xl font-black text-amber-600 dark:text-amber-400">
+              {globalKpis.topTenant?.overallScore ?? 0}%
+            </p>
+            <span className="truncate text-xs font-semibold text-slate-700 dark:text-slate-300">
+              {globalKpis.topTenant?.name ?? 'None'}
+            </span>
+          </div>
+        </Card>
+
+        {/* Metric 3: Full Security Stack Adoption */}
+        <Card className="p-4">
+          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            {m.HEADING_FULL_TELEMETRY}
+          </span>
+          <div className="mt-1 flex items-baseline gap-2">
+            <p className="text-2xl font-black text-blue-600 dark:text-blue-400">
+              {globalKpis.fullTelemetryPct}%
+            </p>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              ({globalKpis.fullTelemetryCount} Tenants)
+            </span>
+          </div>
+        </Card>
+
+        {/* Metric 4: Total Managed Tenants */}
+        <Card className="p-4">
+          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            {m.HEADING_MANAGED_COUNT}
+          </span>
+          <div className="mt-1 flex items-baseline gap-2">
+            <p className="text-2xl font-black text-slate-900 dark:text-white">
+              {ALL_TENANTS.length}
+            </p>
+            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+              100% Monitored
+            </span>
+          </div>
+        </Card>
+      </div>
+
+      {/* Top 3 Podium Cards */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Trophy className="h-4 w-4 text-amber-500" aria-hidden="true" />
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            {m.HEADING_PODIUM}
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {ALL_TENANTS.slice(0, 3).map((tenant, idx) => {
+            const isFirst = idx === 0;
+            const isSecond = idx === 1;
+
+            return (
+              <Card
+                key={tenant.id}
+                className={cn(
+                  'relative overflow-hidden p-5 transition-transform hover:scale-[1.01]',
+                  isFirst
+                    ? 'border-amber-300 bg-amber-50/40 dark:border-amber-800 dark:bg-amber-950/20 ring-1 ring-amber-400/40'
+                    : isSecond
+                      ? 'border-slate-300 bg-slate-100/50 dark:border-slate-700 dark:bg-slate-900/40'
+                      : 'border-orange-200 bg-orange-50/30 dark:border-orange-900/40 dark:bg-orange-950/20'
+                )}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1.5">
+                      {isFirst ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-800 dark:bg-amber-950/80 dark:text-amber-300">
+                          <Trophy className="h-3.5 w-3.5" aria-hidden="true" />
+                          Rank #1 Leader
+                        </span>
+                      ) : isSecond ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-slate-200 px-2 py-0.5 text-xs font-black text-slate-800 dark:bg-slate-800 dark:text-slate-200">
+                          <Medal className="h-3.5 w-3.5" aria-hidden="true" />
+                          Rank #2 Runner Up
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-orange-100 px-2 py-0.5 text-xs font-black text-orange-800 dark:bg-orange-950/80 dark:text-orange-300">
+                          <Award className="h-3.5 w-3.5" aria-hidden="true" />
+                          Rank #3 Podium
+                        </span>
+                      )}
+                    </div>
+
+                    <h4 className="truncate font-bold text-slate-900 dark:text-white">
+                      {tenant.name}
+                    </h4>
+                    <p className="font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                      {tenant.domain}
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <span className="font-mono text-2xl font-black text-slate-900 dark:text-white">
+                      {tenant.overallScore}%
+                    </span>
+                    <p className="text-[10px] text-slate-400">Overall Score</p>
+                  </div>
+                </div>
+
+                {/* Status Bubbles count */}
+                <div className="mt-4 flex items-center justify-between border-t border-slate-200/60 pt-3 text-[11px] dark:border-slate-800">
+                  <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
+                    <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>
+                      {[
+                        tenant.statusBubbles.sentinel,
+                        tenant.statusBubbles.mde,
+                        tenant.statusBubbles.mdi,
+                        tenant.statusBubbles.logAnalytics,
+                      ].filter(Boolean).length}
+                      /4 Active Telemetry
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setInspectingTenant(tenant)}
+                    className="cursor-pointer font-bold text-accent hover:underline active:scale-95"
+                  >
+                    View &rarr;
+                  </button>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* View Layout Tabs */}
       <div className="flex border-b border-slate-200 dark:border-slate-800">
         <button
           type="button"
-          onClick={() => setActiveTab('defender')}
+          onClick={() => setActiveTab('tiles')}
           className={cn(
             'flex cursor-pointer select-none items-center gap-2 border-b-2 px-5 py-3 text-xs font-bold transition-colors',
-            activeTab === 'defender'
+            activeTab === 'tiles'
               ? 'border-accent text-accent font-semibold'
               : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
           )}
         >
-          <ShieldAlert className="h-4 w-4" aria-hidden="true" />
-          <span>{APP_STRINGS.VIEWS.MICROSOFT.TAB_DEFENDER}</span>
+          <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+          <span>{m.TAB_TILES}</span>
         </button>
 
         <button
           type="button"
-          onClick={() => setActiveTab('msrc')}
+          onClick={() => setActiveTab('charts')}
           className={cn(
             'flex cursor-pointer select-none items-center gap-2 border-b-2 px-5 py-3 text-xs font-bold transition-colors',
-            activeTab === 'msrc'
+            activeTab === 'charts'
               ? 'border-accent text-accent font-semibold'
               : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
           )}
         >
-          <Flame className="h-4 w-4" aria-hidden="true" />
-          <span>{APP_STRINGS.VIEWS.MICROSOFT.TAB_MSRC}</span>
+          <BarChart3 className="h-4 w-4" aria-hidden="true" />
+          <span>{m.TAB_CHARTS}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('table')}
+          className={cn(
+            'flex cursor-pointer select-none items-center gap-2 border-b-2 px-5 py-3 text-xs font-bold transition-colors',
+            activeTab === 'table'
+              ? 'border-accent text-accent font-semibold'
+              : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+          )}
+        >
+          <List className="h-4 w-4" aria-hidden="true" />
+          <span>{m.TAB_TABLE}</span>
         </button>
       </div>
 
-      {/* TAB 1: DEFENDER INCIDENT TRIAGE */}
-      {activeTab === 'defender' && (
-        <div className="space-y-6">
-          {/* KPI Dashboard */}
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <Card className="p-4">
-              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                {APP_STRINGS.VIEWS.MICROSOFT.HEADING_KPI_ACTIVE}
-              </span>
-              <p className="mt-1 text-2xl font-black text-rose-600 dark:text-rose-400">
-                {kpiMetrics.active}
-              </p>
-            </Card>
-
-            <Card className="p-4">
-              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                {APP_STRINGS.VIEWS.MICROSOFT.HEADING_KPI_CRITICAL}
-              </span>
-              <p className="mt-1 text-2xl font-black text-amber-600 dark:text-amber-400">
-                {kpiMetrics.criticalOrHigh}
-              </p>
-            </Card>
-
-            <Card className="p-4">
-              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                {APP_STRINGS.VIEWS.MICROSOFT.HEADING_KPI_RESOLVED}
-              </span>
-              <p className="mt-1 text-2xl font-black text-emerald-600 dark:text-emerald-400">
-                {kpiMetrics.resolved}
-              </p>
-            </Card>
-
-            <Card className="p-4">
-              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                {APP_STRINGS.VIEWS.MICROSOFT.HEADING_KPI_TOTAL}
-              </span>
-              <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">
-                {kpiMetrics.total}
-              </p>
-            </Card>
+      {/* Action Toolbar, Search & Filter Controls */}
+      <Card className="p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          {/* Search bar */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" aria-hidden="true" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => handleFilterChange(setSearchQuery, e.target.value)}
+              placeholder={m.INPUT_SEARCH_TENANTS}
+              className="w-full rounded-lg border border-slate-200 bg-slate-50/60 py-2 pl-9 pr-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:outline-none dark:border-slate-800 dark:bg-slate-800/60 dark:text-white"
+            />
           </div>
 
-          {/* Action Toolbar & Filters */}
-          <Card className="p-4">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-wrap items-center gap-2">
-                <Filter className="h-4 w-4 text-slate-400" aria-hidden="true" />
-                <select
-                  value={severityFilter}
-                  onChange={(e) => setSeverityFilter(e.target.value)}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                >
-                  <option value="all">{APP_STRINGS.VIEWS.MICROSOFT.BTN_FILTER_ALL}</option>
-                  <option value="critical">Critical</option>
-                  <option value="high">High</option>
-                  <option value="medium">Medium</option>
-                  <option value="low">Low</option>
-                </select>
-
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                >
-                  <option value="all">All Statuses</option>
-                  <option value="active">Active</option>
-                  <option value="investigating">Investigating</option>
-                  <option value="resolved">Resolved</option>
-                </select>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <Button onClick={simulateThreatSignal} icon={Sparkles} variant="warning">
-                  {APP_STRINGS.VIEWS.MICROSOFT.BTN_SIMULATE_ALERT}
-                </Button>
-                <Button onClick={exportSentinelLog} icon={Download} variant="secondary">
-                  {APP_STRINGS.VIEWS.MICROSOFT.BTN_EXPORT_SENTINEL}
-                </Button>
-              </div>
+          {/* Filters & Sorting */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Telemetry Bubble Filter */}
+            <div className="flex items-center gap-1.5">
+              <Filter className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+              <select
+                value={telemetryFilter}
+                onChange={(e) => handleFilterChange(setTelemetryFilter, e.target.value)}
+                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+              >
+                <option value="all">{m.OPT_FILTER_ALL}</option>
+                <option value="full">{m.OPT_FILTER_FULL_STACK}</option>
+                <option value="sentinel">{m.OPT_FILTER_SENTINEL}</option>
+                <option value="mde">{m.OPT_FILTER_MDE}</option>
+                <option value="mdi">{m.OPT_FILTER_MDI}</option>
+                <option value="logAnalytics">{m.OPT_FILTER_AUDIT}</option>
+              </select>
             </div>
-          </Card>
 
-          {/* Incidents List */}
-          <div className="space-y-3">
-            {filteredIncidents.length === 0 ? (
-              <Card className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
-                {APP_STRINGS.VIEWS.MICROSOFT.TXT_NO_INCIDENTS}
-              </Card>
-            ) : (
-              filteredIncidents.map((incident) => {
-                const colors = SEVERITY_COLORS[incident.severity];
-                return (
-                  <Card key={incident.id} className="p-5">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="space-y-1.5">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span
-                            className={cn(
-                              'rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider',
-                              colors.bg,
-                              colors.text,
-                              colors.border
-                            )}
-                          >
-                            {incident.severity}
-                          </span>
-                          <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-                            {incident.category}
-                          </span>
-                          <span className="text-[11px] text-slate-400">
-                            Source: {incident.source}
-                          </span>
-                        </div>
-                        <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                          {incident.title}
-                        </h4>
-                        <p className="text-xs text-slate-600 dark:text-slate-300">
-                          {incident.description}
-                        </p>
-                        <div className="mt-2 rounded-lg bg-slate-50 p-2.5 text-[11px] text-slate-600 dark:bg-slate-800/60 dark:text-slate-400">
-                          <strong className="text-slate-800 dark:text-slate-200">Defender Recommendation: </strong>
-                          {incident.recommendation}
-                        </div>
-                      </div>
+            {/* Score Tier Filter */}
+            <select
+              value={selectedTier}
+              onChange={(e) => handleFilterChange(setSelectedTier, e.target.value as TenantScoreTier)}
+              className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+            >
+              <option value="all">{m.OPT_TIER_ALL}</option>
+              <option value="diamond">{m.OPT_TIER_DIAMOND}</option>
+              <option value="gold">{m.OPT_TIER_GOLD}</option>
+              <option value="silver">{m.OPT_TIER_SILVER}</option>
+              <option value="bronze">{m.OPT_TIER_BRONZE}</option>
+              <option value="critical">{m.OPT_TIER_CRITICAL}</option>
+            </select>
 
-                      {/* Status Selector */}
-                      <div className="flex shrink-0 items-center gap-1.5 pt-1 sm:pt-0">
-                        {STATUS_OPTIONS.map((st) => {
-                          const isSelected = incident.status === st.id;
-                          return (
-                            <button
-                              key={st.id}
-                              type="button"
-                              onClick={() => updateStatus(incident.id, st.id)}
-                              className={cn(
-                                'cursor-pointer rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all active:scale-95',
-                                isSelected
-                                  ? st.id === 'resolved'
-                                    ? 'bg-emerald-600 text-white'
-                                    : st.id === 'investigating'
-                                      ? 'bg-blue-600 text-white'
-                                      : 'bg-rose-600 text-white'
-                                  : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800'
-                              )}
-                            >
-                              {st.label}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </Card>
-                );
-              })
+            {/* Sort Field Selector */}
+            <div className="flex items-center gap-1.5">
+              <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+              <select
+                value={sortField}
+                onChange={(e) => handleFilterChange(setSortField, e.target.value as TenantSortField)}
+                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+              >
+                <option value="overallScore">
+                  {sortOrder === 'desc' ? m.OPT_SORT_SCORE_DESC : m.OPT_SORT_SCORE_ASC}
+                </option>
+                <option value="rank">
+                  {sortOrder === 'asc' ? m.OPT_SORT_RANK_ASC : m.OPT_SORT_RANK_DESC}
+                </option>
+                <option value="name">
+                  {sortOrder === 'asc' ? m.OPT_SORT_NAME_ASC : m.OPT_SORT_NAME_DESC}
+                </option>
+                <option value="device">
+                  {sortOrder === 'desc' ? m.OPT_SORT_DEVICE_DESC : m.OPT_SORT_DEVICE_ASC}
+                </option>
+                <option value="identities">
+                  {sortOrder === 'desc' ? m.OPT_SORT_IDENTITIES_DESC : m.OPT_SORT_IDENTITIES_ASC}
+                </option>
+                <option value="apps">
+                  {sortOrder === 'desc' ? m.OPT_SORT_APPS_DESC : m.OPT_SORT_APPS_ASC}
+                </option>
+                <option value="data">
+                  {sortOrder === 'desc' ? m.OPT_SORT_DATA_DESC : m.OPT_SORT_DATA_ASC}
+                </option>
+              </select>
+            </div>
+
+            {/* Sort Order Toggle */}
+            <button
+              type="button"
+              onClick={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
+              title={`Toggle sort order: currently ${orderLabel}`}
+              aria-label={`Toggle sort order: currently ${orderLabel}`}
+              className="flex cursor-pointer select-none items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 active:scale-95 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+            >
+              {sortOrder === 'desc' ? (
+                <ArrowDown className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" aria-hidden="true" />
+              ) : (
+                <ArrowUp className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" aria-hidden="true" />
+              )}
+              <span>{orderLabel}</span>
+            </button>
+
+            {/* Reset Filters */}
+            {(searchQuery || telemetryFilter !== 'all' || selectedTier !== 'all' || sortField !== 'overallScore') && (
+              <Button onClick={handleResetFilters} icon={RotateCcw} variant="secondary">
+                {m.BTN_RESET_FILTERS}
+              </Button>
             )}
           </div>
         </div>
-      )}
+      </Card>
 
-      {/* TAB 2: MSRC CVE & VULNERABILITY RADAR */}
-      {activeTab === 'msrc' && (
+      {/* TAB 1: TILE-BASED VIEW (PRIMARY) */}
+      {activeTab === 'tiles' && (
         <div className="space-y-6">
-          {/* Search and Filters Bar */}
-          <Card className="p-4">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" aria-hidden="true" />
-                <input
-                  type="text"
-                  value={cveQuery}
-                  onChange={(e) => setCveQuery(e.target.value)}
-                  placeholder={APP_STRINGS.VIEWS.MICROSOFT.INPUT_SEARCH_CVES}
-                  className="w-full rounded-lg border border-slate-200 bg-slate-50/60 py-2 pl-9 pr-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:outline-none dark:border-slate-800 dark:bg-slate-800/60 dark:text-white"
+          {processedTenants.length === 0 ? (
+            <Card className="p-12 text-center text-xs text-slate-500 dark:text-slate-400">
+              {m.TXT_NO_TENANTS}
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {paginatedTenants.map((tenant) => (
+                <TenantCard
+                  key={tenant.id}
+                  tenant={tenant}
+                  onInspect={setInspectingTenant}
                 />
+              ))}
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {processedTenants.length > 0 && (
+            <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-4 sm:flex-row dark:border-slate-800">
+              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <span>
+                  {m.TXT_PAGINATION_SHOWING}{' '}
+                  <strong className="text-slate-900 dark:text-white">
+                    {(page - 1) * pageSize + 1}
+                  </strong>{' '}
+                  -{' '}
+                  <strong className="text-slate-900 dark:text-white">
+                    {Math.min(page * pageSize, processedTenants.length)}
+                  </strong>{' '}
+                  {m.TXT_PAGINATION_OF}{' '}
+                  <strong className="text-slate-900 dark:text-white">
+                    {processedTenants.length}
+                  </strong>{' '}
+                  {m.TXT_PAGINATION_TENANTS}
+                </span>
+
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                >
+                  <option value={12}>12 / page</option>
+                  <option value={24}>24 / page</option>
+                  <option value={48}>48 / page</option>
+                  <option value={200}>All 200</option>
+                </select>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                <select
-                  value={cveSeverity}
-                  onChange={(e) => setCveSeverity(e.target.value)}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+              <div className="flex items-center gap-1.5">
+                <Button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  variant="secondary"
                 >
-                  <option value="all">All Severities</option>
-                  <option value="critical">Critical</option>
-                  <option value="high">High</option>
-                  <option value="medium">Medium</option>
-                </select>
+                  &larr; Previous
+                </Button>
 
-                <select
-                  value={cveProduct}
-                  onChange={(e) => setCveProduct(e.target.value)}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                <span className="px-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  {m.TXT_PAGE} {page} {m.TXT_PAGINATION_OF} {totalPages}
+                </span>
+
+                <Button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  variant="secondary"
                 >
-                  <option value="all">All Products</option>
-                  <option value="edge">Microsoft Edge</option>
-                  <option value="entra">Azure Entra ID</option>
-                  <option value="defense">Windows Web Defense</option>
-                  <option value="365">Microsoft 365</option>
-                </select>
+                  Next &rarr;
+                </Button>
               </div>
             </div>
-          </Card>
-
-          {/* CVE Cards Grid */}
-          <div className="space-y-3">
-            {filteredCves.length === 0 ? (
-              <Card className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
-                {APP_STRINGS.VIEWS.MICROSOFT.TXT_NO_CVES}
-              </Card>
-            ) : (
-              filteredCves.map((cve) => (
-                <Card key={cve.cveId} className="p-5">
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-mono text-xs font-bold text-accent">
-                          {cve.cveId}
-                        </span>
-                        <span
-                          className={cn(
-                            'rounded-md px-2 py-0.5 text-[10px] font-bold uppercase',
-                            cve.severity === 'Critical'
-                              ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
-                              : cve.severity === 'High'
-                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
-                                : 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                          )}
-                        >
-                          {cve.severity}
-                        </span>
-                        <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                          CVSS {cve.cvssScore}
-                        </span>
-                        {cve.isZeroDay && (
-                          <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-600 dark:bg-rose-950/80 dark:text-rose-400">
-                            <Flame className="h-3 w-3" aria-hidden="true" />
-                            {APP_STRINGS.VIEWS.MICROSOFT.TXT_ZERO_DAY_BADGE}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 text-[11px] text-slate-400">
-                        <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>Published: {cve.publishedDate}</span>
-                      </div>
-                    </div>
-
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                      {cve.title}
-                    </h4>
-                    <p className="text-xs text-slate-600 dark:text-slate-300">
-                      {cve.description}
-                    </p>
-
-                    <div className="mt-3 flex flex-col gap-2 rounded-lg bg-slate-50 p-3 text-xs sm:flex-row sm:items-center sm:justify-between dark:bg-slate-800/60">
-                      <div>
-                        <span className="font-semibold text-slate-700 dark:text-slate-300">
-                          Recommended Mitigation:
-                        </span>{' '}
-                        <span className="text-slate-600 dark:text-slate-400">{cve.mitigation}</span>
-                      </div>
-                      <span className="shrink-0 rounded bg-white px-2 py-1 font-mono text-[10px] font-semibold text-slate-700 shadow-2xs dark:bg-slate-900 dark:text-slate-300">
-                        {cve.kbArticle}
-                      </span>
-                    </div>
-                  </div>
-                </Card>
-              ))
-            )}
-          </div>
+          )}
         </div>
       )}
+
+      {/* TAB 2: GAMIFIED LEADERBOARD CHARTS */}
+      {activeTab === 'charts' && (
+        <TenantLeaderboardChart
+          tenants={processedTenants}
+          selectedTier={selectedTier}
+          onSelectTier={setSelectedTier}
+          onInspectTenant={setInspectingTenant}
+        />
+      )}
+
+      {/* TAB 3: DIRECTORY SPREADSHEET TABLE */}
+      {activeTab === 'table' && (
+        <Card className="overflow-hidden p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="border-b border-slate-200 bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-400">
+                <tr>
+                  <th className="px-4 py-3">Rank</th>
+                  <th className="px-4 py-3">Tenant & Domain</th>
+                  <th className="px-4 py-3 text-center">Score</th>
+                  <th className="px-4 py-3 text-center">{m.LABEL_BUBBLES_SECTION}</th>
+                  <th className="px-4 py-3 text-right">{m.CAT_DEVICE}</th>
+                  <th className="px-4 py-3 text-right">{m.CAT_IDENTITIES}</th>
+                  <th className="px-4 py-3 text-right">{m.CAT_APPS}</th>
+                  <th className="px-4 py-3 text-right">{m.CAT_DATA}</th>
+                  <th className="px-4 py-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {paginatedTenants.map((tenant) => (
+                  <tr
+                    key={tenant.id}
+                    className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors"
+                  >
+                    <td className="px-4 py-3 font-mono font-bold text-slate-600 dark:text-slate-400">
+                      #{tenant.rank}
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="font-bold text-slate-900 dark:text-white">{tenant.name}</p>
+                      <p className="font-mono text-[10px] text-slate-400">{tenant.domain}</p>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className="font-mono font-black text-sm text-slate-900 dark:text-white">
+                        {tenant.overallScore}%
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-center gap-1">
+                        <span
+                          title="Sentinel"
+                          className={cn(
+                            'h-2 w-2 rounded-full',
+                            tenant.statusBubbles.sentinel ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
+                          )}
+                        />
+                        <span
+                          title="MDE"
+                          className={cn(
+                            'h-2 w-2 rounded-full',
+                            tenant.statusBubbles.mde ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
+                          )}
+                        />
+                        <span
+                          title="MDI"
+                          className={cn(
+                            'h-2 w-2 rounded-full',
+                            tenant.statusBubbles.mdi ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
+                          )}
+                        />
+                        <span
+                          title="Audit Logging"
+                          className={cn(
+                            'h-2 w-2 rounded-full',
+                            tenant.statusBubbles.logAnalytics ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
+                          )}
+                        />
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono">{tenant.categories.device}%</td>
+                    <td className="px-4 py-3 text-right font-mono">{tenant.categories.identities}%</td>
+                    <td className="px-4 py-3 text-right font-mono">{tenant.categories.apps}%</td>
+                    <td className="px-4 py-3 text-right font-mono">{tenant.categories.data}%</td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        type="button"
+                        onClick={() => setInspectingTenant(tenant)}
+                        className="cursor-pointer font-bold text-accent hover:underline text-xs"
+                      >
+                        Inspect
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+
+      {/* Detailed Tenant Inspection Modal */}
+      <TenantDetailModal
+        tenant={inspectingTenant}
+        isOpen={Boolean(inspectingTenant)}
+        onClose={() => setInspectingTenant(null)}
+      />
     </div>
   );
 });
+
+MicrosoftView.displayName = 'MicrosoftView';
 
 // Colocated Microsoft view routing metadata
 export const microsoftView: ViewDefinition = {

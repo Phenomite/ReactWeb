@@ -43,9 +43,9 @@ export const ACCENT_CONFIG = {
   DEFAULT_ACCENT: 'blue' as AccentColor,
 } as const;
 
-// Toast notification timeout constants
+// Toast notification timeout constants (configured for 5 seconds per user specification)
 export const TOAST_CONFIG = {
-  DEFAULT_DURATION_MS: 3500,
+  DEFAULT_DURATION_MS: 5000,
 } as const;
 
 // Authentication storage constants

@@ -1,0 +1,4402 @@
+[
+  {
+    "id": "tenant-016",
+    "name": "Consolidated Messenger Global",
+    "domain": "consolidatedmessen.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "Sweden Central",
+    "seatCount": 52614,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 90.1,
+      "identities": 97.4,
+      "apps": 95.8,
+      "data": 91.3
+    },
+    "overallScore": 93.9,
+    "rank": 1
+  },
+  {
+    "id": "tenant-143",
+    "name": "Apex Capital Technologies",
+    "domain": "apexcapitaltechnol.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "Switzerland North",
+    "seatCount": 74343,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 92,
+      "identities": 92.2,
+      "apps": 79.6,
+      "data": 90.1
+    },
+    "overallScore": 89,
+    "rank": 2
+  },
+  {
+    "id": "tenant-067",
+    "name": "Southridge Enterprises",
+    "domain": "southridgeenterpri.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "North Europe",
+    "seatCount": 46406,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 89.3,
+      "identities": 95.8,
+      "apps": 91.9,
+      "data": 71.9
+    },
+    "overallScore": 88.8,
+    "rank": 3
+  },
+  {
+    "id": "tenant-024",
+    "name": "Fourth Coffee Global",
+    "domain": "fourthcoffeeglobal.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Japan East",
+    "seatCount": 57411,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 83.8,
+      "identities": 88.5,
+      "apps": 92.7,
+      "data": 89.6
+    },
+    "overallScore": 88.3,
+    "rank": 4
+  },
+  {
+    "id": "tenant-014",
+    "name": "Wide World Importers Global",
+    "domain": "wideworldimporters.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "Canada Central",
+    "seatCount": 88395,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 79.3,
+      "identities": 93.8,
+      "apps": 90.6,
+      "data": 85.7
+    },
+    "overallScore": 87.6,
+    "rank": 5
+  },
+  {
+    "id": "tenant-132",
+    "name": "Munson's Pickles Technologies",
+    "domain": "munsonspicklestech.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "West Europe",
+    "seatCount": 11431,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 90.9,
+      "identities": 92.4,
+      "apps": 90.5,
+      "data": 65.2
+    },
+    "overallScore": 86.7,
+    "rank": 6
+  },
+  {
+    "id": "tenant-086",
+    "name": "Baldwin Museum Enterprises",
+    "domain": "baldwinmuseumenter.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "Japan East",
+    "seatCount": 12449,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 86.1,
+      "identities": 95.5,
+      "apps": 78.4,
+      "data": 81.6
+    },
+    "overallScore": 86.6,
+    "rank": 7
+  },
+  {
+    "id": "tenant-027",
+    "name": "Margie's Travel Global",
+    "domain": "margiestravelgloba.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "West US 2",
+    "seatCount": 22687,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 85.8,
+      "identities": 85.4,
+      "apps": 82.5,
+      "data": 93
+    },
+    "overallScore": 86.2,
+    "rank": 8
+  },
+  {
+    "id": "tenant-051",
+    "name": "Ironclad Cloud Global",
+    "domain": "ironcladcloudgloba.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "Australia East",
+    "seatCount": 92470,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 88.8,
+      "identities": 89.3,
+      "apps": 89.4,
+      "data": 72.7
+    },
+    "overallScore": 86.2,
+    "rank": 9
+  },
+  {
+    "id": "tenant-089",
+    "name": "Skyline Networks Enterprises",
+    "domain": "skylinenetworksent.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Southeast Asia",
+    "seatCount": 79379,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 76.6,
+      "identities": 89.3,
+      "apps": 88.5,
+      "data": 91.8
+    },
+    "overallScore": 86,
+    "rank": 10
+  },
+  {
+    "id": "tenant-042",
+    "name": "Pinnacle Systems Global",
+    "domain": "pinnaclesystemsglo.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "East US",
+    "seatCount": 44450,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 85.3,
+      "identities": 83.3,
+      "apps": 92.6,
+      "data": 82.3
+    },
+    "overallScore": 85.7,
+    "rank": 11
+  },
+  {
+    "id": "tenant-015",
+    "name": "Southridge Global",
+    "domain": "southridgeglobal.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "Southeast Asia",
+    "seatCount": 73624,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 80,
+      "identities": 91.5,
+      "apps": 86,
+      "data": 82.5
+    },
+    "overallScore": 85.5,
+    "rank": 12
+  },
+  {
+    "id": "tenant-031",
+    "name": "Parnell Aerospace Global",
+    "domain": "parnellaerospacegl.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "West US 2",
+    "seatCount": 88475,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 88.4,
+      "identities": 82.1,
+      "apps": 88.3,
+      "data": 83.3
+    },
+    "overallScore": 85.4,
+    "rank": 13
+  },
+  {
+    "id": "tenant-003",
+    "name": "Woodgrove Global",
+    "domain": "woodgroveglobal.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "Japan East",
+    "seatCount": 29526,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 94.3,
+      "identities": 83.3,
+      "apps": 81.3,
+      "data": 79.1
+    },
+    "overallScore": 85.2,
+    "rank": 14
+  },
+  {
+    "id": "tenant-021",
+    "name": "Lamna Healthcare Global",
+    "domain": "lamnahealthcareglo.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "Central US",
+    "seatCount": 8128,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 81.3,
+      "identities": 89.7,
+      "apps": 87.7,
+      "data": 80.2
+    },
+    "overallScore": 85.2,
+    "rank": 15
+  },
+  {
+    "id": "tenant-029",
+    "name": "Proseware Global",
+    "domain": "prosewareglobal.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "Canada Central",
+    "seatCount": 35326,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 97.5,
+      "identities": 85.1,
+      "apps": 80.2,
+      "data": 70.8
+    },
+    "overallScore": 84.9,
+    "rank": 16
+  },
+  {
+    "id": "tenant-036",
+    "name": "Finman Global Global",
+    "domain": "finmanglobalglobal.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "Sweden Central",
+    "seatCount": 35705,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 83.3,
+      "identities": 91.5,
+      "apps": 83.8,
+      "data": 76.6
+    },
+    "overallScore": 84.8,
+    "rank": 17
+  },
+  {
+    "id": "tenant-119",
+    "name": "Southridge Technologies",
+    "domain": "southridgetechnolo.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Sweden Central",
+    "seatCount": 46214,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 92,
+      "identities": 90.2,
+      "apps": 73.9,
+      "data": 77.1
+    },
+    "overallScore": 84.8,
+    "rank": 18
+  },
+  {
+    "id": "tenant-054",
+    "name": "Fabrikam Enterprises",
+    "domain": "fabrikamenterprise.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "North Europe",
+    "seatCount": 85152,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 90.1,
+      "identities": 86.9,
+      "apps": 86.7,
+      "data": 69.5
+    },
+    "overallScore": 84.6,
+    "rank": 19
+  },
+  {
+    "id": "tenant-030",
+    "name": "City Power & Light Global",
+    "domain": "citypowerlightglob.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "Central US",
+    "seatCount": 40004,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 88.2,
+      "identities": 89.9,
+      "apps": 74.8,
+      "data": 81.2
+    },
+    "overallScore": 84.5,
+    "rank": 20
+  },
+  {
+    "id": "tenant-056",
+    "name": "Northwind Enterprises",
+    "domain": "northwindenterpris.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "Japan East",
+    "seatCount": 33318,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 78.8,
+      "identities": 96,
+      "apps": 81,
+      "data": 74.3
+    },
+    "overallScore": 84,
+    "rank": 21
+  },
+  {
+    "id": "tenant-019",
+    "name": "Datum Cyber Global",
+    "domain": "datumcyberglobal.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "Central US",
+    "seatCount": 17985,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 75.9,
+      "identities": 88.6,
+      "apps": 93.1,
+      "data": 76.9
+    },
+    "overallScore": 83.9,
+    "rank": 22
+  },
+  {
+    "id": "tenant-069",
+    "name": "Graphic Design Institute Enterprises",
+    "domain": "graphicdesigninsti.onmicrosoft.com",
+    "industry": "Financial Services",
+    "region": "West Europe",
+    "seatCount": 26019,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 79.2,
+      "identities": 90.6,
+      "apps": 74.4,
+      "data": 89.1
+    },
+    "overallScore": 83.6,
+    "rank": 23
+  },
+  {
+    "id": "tenant-007",
+    "name": "Litware Global",
+    "domain": "litwareglobal.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "Australia East",
+    "seatCount": 68286,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 88.8,
+      "identities": 84.4,
+      "apps": 82.5,
+      "data": 74.6
+    },
+    "overallScore": 83.4,
+    "rank": 24
+  },
+  {
+    "id": "tenant-006",
+    "name": "Adatum Global",
+    "domain": "adatumglobal.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "North Europe",
+    "seatCount": 49626,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 90,
+      "identities": 83.5,
+      "apps": 75.9,
+      "data": 81.3
+    },
+    "overallScore": 83.3,
+    "rank": 25
+  },
+  {
+    "id": "tenant-071",
+    "name": "Datum Cyber Enterprises",
+    "domain": "datumcyberenterpri.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "Sweden Central",
+    "seatCount": 7998,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 82.4,
+      "identities": 88.6,
+      "apps": 70.5,
+      "data": 90.4
+    },
+    "overallScore": 83.2,
+    "rank": 26
+  },
+  {
+    "id": "tenant-037",
+    "name": "Skyline Networks Global",
+    "domain": "skylinenetworksglo.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "North Europe",
+    "seatCount": 80847,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 96.7,
+      "identities": 77.9,
+      "apps": 80.3,
+      "data": 74.5
+    },
+    "overallScore": 83.1,
+    "rank": 27
+  },
+  {
+    "id": "tenant-139",
+    "name": "Tosh Mondo Technologies",
+    "domain": "toshmondotechnolog.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "Canada Central",
+    "seatCount": 87285,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 92.3,
+      "identities": 86.8,
+      "apps": 73.1,
+      "data": 74
+    },
+    "overallScore": 83,
+    "rank": 28
+  },
+  {
+    "id": "tenant-033",
+    "name": "Bellows College Global",
+    "domain": "bellowscollegeglob.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "UK South",
+    "seatCount": 10706,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 84.7,
+      "identities": 88.1,
+      "apps": 75.6,
+      "data": 79.6
+    },
+    "overallScore": 82.9,
+    "rank": 29
+  },
+  {
+    "id": "tenant-088",
+    "name": "Finman Global Enterprises",
+    "domain": "finmanglobalenterp.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "West Europe",
+    "seatCount": 64880,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 84.3,
+      "identities": 84.7,
+      "apps": 85.1,
+      "data": 74.8
+    },
+    "overallScore": 82.9,
+    "rank": 30
+  },
+  {
+    "id": "tenant-039",
+    "name": "Apex Capital Global",
+    "domain": "apexcapitalglobal.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "West US 2",
+    "seatCount": 71219,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 75.3,
+      "identities": 91.1,
+      "apps": 78.9,
+      "data": 83.8
+    },
+    "overallScore": 82.7,
+    "rank": 31
+  },
+  {
+    "id": "tenant-097",
+    "name": "Titan Industrial Enterprises",
+    "domain": "titanindustrialent.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "Sweden Central",
+    "seatCount": 74236,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 77.8,
+      "identities": 84.4,
+      "apps": 81.7,
+      "data": 88.7
+    },
+    "overallScore": 82.7,
+    "rank": 32
+  },
+  {
+    "id": "tenant-106",
+    "name": "Fabrikam Technologies",
+    "domain": "fabrikamtechnologi.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "Sweden Central",
+    "seatCount": 9231,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 86,
+      "identities": 86,
+      "apps": 74.2,
+      "data": 82.3
+    },
+    "overallScore": 82.7,
+    "rank": 33
+  },
+  {
+    "id": "tenant-048",
+    "name": "OmniCorp Global Global",
+    "domain": "omnicorpglobalglob.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "Canada Central",
+    "seatCount": 80446,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 74.9,
+      "identities": 94.8,
+      "apps": 83.4,
+      "data": 70.8
+    },
+    "overallScore": 82.4,
+    "rank": 34
+  },
+  {
+    "id": "tenant-064",
+    "name": "Alpine Enterprises",
+    "domain": "alpineenterprises.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "Japan East",
+    "seatCount": 47928,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 79.7,
+      "identities": 90.3,
+      "apps": 66.9,
+      "data": 91.1
+    },
+    "overallScore": 82.3,
+    "rank": 35
+  },
+  {
+    "id": "tenant-096",
+    "name": "Meridian Bio Enterprises",
+    "domain": "meridianbioenterpr.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "West Europe",
+    "seatCount": 71305,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 94.2,
+      "identities": 77.2,
+      "apps": 79.2,
+      "data": 76.6
+    },
+    "overallScore": 82.3,
+    "rank": 36
+  },
+  {
+    "id": "tenant-052",
+    "name": "Horizon Financial Global",
+    "domain": "horizonfinancialgl.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "West Europe",
+    "seatCount": 34130,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 88.3,
+      "identities": 80.7,
+      "apps": 78.5,
+      "data": 79
+    },
+    "overallScore": 82,
+    "rank": 37
+  },
+  {
+    "id": "tenant-002",
+    "name": "Fabrikam Global",
+    "domain": "fabrikamglobal.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "North Europe",
+    "seatCount": 16944,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 80.1,
+      "identities": 79.8,
+      "apps": 76.9,
+      "data": 92.7
+    },
+    "overallScore": 81.6,
+    "rank": 38
+  },
+  {
+    "id": "tenant-004",
+    "name": "Northwind Global",
+    "domain": "northwindglobal.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "Japan East",
+    "seatCount": 8482,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 75.4,
+      "identities": 88,
+      "apps": 73.6,
+      "data": 88.2
+    },
+    "overallScore": 81.3,
+    "rank": 39
+  },
+  {
+    "id": "tenant-010",
+    "name": "Lucerne Global",
+    "domain": "lucerneglobal.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "Canada Central",
+    "seatCount": 38299,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 78,
+      "identities": 89.4,
+      "apps": 79.8,
+      "data": 73.8
+    },
+    "overallScore": 81.3,
+    "rank": 40
+  },
+  {
+    "id": "tenant-009",
+    "name": "Trey Research Global",
+    "domain": "treyresearchglobal.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "Canada Central",
+    "seatCount": 81999,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 95.1,
+      "identities": 86,
+      "apps": 52.7,
+      "data": 85.8
+    },
+    "overallScore": 81.2,
+    "rank": 41
+  },
+  {
+    "id": "tenant-053",
+    "name": "Contoso Enterprises",
+    "domain": "contosoenterprises.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "Southeast Asia",
+    "seatCount": 76582,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 93.7,
+      "identities": 91.5,
+      "apps": 76.4,
+      "data": 48.3
+    },
+    "overallScore": 81,
+    "rank": 42
+  },
+  {
+    "id": "tenant-008",
+    "name": "AdventureWorks Global",
+    "domain": "adventureworksglob.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "Australia East",
+    "seatCount": 8482,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 84,
+      "identities": 92.8,
+      "apps": 69.5,
+      "data": 68
+    },
+    "overallScore": 80.7,
+    "rank": 43
+  },
+  {
+    "id": "tenant-099",
+    "name": "Echo Dynamics Enterprises",
+    "domain": "echodynamicsenterp.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "Southeast Asia",
+    "seatCount": 55418,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 81.5,
+      "identities": 90.8,
+      "apps": 77,
+      "data": 66.2
+    },
+    "overallScore": 80.7,
+    "rank": 44
+  },
+  {
+    "id": "tenant-170",
+    "name": "Wide World Importers Systems",
+    "domain": "wideworldimporters.onmicrosoft.com",
+    "industry": "Financial Services",
+    "region": "Switzerland North",
+    "seatCount": 30835,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 76.3,
+      "identities": 87,
+      "apps": 79.8,
+      "data": 76.9
+    },
+    "overallScore": 80.6,
+    "rank": 45
+  },
+  {
+    "id": "tenant-083",
+    "name": "Parnell Aerospace Enterprises",
+    "domain": "parnellaerospaceen.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "North Europe",
+    "seatCount": 52162,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 90.3,
+      "identities": 79.7,
+      "apps": 79.2,
+      "data": 68.1
+    },
+    "overallScore": 80.5,
+    "rank": 46
+  },
+  {
+    "id": "tenant-092",
+    "name": "Solstice Energy Enterprises",
+    "domain": "solsticeenergyente.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "Japan East",
+    "seatCount": 18691,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 72,
+      "identities": 89.5,
+      "apps": 80.1,
+      "data": 76.5
+    },
+    "overallScore": 80.2,
+    "rank": 47
+  },
+  {
+    "id": "tenant-114",
+    "name": "Lucerne Technologies",
+    "domain": "lucernetechnologie.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "Canada Central",
+    "seatCount": 43387,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 85.7,
+      "identities": 76.4,
+      "apps": 75.9,
+      "data": 83.5
+    },
+    "overallScore": 80.2,
+    "rank": 48
+  },
+  {
+    "id": "tenant-081",
+    "name": "Proseware Enterprises",
+    "domain": "prosewareenterpris.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "Australia East",
+    "seatCount": 15278,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 83,
+      "identities": 77.2,
+      "apps": 79.2,
+      "data": 79.6
+    },
+    "overallScore": 79.7,
+    "rank": 49
+  },
+  {
+    "id": "tenant-028",
+    "name": "Munson's Pickles Global",
+    "domain": "munsonspicklesglob.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "West US 2",
+    "seatCount": 19304,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 77.1,
+      "identities": 81.5,
+      "apps": 80.2,
+      "data": 78.7
+    },
+    "overallScore": 79.5,
+    "rank": 50
+  },
+  {
+    "id": "tenant-176",
+    "name": "Blue Yonder Systems",
+    "domain": "blueyondersystems.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "West Europe",
+    "seatCount": 39328,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 82.9,
+      "identities": 85.2,
+      "apps": 74.8,
+      "data": 69.6
+    },
+    "overallScore": 79.5,
+    "rank": 51
+  },
+  {
+    "id": "tenant-013",
+    "name": "VanArsdel Global",
+    "domain": "vanarsdelglobal.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "Canada Central",
+    "seatCount": 89950,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 85.8,
+      "identities": 82.4,
+      "apps": 72.6,
+      "data": 72.5
+    },
+    "overallScore": 79.4,
+    "rank": 52
+  },
+  {
+    "id": "tenant-057",
+    "name": "Tailspin Enterprises",
+    "domain": "tailspinenterprise.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "West Europe",
+    "seatCount": 12568,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 85.4,
+      "identities": 76.6,
+      "apps": 70.2,
+      "data": 84.9
+    },
+    "overallScore": 79.2,
+    "rank": 53
+  },
+  {
+    "id": "tenant-011",
+    "name": "Coho Global",
+    "domain": "cohoglobal.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "Australia East",
+    "seatCount": 56352,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 82.7,
+      "identities": 96.8,
+      "apps": 40.4,
+      "data": 88.7
+    },
+    "overallScore": 79,
+    "rank": 54
+  },
+  {
+    "id": "tenant-128",
+    "name": "Fourth Coffee Technologies",
+    "domain": "fourthcoffeetechno.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "West US 2",
+    "seatCount": 8720,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 87.7,
+      "identities": 84.4,
+      "apps": 86.6,
+      "data": 46.4
+    },
+    "overallScore": 79,
+    "rank": 55
+  },
+  {
+    "id": "tenant-050",
+    "name": "Falcon Defense Global",
+    "domain": "falcondefensegloba.onmicrosoft.com",
+    "industry": "Financial Services",
+    "region": "Central US",
+    "seatCount": 84373,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 83.8,
+      "identities": 90.9,
+      "apps": 82.1,
+      "data": 45.4
+    },
+    "overallScore": 78.8,
+    "rank": 56
+  },
+  {
+    "id": "tenant-084",
+    "name": "Terra Flora Enterprises",
+    "domain": "terrafloraenterpri.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "Sweden Central",
+    "seatCount": 70500,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 83.6,
+      "identities": 91.6,
+      "apps": 57.4,
+      "data": 74.5
+    },
+    "overallScore": 78.8,
+    "rank": 57
+  },
+  {
+    "id": "tenant-113",
+    "name": "Trey Research Technologies",
+    "domain": "treyresearchtechno.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "Central US",
+    "seatCount": 43042,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 94.4,
+      "identities": 75.3,
+      "apps": 72.6,
+      "data": 66.7
+    },
+    "overallScore": 78.5,
+    "rank": 58
+  },
+  {
+    "id": "tenant-049",
+    "name": "Crestview Health Global",
+    "domain": "crestviewhealthglo.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "Australia East",
+    "seatCount": 20062,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 77.4,
+      "identities": 81.7,
+      "apps": 73.1,
+      "data": 80
+    },
+    "overallScore": 78.3,
+    "rank": 59
+  },
+  {
+    "id": "tenant-177",
+    "name": "Lamna Healthcare Systems",
+    "domain": "lamnahealthcaresys.onmicrosoft.com",
+    "industry": "Financial Services",
+    "region": "West Europe",
+    "seatCount": 52586,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 76.3,
+      "identities": 79.7,
+      "apps": 77.9,
+      "data": 79.2
+    },
+    "overallScore": 78.3,
+    "rank": 60
+  },
+  {
+    "id": "tenant-188",
+    "name": "Terra Flora Systems",
+    "domain": "terraflorasystems.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "East US",
+    "seatCount": 47573,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 76.1,
+      "identities": 75.3,
+      "apps": 84.4,
+      "data": 78.9
+    },
+    "overallScore": 78.2,
+    "rank": 61
+  },
+  {
+    "id": "tenant-090",
+    "name": "Vanguard Medical Enterprises",
+    "domain": "vanguardmedicalent.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "Canada Central",
+    "seatCount": 11014,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 78,
+      "identities": 80,
+      "apps": 70.5,
+      "data": 84.3
+    },
+    "overallScore": 78.1,
+    "rank": 62
+  },
+  {
+    "id": "tenant-063",
+    "name": "Coho Enterprises",
+    "domain": "cohoenterprises.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "Southeast Asia",
+    "seatCount": 42961,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 83.8,
+      "identities": 91.5,
+      "apps": 49.1,
+      "data": 76.8
+    },
+    "overallScore": 77.4,
+    "rank": 63
+  },
+  {
+    "id": "tenant-026",
+    "name": "Wingtip Toys Global",
+    "domain": "wingtiptoysglobal.onmicrosoft.com",
+    "industry": "Financial Services",
+    "region": "Switzerland North",
+    "seatCount": 90667,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 76.2,
+      "identities": 82.2,
+      "apps": 78.4,
+      "data": 68.2
+    },
+    "overallScore": 77.2,
+    "rank": 64
+  },
+  {
+    "id": "tenant-043",
+    "name": "Aegis Logistics Global",
+    "domain": "aegislogisticsglob.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "North Europe",
+    "seatCount": 9560,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 80.4,
+      "identities": 92.5,
+      "apps": 42.6,
+      "data": 86.3
+    },
+    "overallScore": 77,
+    "rank": 65
+  },
+  {
+    "id": "tenant-038",
+    "name": "Vanguard Medical Global",
+    "domain": "vanguardmedicalglo.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Japan East",
+    "seatCount": 41492,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 83.9,
+      "identities": 78.6,
+      "apps": 71.2,
+      "data": 69.3
+    },
+    "overallScore": 76.8,
+    "rank": 66
+  },
+  {
+    "id": "tenant-148",
+    "name": "Meridian Bio Technologies",
+    "domain": "meridianbiotechnol.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "West Europe",
+    "seatCount": 87706,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 90,
+      "identities": 62.3,
+      "apps": 82.4,
+      "data": 75.3
+    },
+    "overallScore": 76.8,
+    "rank": 67
+  },
+  {
+    "id": "tenant-066",
+    "name": "Wide World Importers Enterprises",
+    "domain": "wideworldimporters.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "Canada Central",
+    "seatCount": 70746,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 77.7,
+      "identities": 89.2,
+      "apps": 49.2,
+      "data": 86.4
+    },
+    "overallScore": 76.7,
+    "rank": 68
+  },
+  {
+    "id": "tenant-018",
+    "name": "Humongous Insurance Global",
+    "domain": "humongousinsurance.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "Canada Central",
+    "seatCount": 77899,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 80,
+      "identities": 81.2,
+      "apps": 57.9,
+      "data": 85
+    },
+    "overallScore": 76.4,
+    "rank": 69
+  },
+  {
+    "id": "tenant-046",
+    "name": "Starlight Media Global",
+    "domain": "starlightmediaglob.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "Australia East",
+    "seatCount": 57156,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 81.2,
+      "identities": 82.1,
+      "apps": 64.2,
+      "data": 71.7
+    },
+    "overallScore": 76,
+    "rank": 70
+  },
+  {
+    "id": "tenant-111",
+    "name": "Litware Technologies",
+    "domain": "litwaretechnologie.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "Central US",
+    "seatCount": 9515,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 80.6,
+      "identities": 86,
+      "apps": 81.6,
+      "data": 44
+    },
+    "overallScore": 76,
+    "rank": 71
+  },
+  {
+    "id": "tenant-022",
+    "name": "Relecloud Global",
+    "domain": "relecloudglobal.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "Japan East",
+    "seatCount": 73588,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 88.1,
+      "identities": 89.3,
+      "apps": 47.7,
+      "data": 67.7
+    },
+    "overallScore": 75.9,
+    "rank": 72
+  },
+  {
+    "id": "tenant-065",
+    "name": "VanArsdel Enterprises",
+    "domain": "vanarsdelenterpris.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "West US 2",
+    "seatCount": 28945,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 76.4,
+      "identities": 84,
+      "apps": 71.7,
+      "data": 65.6
+    },
+    "overallScore": 75.9,
+    "rank": 73
+  },
+  {
+    "id": "tenant-172",
+    "name": "Consolidated Messenger Systems",
+    "domain": "consolidatedmessen.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "West Europe",
+    "seatCount": 73207,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 77.6,
+      "identities": 80.7,
+      "apps": 86.7,
+      "data": 49.7
+    },
+    "overallScore": 75.6,
+    "rank": 74
+  },
+  {
+    "id": "tenant-025",
+    "name": "Nod Publishers Global",
+    "domain": "nodpublishersgloba.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Sweden Central",
+    "seatCount": 52138,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 91.2,
+      "identities": 48.1,
+      "apps": 89.1,
+      "data": 83.4
+    },
+    "overallScore": 75.5,
+    "rank": 75
+  },
+  {
+    "id": "tenant-055",
+    "name": "Woodgrove Enterprises",
+    "domain": "woodgroveenterpris.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "Sweden Central",
+    "seatCount": 75038,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 79.3,
+      "identities": 79.9,
+      "apps": 84.2,
+      "data": 50
+    },
+    "overallScore": 75.3,
+    "rank": 76
+  },
+  {
+    "id": "tenant-158",
+    "name": "Fabrikam Systems",
+    "domain": "fabrikamsystems.onmicrosoft.com",
+    "industry": "Financial Services",
+    "region": "Southeast Asia",
+    "seatCount": 46646,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 83.2,
+      "identities": 88.2,
+      "apps": 48.8,
+      "data": 72.3
+    },
+    "overallScore": 75.3,
+    "rank": 77
+  },
+  {
+    "id": "tenant-167",
+    "name": "Coho Systems",
+    "domain": "cohosystems.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "North Europe",
+    "seatCount": 47249,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 77.7,
+      "identities": 84,
+      "apps": 53.5,
+      "data": 82.9
+    },
+    "overallScore": 75.3,
+    "rank": 78
+  },
+  {
+    "id": "tenant-059",
+    "name": "Litware Enterprises",
+    "domain": "litwareenterprises.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "UK South",
+    "seatCount": 44726,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 74.9,
+      "identities": 92.7,
+      "apps": 42.9,
+      "data": 83.4
+    },
+    "overallScore": 75.1,
+    "rank": 79
+  },
+  {
+    "id": "tenant-005",
+    "name": "Tailspin Global",
+    "domain": "tailspinglobal.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "East US",
+    "seatCount": 38789,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 75.7,
+      "identities": 60.3,
+      "apps": 83.2,
+      "data": 86.2
+    },
+    "overallScore": 74.3,
+    "rank": 80
+  },
+  {
+    "id": "tenant-072",
+    "name": "Blue Yonder Enterprises",
+    "domain": "blueyonderenterpri.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "Japan East",
+    "seatCount": 42188,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 88.3,
+      "identities": 83.7,
+      "apps": 68.9,
+      "data": 41.7
+    },
+    "overallScore": 74.2,
+    "rank": 81
+  },
+  {
+    "id": "tenant-074",
+    "name": "Relecloud Enterprises",
+    "domain": "relecloudenterpris.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "Japan East",
+    "seatCount": 42821,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 91.9,
+      "identities": 88,
+      "apps": 58.3,
+      "data": 40.7
+    },
+    "overallScore": 74,
+    "rank": 82
+  },
+  {
+    "id": "tenant-189",
+    "name": "Bellows College Systems",
+    "domain": "bellowscollegesyst.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "West Europe",
+    "seatCount": 75304,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 89.2,
+      "identities": 52.4,
+      "apps": 83,
+      "data": 77.7
+    },
+    "overallScore": 74,
+    "rank": 83
+  },
+  {
+    "id": "tenant-035",
+    "name": "Tosh Mondo Global",
+    "domain": "toshmondoglobal.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "Canada Central",
+    "seatCount": 80523,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 91.7,
+      "identities": 47.4,
+      "apps": 84.9,
+      "data": 79.8
+    },
+    "overallScore": 73.9,
+    "rank": 84
+  },
+  {
+    "id": "tenant-145",
+    "name": "Helios Robotics Technologies",
+    "domain": "heliosroboticstech.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "West Europe",
+    "seatCount": 20547,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 80.1,
+      "identities": 91.4,
+      "apps": 40.8,
+      "data": 73.8
+    },
+    "overallScore": 73.9,
+    "rank": 85
+  },
+  {
+    "id": "tenant-017",
+    "name": "Graphic Design Institute Global",
+    "domain": "graphicdesigninsti.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "West US 2",
+    "seatCount": 46403,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 82.7,
+      "identities": 54.4,
+      "apps": 80.7,
+      "data": 84.8
+    },
+    "overallScore": 73.6,
+    "rank": 86
+  },
+  {
+    "id": "tenant-061",
+    "name": "Trey Research Enterprises",
+    "domain": "treyresearchenterp.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "West US 2",
+    "seatCount": 57918,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 90.2,
+      "identities": 84.6,
+      "apps": 73.9,
+      "data": 26.5
+    },
+    "overallScore": 73.4,
+    "rank": 87
+  },
+  {
+    "id": "tenant-080",
+    "name": "Munson's Pickles Enterprises",
+    "domain": "munsonspicklesente.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "Sweden Central",
+    "seatCount": 93766,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 84.6,
+      "identities": 92.7,
+      "apps": 69.8,
+      "data": 25.9
+    },
+    "overallScore": 73.4,
+    "rank": 88
+  },
+  {
+    "id": "tenant-060",
+    "name": "AdventureWorks Enterprises",
+    "domain": "adventureworksente.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "Central US",
+    "seatCount": 10269,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 79.6,
+      "identities": 55.6,
+      "apps": 90.9,
+      "data": 73.2
+    },
+    "overallScore": 73.3,
+    "rank": 89
+  },
+  {
+    "id": "tenant-180",
+    "name": "Fourth Coffee Systems",
+    "domain": "fourthcoffeesystem.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "West Europe",
+    "seatCount": 67076,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 79.4,
+      "identities": 71.3,
+      "apps": 83.6,
+      "data": 51.4
+    },
+    "overallScore": 72.7,
+    "rank": 90
+  },
+  {
+    "id": "tenant-041",
+    "name": "Helios Robotics Global",
+    "domain": "heliosroboticsglob.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "West Europe",
+    "seatCount": 63712,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 78.2,
+      "identities": 46.5,
+      "apps": 89.5,
+      "data": 89.4
+    },
+    "overallScore": 72.6,
+    "rank": 91
+  },
+  {
+    "id": "tenant-012",
+    "name": "Alpine Global",
+    "domain": "alpineglobal.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "Southeast Asia",
+    "seatCount": 39392,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 74.9,
+      "identities": 93.2,
+      "apps": 32.7,
+      "data": 80.7
+    },
+    "overallScore": 72.5,
+    "rank": 92
+  },
+  {
+    "id": "tenant-129",
+    "name": "Nod Publishers Technologies",
+    "domain": "nodpublisherstechn.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "Canada Central",
+    "seatCount": 63772,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 80.2,
+      "identities": 84.4,
+      "apps": 76.4,
+      "data": 33.7
+    },
+    "overallScore": 72.3,
+    "rank": 93
+  },
+  {
+    "id": "tenant-156",
+    "name": "Horizon Financial Technologies",
+    "domain": "horizonfinancialte.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "Japan East",
+    "seatCount": 84977,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 82,
+      "identities": 60.2,
+      "apps": 72.6,
+      "data": 77.3
+    },
+    "overallScore": 72.1,
+    "rank": 94
+  },
+  {
+    "id": "tenant-115",
+    "name": "Coho Technologies",
+    "domain": "cohotechnologies.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "North Europe",
+    "seatCount": 25303,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 74.4,
+      "identities": 76.5,
+      "apps": 60.9,
+      "data": 72.5
+    },
+    "overallScore": 71.8,
+    "rank": 95
+  },
+  {
+    "id": "tenant-082",
+    "name": "City Power & Light Enterprises",
+    "domain": "citypowerlightente.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "West US 2",
+    "seatCount": 18396,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 78.2,
+      "identities": 59.2,
+      "apps": 70.1,
+      "data": 82.5
+    },
+    "overallScore": 71.1,
+    "rank": 96
+  },
+  {
+    "id": "tenant-040",
+    "name": "Solstice Energy Global",
+    "domain": "solsticeenergyglob.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "Australia East",
+    "seatCount": 55950,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 87.6,
+      "identities": 86.7,
+      "apps": 43.1,
+      "data": 51
+    },
+    "overallScore": 70.9,
+    "rank": 97
+  },
+  {
+    "id": "tenant-077",
+    "name": "Nod Publishers Enterprises",
+    "domain": "nodpublishersenter.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "West Europe",
+    "seatCount": 8905,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 94.4,
+      "identities": 60.3,
+      "apps": 41.4,
+      "data": 88.2
+    },
+    "overallScore": 70.7,
+    "rank": 98
+  },
+  {
+    "id": "tenant-023",
+    "name": "Kudo Global Global",
+    "domain": "kudoglobalglobal.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "West US 2",
+    "seatCount": 21549,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 58,
+      "identities": 92.1,
+      "apps": 47.5,
+      "data": 80.4
+    },
+    "overallScore": 70.6,
+    "rank": 99
+  },
+  {
+    "id": "tenant-174",
+    "name": "Humongous Insurance Systems",
+    "domain": "humongousinsurance.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "West Europe",
+    "seatCount": 33767,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 70,
+      "identities": 86.2,
+      "apps": 80.7,
+      "data": 29.8
+    },
+    "overallScore": 70.3,
+    "rank": 100
+  },
+  {
+    "id": "tenant-104",
+    "name": "Horizon Financial Enterprises",
+    "domain": "horizonfinancialen.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "Canada Central",
+    "seatCount": 13365,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 83.3,
+      "identities": 74.4,
+      "apps": 76.7,
+      "data": 34.5
+    },
+    "overallScore": 70.2,
+    "rank": 101
+  },
+  {
+    "id": "tenant-079",
+    "name": "Margie's Travel Enterprises",
+    "domain": "margiestravelenter.onmicrosoft.com",
+    "industry": "Financial Services",
+    "region": "North Europe",
+    "seatCount": 26381,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 76.4,
+      "identities": 80.3,
+      "apps": 76.1,
+      "data": 32.7
+    },
+    "overallScore": 69.7,
+    "rank": 102
+  },
+  {
+    "id": "tenant-126",
+    "name": "Relecloud Technologies",
+    "domain": "relecloudtechnolog.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "Australia East",
+    "seatCount": 76394,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 69.9,
+      "identities": 73.6,
+      "apps": 48.2,
+      "data": 87.7
+    },
+    "overallScore": 69.5,
+    "rank": 103
+  },
+  {
+    "id": "tenant-137",
+    "name": "Bellows College Technologies",
+    "domain": "bellowscollegetech.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "East US",
+    "seatCount": 1518,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 86.6,
+      "identities": 49.8,
+      "apps": 70.1,
+      "data": 76.4
+    },
+    "overallScore": 69.4,
+    "rank": 104
+  },
+  {
+    "id": "tenant-192",
+    "name": "Finman Global Systems",
+    "domain": "finmanglobalsystem.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "West US 2",
+    "seatCount": 91739,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 80.9,
+      "identities": 72.3,
+      "apps": 78.1,
+      "data": 34.9
+    },
+    "overallScore": 69.3,
+    "rank": 105
+  },
+  {
+    "id": "tenant-100",
+    "name": "OmniCorp Global Enterprises",
+    "domain": "omnicorpglobalente.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "Canada Central",
+    "seatCount": 37912,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 91.5,
+      "identities": 41.3,
+      "apps": 75,
+      "data": 76.5
+    },
+    "overallScore": 69.1,
+    "rank": 106
+  },
+  {
+    "id": "tenant-108",
+    "name": "Northwind Technologies",
+    "domain": "northwindtechnolog.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Switzerland North",
+    "seatCount": 38014,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 72.9,
+      "identities": 84.2,
+      "apps": 34.3,
+      "data": 78.6
+    },
+    "overallScore": 69.1,
+    "rank": 107
+  },
+  {
+    "id": "tenant-147",
+    "name": "Aegis Logistics Technologies",
+    "domain": "aegislogisticstech.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "Central US",
+    "seatCount": 46337,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 49.1,
+      "identities": 83.7,
+      "apps": 67.8,
+      "data": 75.4
+    },
+    "overallScore": 69,
+    "rank": 108
+  },
+  {
+    "id": "tenant-047",
+    "name": "Echo Dynamics Global",
+    "domain": "echodynamicsglobal.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "West Europe",
+    "seatCount": 43598,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 58.3,
+      "identities": 85.1,
+      "apps": 40.3,
+      "data": 91.1
+    },
+    "overallScore": 68.8,
+    "rank": 109
+  },
+  {
+    "id": "tenant-001",
+    "name": "Contoso Global",
+    "domain": "contosoglobal.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "Australia East",
+    "seatCount": 8528,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 85.7,
+      "identities": 77.9,
+      "apps": 33.8,
+      "data": 68.5
+    },
+    "overallScore": 68.7,
+    "rank": 110
+  },
+  {
+    "id": "tenant-200",
+    "name": "Meridian Bio Systems",
+    "domain": "meridianbiosystems.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "UK South",
+    "seatCount": 16801,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 80.2,
+      "identities": 80.4,
+      "apps": 41.6,
+      "data": 63
+    },
+    "overallScore": 68.7,
+    "rank": 111
+  },
+  {
+    "id": "tenant-110",
+    "name": "Adatum Technologies",
+    "domain": "adatumtechnologies.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "North Europe",
+    "seatCount": 64134,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 77.5,
+      "identities": 78.7,
+      "apps": 42.2,
+      "data": 69.2
+    },
+    "overallScore": 68.6,
+    "rank": 112
+  },
+  {
+    "id": "tenant-032",
+    "name": "Terra Flora Global",
+    "domain": "terrafloraglobal.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "West Europe",
+    "seatCount": 80023,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 89.2,
+      "identities": 56.2,
+      "apps": 90.4,
+      "data": 28.5
+    },
+    "overallScore": 68,
+    "rank": 113
+  },
+  {
+    "id": "tenant-163",
+    "name": "Litware Systems",
+    "domain": "litwaresystems.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Sweden Central",
+    "seatCount": 59195,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 69.3,
+      "identities": 86.4,
+      "apps": 39.6,
+      "data": 65.7
+    },
+    "overallScore": 67.6,
+    "rank": 114
+  },
+  {
+    "id": "tenant-103",
+    "name": "Ironclad Cloud Enterprises",
+    "domain": "ironcladcloudenter.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "Canada Central",
+    "seatCount": 53769,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 71.7,
+      "identities": 86.1,
+      "apps": 70.6,
+      "data": 22.3
+    },
+    "overallScore": 67.2,
+    "rank": 115
+  },
+  {
+    "id": "tenant-075",
+    "name": "Kudo Global Enterprises",
+    "domain": "kudoglobalenterpri.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "Central US",
+    "seatCount": 85591,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 80.6,
+      "identities": 83.7,
+      "apps": 54,
+      "data": 32.8
+    },
+    "overallScore": 67.1,
+    "rank": 116
+  },
+  {
+    "id": "tenant-153",
+    "name": "Crestview Health Technologies",
+    "domain": "crestviewhealthtec.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "West US 2",
+    "seatCount": 13305,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 81.1,
+      "identities": 42.8,
+      "apps": 88.7,
+      "data": 61.9
+    },
+    "overallScore": 67.1,
+    "rank": 117
+  },
+  {
+    "id": "tenant-073",
+    "name": "Lamna Healthcare Enterprises",
+    "domain": "lamnahealthcareent.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "Southeast Asia",
+    "seatCount": 5607,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 94.4,
+      "identities": 31.6,
+      "apps": 70.2,
+      "data": 78.5
+    },
+    "overallScore": 66.1,
+    "rank": 118
+  },
+  {
+    "id": "tenant-125",
+    "name": "Lamna Healthcare Technologies",
+    "domain": "lamnahealthcaretec.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "Canada Central",
+    "seatCount": 12322,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 88.4,
+      "identities": 49.6,
+      "apps": 89.1,
+      "data": 32.6
+    },
+    "overallScore": 66.1,
+    "rank": 119
+  },
+  {
+    "id": "tenant-020",
+    "name": "Blue Yonder Global",
+    "domain": "blueyonderglobal.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "Canada Central",
+    "seatCount": 74025,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 88.1,
+      "identities": 41,
+      "apps": 71,
+      "data": 68.8
+    },
+    "overallScore": 65.8,
+    "rank": 120
+  },
+  {
+    "id": "tenant-117",
+    "name": "VanArsdel Technologies",
+    "domain": "vanarsdeltechnolog.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "UK South",
+    "seatCount": 67566,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 71.4,
+      "identities": 49.3,
+      "apps": 74.8,
+      "data": 75.1
+    },
+    "overallScore": 65.7,
+    "rank": 121
+  },
+  {
+    "id": "tenant-144",
+    "name": "Solstice Energy Technologies",
+    "domain": "solsticeenergytech.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "Japan East",
+    "seatCount": 73940,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 87.9,
+      "identities": 48.3,
+      "apps": 84.9,
+      "data": 38.7
+    },
+    "overallScore": 65.7,
+    "rank": 122
+  },
+  {
+    "id": "tenant-155",
+    "name": "Ironclad Cloud Technologies",
+    "domain": "ironcladcloudtechn.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "East US",
+    "seatCount": 57069,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 76,
+      "identities": 47,
+      "apps": 82.6,
+      "data": 62.2
+    },
+    "overallScore": 65.7,
+    "rank": 123
+  },
+  {
+    "id": "tenant-105",
+    "name": "Contoso Technologies",
+    "domain": "contosotechnologie.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "UK South",
+    "seatCount": 12479,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 55.9,
+      "identities": 77.9,
+      "apps": 40.2,
+      "data": 90
+    },
+    "overallScore": 65.6,
+    "rank": 124
+  },
+  {
+    "id": "tenant-102",
+    "name": "Falcon Defense Enterprises",
+    "domain": "falcondefenseenter.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "West Europe",
+    "seatCount": 89367,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 79.6,
+      "identities": 50.4,
+      "apps": 48.4,
+      "data": 91.5
+    },
+    "overallScore": 65.5,
+    "rank": 125
+  },
+  {
+    "id": "tenant-183",
+    "name": "Margie's Travel Systems",
+    "domain": "margiestravelsyste.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "UK South",
+    "seatCount": 3403,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 70.9,
+      "identities": 72.7,
+      "apps": 66.8,
+      "data": 42.9
+    },
+    "overallScore": 65.5,
+    "rank": 126
+  },
+  {
+    "id": "tenant-085",
+    "name": "Bellows College Enterprises",
+    "domain": "bellowscollegeente.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "UK South",
+    "seatCount": 77097,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 75.7,
+      "identities": 89.6,
+      "apps": 35.9,
+      "data": 39.8
+    },
+    "overallScore": 64.9,
+    "rank": 127
+  },
+  {
+    "id": "tenant-118",
+    "name": "Wide World Importers Technologies",
+    "domain": "wideworldimporters.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "Southeast Asia",
+    "seatCount": 65798,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 55.7,
+      "identities": 81.1,
+      "apps": 46.8,
+      "data": 72.1
+    },
+    "overallScore": 64.8,
+    "rank": 128
+  },
+  {
+    "id": "tenant-193",
+    "name": "Skyline Networks Systems",
+    "domain": "skylinenetworkssys.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "North Europe",
+    "seatCount": 13346,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 76.3,
+      "identities": 84.8,
+      "apps": 49.5,
+      "data": 28.6
+    },
+    "overallScore": 64.5,
+    "rank": 129
+  },
+  {
+    "id": "tenant-062",
+    "name": "Lucerne Enterprises",
+    "domain": "lucerneenterprises.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "West US 2",
+    "seatCount": 48890,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 51.6,
+      "identities": 93.3,
+      "apps": 62.9,
+      "data": 34.9
+    },
+    "overallScore": 64.4,
+    "rank": 130
+  },
+  {
+    "id": "tenant-112",
+    "name": "AdventureWorks Technologies",
+    "domain": "adventureworkstech.onmicrosoft.com",
+    "industry": "Financial Services",
+    "region": "Central US",
+    "seatCount": 44941,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 74.1,
+      "identities": 48.5,
+      "apps": 85.6,
+      "data": 51.2
+    },
+    "overallScore": 64.3,
+    "rank": 131
+  },
+  {
+    "id": "tenant-045",
+    "name": "Titan Industrial Global",
+    "domain": "titanindustrialglo.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "Canada Central",
+    "seatCount": 2695,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 35,
+      "identities": 87.6,
+      "apps": 60.3,
+      "data": 72.2
+    },
+    "overallScore": 64.1,
+    "rank": 132
+  },
+  {
+    "id": "tenant-122",
+    "name": "Humongous Insurance Technologies",
+    "domain": "humongousinsurance.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "Sweden Central",
+    "seatCount": 57900,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 90.3,
+      "identities": 45.8,
+      "apps": 47.7,
+      "data": 75.3
+    },
+    "overallScore": 64,
+    "rank": 133
+  },
+  {
+    "id": "tenant-034",
+    "name": "Baldwin Museum Global",
+    "domain": "baldwinmuseumgloba.onmicrosoft.com",
+    "industry": "Financial Services",
+    "region": "Sweden Central",
+    "seatCount": 50574,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 80.8,
+      "identities": 64.3,
+      "apps": 74.9,
+      "data": 22.2
+    },
+    "overallScore": 63.7,
+    "rank": 134
+  },
+  {
+    "id": "tenant-136",
+    "name": "Terra Flora Technologies",
+    "domain": "terrafloratechnolo.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "East US",
+    "seatCount": 15648,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 82,
+      "identities": 42,
+      "apps": 60.4,
+      "data": 76.5
+    },
+    "overallScore": 63.5,
+    "rank": 135
+  },
+  {
+    "id": "tenant-124",
+    "name": "Blue Yonder Technologies",
+    "domain": "blueyondertechnolo.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "East US",
+    "seatCount": 43838,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 71.8,
+      "identities": 60.7,
+      "apps": 70.4,
+      "data": 45.9
+    },
+    "overallScore": 63.3,
+    "rank": 136
+  },
+  {
+    "id": "tenant-121",
+    "name": "Graphic Design Institute Technologies",
+    "domain": "graphicdesigninsti.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "UK South",
+    "seatCount": 75960,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 34.1,
+      "identities": 78.3,
+      "apps": 62.1,
+      "data": 81.7
+    },
+    "overallScore": 63,
+    "rank": 137
+  },
+  {
+    "id": "tenant-168",
+    "name": "Alpine Systems",
+    "domain": "alpinesystems.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "North Europe",
+    "seatCount": 1404,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 81.4,
+      "identities": 62.3,
+      "apps": 74.5,
+      "data": 21.3
+    },
+    "overallScore": 63,
+    "rank": 138
+  },
+  {
+    "id": "tenant-161",
+    "name": "Tailspin Systems",
+    "domain": "tailspinsystems.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Sweden Central",
+    "seatCount": 8544,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 72.6,
+      "identities": 77.1,
+      "apps": 44.3,
+      "data": 44.3
+    },
+    "overallScore": 62.7,
+    "rank": 139
+  },
+  {
+    "id": "tenant-134",
+    "name": "City Power & Light Technologies",
+    "domain": "citypowerlighttech.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "West US 2",
+    "seatCount": 3209,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 93.8,
+      "identities": 32,
+      "apps": 65.2,
+      "data": 65.4
+    },
+    "overallScore": 62.6,
+    "rank": 140
+  },
+  {
+    "id": "tenant-127",
+    "name": "Kudo Global Technologies",
+    "domain": "kudoglobaltechnolo.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "Canada Central",
+    "seatCount": 6114,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 48.9,
+      "identities": 83,
+      "apps": 60.8,
+      "data": 49.1
+    },
+    "overallScore": 62.5,
+    "rank": 141
+  },
+  {
+    "id": "tenant-107",
+    "name": "Woodgrove Technologies",
+    "domain": "woodgrovetechnolog.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "Southeast Asia",
+    "seatCount": 37484,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 73.1,
+      "identities": 47.6,
+      "apps": 70,
+      "data": 63
+    },
+    "overallScore": 62.4,
+    "rank": 142
+  },
+  {
+    "id": "tenant-166",
+    "name": "Lucerne Systems",
+    "domain": "lucernesystems.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "West Europe",
+    "seatCount": 30278,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 85.4,
+      "identities": 51.9,
+      "apps": 35.7,
+      "data": 78.1
+    },
+    "overallScore": 62.4,
+    "rank": 143
+  },
+  {
+    "id": "tenant-094",
+    "name": "Pinnacle Systems Enterprises",
+    "domain": "pinnaclesystemsent.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "West Europe",
+    "seatCount": 84715,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 57.7,
+      "identities": 59.8,
+      "apps": 65.2,
+      "data": 70.6
+    },
+    "overallScore": 62.3,
+    "rank": 144
+  },
+  {
+    "id": "tenant-109",
+    "name": "Tailspin Technologies",
+    "domain": "tailspintechnologi.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "East US",
+    "seatCount": 72671,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 48.4,
+      "identities": 81.2,
+      "apps": 32.3,
+      "data": 86.8
+    },
+    "overallScore": 62.3,
+    "rank": 145
+  },
+  {
+    "id": "tenant-140",
+    "name": "Finman Global Technologies",
+    "domain": "finmanglobaltechno.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "Australia East",
+    "seatCount": 71248,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 41.4,
+      "identities": 81.5,
+      "apps": 67.7,
+      "data": 54.1
+    },
+    "overallScore": 62.3,
+    "rank": 146
+  },
+  {
+    "id": "tenant-116",
+    "name": "Alpine Technologies",
+    "domain": "alpinetechnologies.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "Japan East",
+    "seatCount": 88604,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 34.6,
+      "identities": 92.9,
+      "apps": 49.2,
+      "data": 66.4
+    },
+    "overallScore": 62.2,
+    "rank": 147
+  },
+  {
+    "id": "tenant-133",
+    "name": "Proseware Technologies",
+    "domain": "prosewaretechnolog.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "East US",
+    "seatCount": 44881,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 53.6,
+      "identities": 87.4,
+      "apps": 32.2,
+      "data": 66.7
+    },
+    "overallScore": 62.1,
+    "rank": 148
+  },
+  {
+    "id": "tenant-151",
+    "name": "Echo Dynamics Technologies",
+    "domain": "echodynamicstechno.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "Canada Central",
+    "seatCount": 32786,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 27.1,
+      "identities": 76.2,
+      "apps": 66.6,
+      "data": 85.9
+    },
+    "overallScore": 62.1,
+    "rank": 149
+  },
+  {
+    "id": "tenant-131",
+    "name": "Margie's Travel Technologies",
+    "domain": "margiestraveltechn.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "Switzerland North",
+    "seatCount": 48200,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 55.6,
+      "identities": 75.6,
+      "apps": 35.5,
+      "data": 78.8
+    },
+    "overallScore": 61.8,
+    "rank": 150
+  },
+  {
+    "id": "tenant-130",
+    "name": "Wingtip Toys Technologies",
+    "domain": "wingtiptoystechnol.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "East US",
+    "seatCount": 67782,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 52.2,
+      "identities": 72.7,
+      "apps": 55.6,
+      "data": 63.6
+    },
+    "overallScore": 61.6,
+    "rank": 151
+  },
+  {
+    "id": "tenant-044",
+    "name": "Meridian Bio Global",
+    "domain": "meridianbioglobal.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "Sweden Central",
+    "seatCount": 68253,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 39,
+      "identities": 83.5,
+      "apps": 45,
+      "data": 77.2
+    },
+    "overallScore": 61.4,
+    "rank": 152
+  },
+  {
+    "id": "tenant-190",
+    "name": "Baldwin Museum Systems",
+    "domain": "baldwinmuseumsyste.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Switzerland North",
+    "seatCount": 18187,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 48.8,
+      "identities": 86.6,
+      "apps": 29.7,
+      "data": 74.5
+    },
+    "overallScore": 61.3,
+    "rank": 153
+  },
+  {
+    "id": "tenant-123",
+    "name": "Datum Cyber Technologies",
+    "domain": "datumcybertechnolo.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Australia East",
+    "seatCount": 74375,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 72.5,
+      "identities": 39.9,
+      "apps": 60.5,
+      "data": 81.1
+    },
+    "overallScore": 61,
+    "rank": 154
+  },
+  {
+    "id": "tenant-076",
+    "name": "Fourth Coffee Enterprises",
+    "domain": "fourthcoffeeenterp.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "Sweden Central",
+    "seatCount": 68038,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 85.3,
+      "identities": 51.6,
+      "apps": 49.3,
+      "data": 52.9
+    },
+    "overallScore": 60.8,
+    "rank": 155
+  },
+  {
+    "id": "tenant-098",
+    "name": "Starlight Media Enterprises",
+    "domain": "starlightmediaente.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "UK South",
+    "seatCount": 53276,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 34.6,
+      "identities": 80.7,
+      "apps": 47.1,
+      "data": 80.3
+    },
+    "overallScore": 60.3,
+    "rank": 156
+  },
+  {
+    "id": "tenant-179",
+    "name": "Kudo Global Systems",
+    "domain": "kudoglobalsystems.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "Central US",
+    "seatCount": 55905,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 38.4,
+      "identities": 80.6,
+      "apps": 34.8,
+      "data": 88.2
+    },
+    "overallScore": 60.1,
+    "rank": 157
+  },
+  {
+    "id": "tenant-197",
+    "name": "Helios Robotics Systems",
+    "domain": "heliosroboticssyst.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "Japan East",
+    "seatCount": 89511,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 76.2,
+      "identities": 50.1,
+      "apps": 64.7,
+      "data": 45
+    },
+    "overallScore": 59.7,
+    "rank": 158
+  },
+  {
+    "id": "tenant-078",
+    "name": "Wingtip Toys Enterprises",
+    "domain": "wingtiptoysenterpr.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "Sweden Central",
+    "seatCount": 41496,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 75.2,
+      "identities": 39.8,
+      "apps": 44.2,
+      "data": 86
+    },
+    "overallScore": 59,
+    "rank": 159
+  },
+  {
+    "id": "tenant-087",
+    "name": "Tosh Mondo Enterprises",
+    "domain": "toshmondoenterpris.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "Sweden Central",
+    "seatCount": 56145,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 75.2,
+      "identities": 42.7,
+      "apps": 45.6,
+      "data": 77.8
+    },
+    "overallScore": 58.8,
+    "rank": 160
+  },
+  {
+    "id": "tenant-154",
+    "name": "Falcon Defense Technologies",
+    "domain": "falcondefensetechn.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "West Europe",
+    "seatCount": 36550,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 75.6,
+      "identities": 36.1,
+      "apps": 59.9,
+      "data": 70.9
+    },
+    "overallScore": 58.7,
+    "rank": 161
+  },
+  {
+    "id": "tenant-120",
+    "name": "Consolidated Messenger Technologies",
+    "domain": "consolidatedmessen.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "Southeast Asia",
+    "seatCount": 10664,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 29.5,
+      "identities": 84,
+      "apps": 54.5,
+      "data": 63.6
+    },
+    "overallScore": 58.6,
+    "rank": 162
+  },
+  {
+    "id": "tenant-149",
+    "name": "Titan Industrial Technologies",
+    "domain": "titanindustrialtec.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Central US",
+    "seatCount": 12081,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 53,
+      "identities": 86.9,
+      "apps": 46.6,
+      "data": 31.7
+    },
+    "overallScore": 58.6,
+    "rank": 163
+  },
+  {
+    "id": "tenant-150",
+    "name": "Starlight Media Technologies",
+    "domain": "starlightmediatech.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "Southeast Asia",
+    "seatCount": 80315,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 82.2,
+      "identities": 30.9,
+      "apps": 59.7,
+      "data": 66.6
+    },
+    "overallScore": 58,
+    "rank": 164
+  },
+  {
+    "id": "tenant-198",
+    "name": "Pinnacle Systems Systems",
+    "domain": "pinnaclesystemssys.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "Canada Central",
+    "seatCount": 5692,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 43.8,
+      "identities": 89.9,
+      "apps": 39.9,
+      "data": 45.1
+    },
+    "overallScore": 57.9,
+    "rank": 165
+  },
+  {
+    "id": "tenant-141",
+    "name": "Skyline Networks Technologies",
+    "domain": "skylinenetworkstec.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "North Europe",
+    "seatCount": 64285,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 83.5,
+      "identities": 45.4,
+      "apps": 46.5,
+      "data": 53.4
+    },
+    "overallScore": 57.8,
+    "rank": 166
+  },
+  {
+    "id": "tenant-171",
+    "name": "Southridge Systems",
+    "domain": "southridgesystems.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "Central US",
+    "seatCount": 81834,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 76.3,
+      "identities": 46.2,
+      "apps": 59.8,
+      "data": 47.1
+    },
+    "overallScore": 57.8,
+    "rank": 167
+  },
+  {
+    "id": "tenant-058",
+    "name": "Adatum Enterprises",
+    "domain": "adatumenterprises.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "Sweden Central",
+    "seatCount": 13875,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 26.2,
+      "identities": 83.7,
+      "apps": 39.2,
+      "data": 83
+    },
+    "overallScore": 57.7,
+    "rank": 168
+  },
+  {
+    "id": "tenant-175",
+    "name": "Datum Cyber Systems",
+    "domain": "datumcybersystems.onmicrosoft.com",
+    "industry": "Manufacturing & Robotics",
+    "region": "Central US",
+    "seatCount": 20804,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 33.1,
+      "identities": 70.6,
+      "apps": 60.2,
+      "data": 69.4
+    },
+    "overallScore": 57.6,
+    "rank": 169
+  },
+  {
+    "id": "tenant-196",
+    "name": "Solstice Energy Systems",
+    "domain": "solsticeenergysyst.onmicrosoft.com",
+    "industry": "Financial Services",
+    "region": "West US 2",
+    "seatCount": 87238,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 27.5,
+      "identities": 81.7,
+      "apps": 46.2,
+      "data": 75.1
+    },
+    "overallScore": 57.5,
+    "rank": 170
+  },
+  {
+    "id": "tenant-070",
+    "name": "Humongous Insurance Enterprises",
+    "domain": "humongousinsurance.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "Southeast Asia",
+    "seatCount": 78433,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 28.5,
+      "identities": 57.5,
+      "apps": 64.8,
+      "data": 83.8
+    },
+    "overallScore": 55.7,
+    "rank": 171
+  },
+  {
+    "id": "tenant-184",
+    "name": "Munson's Pickles Systems",
+    "domain": "munsonspicklessyst.onmicrosoft.com",
+    "industry": "Healthcare & Life Sciences",
+    "region": "UK South",
+    "seatCount": 17169,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 28.4,
+      "identities": 90.6,
+      "apps": 32.3,
+      "data": 64.8
+    },
+    "overallScore": 55.7,
+    "rank": 172
+  },
+  {
+    "id": "tenant-165",
+    "name": "Trey Research Systems",
+    "domain": "treyresearchsystem.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Canada Central",
+    "seatCount": 46754,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 41.5,
+      "identities": 55.9,
+      "apps": 59.7,
+      "data": 72.2
+    },
+    "overallScore": 55.6,
+    "rank": 173
+  },
+  {
+    "id": "tenant-157",
+    "name": "Contoso Systems",
+    "domain": "contososystems.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "West Europe",
+    "seatCount": 59920,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 75.3,
+      "identities": 39.3,
+      "apps": 46.4,
+      "data": 63.4
+    },
+    "overallScore": 55.3,
+    "rank": 174
+  },
+  {
+    "id": "tenant-138",
+    "name": "Baldwin Museum Technologies",
+    "domain": "baldwinmuseumtechn.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "Switzerland North",
+    "seatCount": 13297,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 23.8,
+      "identities": 91,
+      "apps": 32.8,
+      "data": 67.8
+    },
+    "overallScore": 55.2,
+    "rank": 175
+  },
+  {
+    "id": "tenant-146",
+    "name": "Pinnacle Systems Technologies",
+    "domain": "pinnaclesystemstec.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "UK South",
+    "seatCount": 41363,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 35.3,
+      "identities": 63.5,
+      "apps": 42.6,
+      "data": 81.5
+    },
+    "overallScore": 54.2,
+    "rank": 176
+  },
+  {
+    "id": "tenant-095",
+    "name": "Aegis Logistics Enterprises",
+    "domain": "aegislogisticsente.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Southeast Asia",
+    "seatCount": 50927,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 71.8,
+      "identities": 29.9,
+      "apps": 89.7,
+      "data": 26.1
+    },
+    "overallScore": 54.1,
+    "rank": 177
+  },
+  {
+    "id": "tenant-142",
+    "name": "Vanguard Medical Technologies",
+    "domain": "vanguardmedicaltec.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "Southeast Asia",
+    "seatCount": 53985,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 45.5,
+      "identities": 47.3,
+      "apps": 58,
+      "data": 73.9
+    },
+    "overallScore": 53.9,
+    "rank": 178
+  },
+  {
+    "id": "tenant-068",
+    "name": "Consolidated Messenger Enterprises",
+    "domain": "consolidatedmessen.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "Canada Central",
+    "seatCount": 45759,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 79.2,
+      "identities": 31.7,
+      "apps": 36.1,
+      "data": 69.4
+    },
+    "overallScore": 52.8,
+    "rank": 179
+  },
+  {
+    "id": "tenant-159",
+    "name": "Woodgrove Systems",
+    "domain": "woodgrovesystems.onmicrosoft.com",
+    "industry": "Technology & SaaS",
+    "region": "West Europe",
+    "seatCount": 83667,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 23.7,
+      "identities": 59.9,
+      "apps": 57,
+      "data": 75.2
+    },
+    "overallScore": 51.9,
+    "rank": 180
+  },
+  {
+    "id": "tenant-191",
+    "name": "Tosh Mondo Systems",
+    "domain": "toshmondosystems.onmicrosoft.com",
+    "industry": "Financial Services",
+    "region": "Switzerland North",
+    "seatCount": 83524,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 34.1,
+      "identities": 86.2,
+      "apps": 42.5,
+      "data": 29.5
+    },
+    "overallScore": 51.8,
+    "rank": 181
+  },
+  {
+    "id": "tenant-091",
+    "name": "Apex Capital Enterprises",
+    "domain": "apexcapitalenterpr.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "Central US",
+    "seatCount": 19207,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 46,
+      "identities": 44.1,
+      "apps": 43.9,
+      "data": 82.4
+    },
+    "overallScore": 51.5,
+    "rank": 182
+  },
+  {
+    "id": "tenant-162",
+    "name": "Adatum Systems",
+    "domain": "adatumsystems.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "Australia East",
+    "seatCount": 90082,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 70.8,
+      "identities": 43.5,
+      "apps": 53.7,
+      "data": 28.8
+    },
+    "overallScore": 50.7,
+    "rank": 183
+  },
+  {
+    "id": "tenant-093",
+    "name": "Helios Robotics Enterprises",
+    "domain": "heliosroboticsente.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "North Europe",
+    "seatCount": 62220,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 55.1,
+      "identities": 29.6,
+      "apps": 51.7,
+      "data": 79
+    },
+    "overallScore": 50.5,
+    "rank": 184
+  },
+  {
+    "id": "tenant-164",
+    "name": "AdventureWorks Systems",
+    "domain": "adventureworkssyst.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "Switzerland North",
+    "seatCount": 59384,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 46.5,
+      "identities": 57.1,
+      "apps": 55.1,
+      "data": 35.4
+    },
+    "overallScore": 49.8,
+    "rank": 185
+  },
+  {
+    "id": "tenant-185",
+    "name": "Proseware Systems",
+    "domain": "prosewaresystems.onmicrosoft.com",
+    "industry": "Financial Services",
+    "region": "Japan East",
+    "seatCount": 90007,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": true,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 84.5,
+      "identities": 36.9,
+      "apps": 36.6,
+      "data": 31.3
+    },
+    "overallScore": 49.2,
+    "rank": 186
+  },
+  {
+    "id": "tenant-169",
+    "name": "VanArsdel Systems",
+    "domain": "vanarsdelsystems.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "Southeast Asia",
+    "seatCount": 77519,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 53.9,
+      "identities": 32.3,
+      "apps": 50.4,
+      "data": 68.3
+    },
+    "overallScore": 48.8,
+    "rank": 187
+  },
+  {
+    "id": "tenant-186",
+    "name": "City Power & Light Systems",
+    "domain": "citypowerlightsyst.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "Southeast Asia",
+    "seatCount": 16580,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 52.2,
+      "identities": 42.6,
+      "apps": 53.6,
+      "data": 46.5
+    },
+    "overallScore": 48.4,
+    "rank": 188
+  },
+  {
+    "id": "tenant-181",
+    "name": "Nod Publishers Systems",
+    "domain": "nodpublisherssyste.onmicrosoft.com",
+    "industry": "Aerospace & Defense",
+    "region": "Central US",
+    "seatCount": 62335,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 45.9,
+      "identities": 44.9,
+      "apps": 55.3,
+      "data": 49.6
+    },
+    "overallScore": 48.3,
+    "rank": 189
+  },
+  {
+    "id": "tenant-194",
+    "name": "Vanguard Medical Systems",
+    "domain": "vanguardmedicalsys.onmicrosoft.com",
+    "industry": "Telecommunications",
+    "region": "Southeast Asia",
+    "seatCount": 2191,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 37.1,
+      "identities": 51.3,
+      "apps": 60.5,
+      "data": 45.3
+    },
+    "overallScore": 48.3,
+    "rank": 190
+  },
+  {
+    "id": "tenant-199",
+    "name": "Aegis Logistics Systems",
+    "domain": "aegislogisticssyst.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Australia East",
+    "seatCount": 63843,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": true,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 28.8,
+      "identities": 71.2,
+      "apps": 43.2,
+      "data": 38.2
+    },
+    "overallScore": 47.2,
+    "rank": 191
+  },
+  {
+    "id": "tenant-173",
+    "name": "Graphic Design Institute Systems",
+    "domain": "graphicdesigninsti.onmicrosoft.com",
+    "industry": "Energy & Utilities",
+    "region": "Switzerland North",
+    "seatCount": 41639,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 53.7,
+      "identities": 44.7,
+      "apps": 59.1,
+      "data": 20.1
+    },
+    "overallScore": 46,
+    "rank": 192
+  },
+  {
+    "id": "tenant-195",
+    "name": "Apex Capital Systems",
+    "domain": "apexcapitalsystems.onmicrosoft.com",
+    "industry": "Media & Entertainment",
+    "region": "Australia East",
+    "seatCount": 29045,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 49.7,
+      "identities": 32.6,
+      "apps": 64.6,
+      "data": 35.6
+    },
+    "overallScore": 45,
+    "rank": 193
+  },
+  {
+    "id": "tenant-182",
+    "name": "Wingtip Toys Systems",
+    "domain": "wingtiptoyssystems.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "West Europe",
+    "seatCount": 78717,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 30.2,
+      "identities": 49.9,
+      "apps": 45.9,
+      "data": 51.2
+    },
+    "overallScore": 43.7,
+    "rank": 194
+  },
+  {
+    "id": "tenant-101",
+    "name": "Crestview Health Enterprises",
+    "domain": "crestviewhealthent.onmicrosoft.com",
+    "industry": "Higher Education",
+    "region": "Canada Central",
+    "seatCount": 26000,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": true
+    },
+    "categories": {
+      "device": 30.3,
+      "identities": 35.3,
+      "apps": 42.7,
+      "data": 69.7
+    },
+    "overallScore": 41.7,
+    "rank": 195
+  },
+  {
+    "id": "tenant-152",
+    "name": "OmniCorp Global Technologies",
+    "domain": "omnicorpglobaltech.onmicrosoft.com",
+    "industry": "Logistics & Supply Chain",
+    "region": "Central US",
+    "seatCount": 10638,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 35.9,
+      "identities": 34.5,
+      "apps": 55.7,
+      "data": 38.4
+    },
+    "overallScore": 40.3,
+    "rank": 196
+  },
+  {
+    "id": "tenant-160",
+    "name": "Northwind Systems",
+    "domain": "northwindsystems.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "East US",
+    "seatCount": 93944,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 42,
+      "identities": 47.8,
+      "apps": 31.7,
+      "data": 21.1
+    },
+    "overallScore": 37.8,
+    "rank": 197
+  },
+  {
+    "id": "tenant-135",
+    "name": "Parnell Aerospace Technologies",
+    "domain": "parnellaerospacete.onmicrosoft.com",
+    "industry": "Government & Public Sector",
+    "region": "Japan East",
+    "seatCount": 8471,
+    "statusBubbles": {
+      "sentinel": true,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 29.8,
+      "identities": 29.8,
+      "apps": 34,
+      "data": 54.1
+    },
+    "overallScore": 35.1,
+    "rank": 198
+  },
+  {
+    "id": "tenant-187",
+    "name": "Parnell Aerospace Systems",
+    "domain": "parnellaerospacesy.onmicrosoft.com",
+    "industry": "Retail & E-Commerce",
+    "region": "Canada Central",
+    "seatCount": 1732,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 34.5,
+      "identities": 35.4,
+      "apps": 40,
+      "data": 29.4
+    },
+    "overallScore": 35.1,
+    "rank": 199
+  },
+  {
+    "id": "tenant-178",
+    "name": "Relecloud Systems",
+    "domain": "relecloudsystems.onmicrosoft.com",
+    "industry": "Financial Services",
+    "region": "North Europe",
+    "seatCount": 81941,
+    "statusBubbles": {
+      "sentinel": false,
+      "mde": false,
+      "mdi": false,
+      "logAnalytics": false
+    },
+    "categories": {
+      "device": 33.8,
+      "identities": 29.9,
+      "apps": 37.4,
+      "data": 39.9
+    },
+    "overallScore": 34.4,
+    "rank": 200
+  }
+]

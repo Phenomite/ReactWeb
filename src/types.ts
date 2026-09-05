@@ -124,4 +124,42 @@ export interface SecurityIncidentContextType {
   exportSentinelLog: () => void;
 }
 
+// Security service telemetry bubbles present above score categories
+export interface TenantStatusBubbles {
+  sentinel: boolean;     // Microsoft Sentinel
+  mde: boolean;          // Microsoft Defender for Endpoint
+  mdi: boolean;          // Microsoft Defender for Identity
+  logAnalytics: boolean; // Azure Log Analytics Audit Logging
+}
+
+// Microsoft Secure Score category breakdowns
+export interface TenantScoreCategories {
+  device: number;        // Device (XDR)
+  identities: number;    // Identities (Entra)
+  apps: number;          // Apps (Defender for Cloud Apps)
+  data: number;          // Data (Purview)
+}
+
+// Tenant record for Microsoft Secure Score leaderboard
+export interface TenantRecord {
+  id: string;
+  name: string;
+  domain: string;
+  industry: string;
+  region: string;
+  seatCount: number;
+  statusBubbles: TenantStatusBubbles;
+  categories: TenantScoreCategories;
+  overallScore: number;
+  rank: number;
+}
+
+// Tenant sorting fields and directions
+export type TenantSortField = 'overallScore' | 'device' | 'identities' | 'apps' | 'data' | 'name' | 'rank';
+export type TenantSortOrder = 'asc' | 'desc';
+
+// Score gamification leagues / tiers
+export type TenantScoreTier = 'all' | 'diamond' | 'gold' | 'silver' | 'bronze' | 'critical';
+
+
 
