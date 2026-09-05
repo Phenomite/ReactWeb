@@ -101,11 +101,11 @@ const rawTenants = tenantNames.map((name, index) => {
   const hasAuditLogging = rand() < (tierFactor * 0.92 + 0.12);
 
   // Category scores (0 - 100)
-  // Device score strongly driven by MDE
+  // Device score strongly driven by Defender XDR (MDE)
   const baseDevice = hasMDE ? randFloat(75, 99) : randFloat(25, 62);
   const device = Number(Math.min(99, Math.max(15, baseDevice * (0.85 + tierFactor * 0.15))).toFixed(1));
 
-  // Identities score strongly driven by MDI and Entra best practices
+  // Identities score strongly driven by Entra (MDI)
   const baseIdentities = hasMDI ? randFloat(78, 99) : randFloat(30, 68);
   const identities = Number(Math.min(99, Math.max(18, baseIdentities * (0.85 + tierFactor * 0.15))).toFixed(1));
 
@@ -113,7 +113,7 @@ const rawTenants = tenantNames.map((name, index) => {
   const baseApps = (hasSentinel && hasMDE) ? randFloat(70, 96) : randFloat(32, 72);
   const apps = Number(Math.min(98, Math.max(12, baseApps * (0.88 + tierFactor * 0.12))).toFixed(1));
 
-  // Data score driven by governance through Purview & Audit Logging
+  // Data score driven by Purview & Audit Logging
   const baseData = hasAuditLogging ? randFloat(68, 96) : randFloat(22, 58);
   const data = Number(Math.min(97, Math.max(10, baseData * (0.85 + tierFactor * 0.15))).toFixed(1));
 

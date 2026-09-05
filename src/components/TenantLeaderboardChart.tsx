@@ -2,7 +2,8 @@ import { memo, useMemo, useState } from 'react';
 import { Trophy, BarChart3, PieChart, ShieldCheck } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { APP_STRINGS } from '@/strings';
-import { cn } from '@/lib/utils';
+import { cn, getActiveSignalCount, getTierForScore } from '@/lib/utils';
+import { TIER_CONFIG, TOTAL_TELEMETRY_SIGNALS } from '@/constants';
 import type { TenantRecord, TenantScoreTier } from '@/types';
 
 interface TenantLeaderboardChartProps {
@@ -19,52 +20,51 @@ export const TenantLeaderboardChart = memo(({
   onInspectTenant,
 }: TenantLeaderboardChartProps) => {
   const m = APP_STRINGS.VIEWS.MICROSOFT;
-  const [topLimit, setTopLimit] = useState<number>(30);
+  const [topLimit, setTopLimit] = useState<number>(15);
 
   // Directly slice the processed tenants to honor the active filter and sort order
   const displayedTenants = useMemo(() => {
     return tenants.slice(0, topLimit);
   }, [tenants, topLimit]);
 
-  // Distribution buckets across all 200 tenants
+  // Distribution buckets across all available tenants driven by TIER_CONFIG
   const distribution = useMemo(() => {
-    let diamond = 0;
-    let gold = 0;
-    let silver = 0;
-    let bronze = 0;
-    let critical = 0;
-
+    const counts: Record<string, number> = { diamond: 0, gold: 0, silver: 0, bronze: 0, critical: 0 };
     tenants.forEach((t) => {
-      if (t.overallScore >= 90) diamond++;
-      else if (t.overallScore >= 80) gold++;
-      else if (t.overallScore >= 70) silver++;
-      else if (t.overallScore >= 50) bronze++;
-      else critical++;
+      const tier = getTierForScore(t.overallScore);
+      counts[tier.id] = (counts[tier.id] ?? 0) + 1;
     });
 
     const total = tenants.length || 1;
-    return [
-      { id: 'diamond' as TenantScoreTier, label: 'Diamond (90%+)', count: diamond, pct: (diamond / total) * 100, color: 'bg-emerald-500' },
-      { id: 'gold' as TenantScoreTier, label: 'Gold (80-89%)', count: gold, pct: (gold / total) * 100, color: 'bg-blue-500' },
-      { id: 'silver' as TenantScoreTier, label: 'Silver (70-79%)', count: silver, pct: (silver / total) * 100, color: 'bg-violet-500' },
-      { id: 'bronze' as TenantScoreTier, label: 'Bronze (50-69%)', count: bronze, pct: (bronze / total) * 100, color: 'bg-amber-500' },
-      { id: 'critical' as TenantScoreTier, label: 'Critical (<50%)', count: critical, pct: (critical / total) * 100, color: 'bg-rose-500' },
-    ];
-  }, [tenants]);
+    const tierLabels: Record<string, string> = {
+      diamond: m.OPT_TIER_DIAMOND,
+      gold: m.OPT_TIER_GOLD,
+      silver: m.OPT_TIER_SILVER,
+      bronze: m.OPT_TIER_BRONZE,
+      critical: m.OPT_TIER_CRITICAL,
+    };
+
+    return TIER_CONFIG.map((t) => ({
+      id: t.id as TenantScoreTier,
+      label: tierLabels[t.id] ?? t.id,
+      count: counts[t.id] ?? 0,
+      pct: ((counts[t.id] ?? 0) / total) * 100,
+      color: t.barColor,
+    }));
+  }, [tenants, m]);
 
   // Category aggregate benchmarks across all tenants
   const categoryBenchmarks = useMemo(() => {
-    if (tenants.length === 0) return { device: 0, identities: 0, apps: 0, data: 0, overall: 0 };
+    if (tenants.length === 0) return { device: 0, identities: 0, apps: 0, data: 0 };
     const sums = tenants.reduce(
       (acc, t) => {
         acc.device += t.categories.device;
         acc.identities += t.categories.identities;
         acc.apps += t.categories.apps;
         acc.data += t.categories.data;
-        acc.overall += t.overallScore;
         return acc;
       },
-      { device: 0, identities: 0, apps: 0, data: 0, overall: 0 }
+      { device: 0, identities: 0, apps: 0, data: 0 }
     );
     const count = tenants.length;
     return {
@@ -72,9 +72,15 @@ export const TenantLeaderboardChart = memo(({
       identities: Number((sums.identities / count).toFixed(1)),
       apps: Number((sums.apps / count).toFixed(1)),
       data: Number((sums.data / count).toFixed(1)),
-      overall: Number((sums.overall / count).toFixed(1)),
     };
   }, [tenants]);
+
+  const benchmarkRows = [
+    { label: `${m.CAT_DEVICE} (${m.CAT_DEVICE_DESC})`, score: categoryBenchmarks.device, color: 'bg-blue-500' },
+    { label: `${m.CAT_IDENTITIES} (${m.CAT_IDENTITIES_DESC})`, score: categoryBenchmarks.identities, color: 'bg-violet-500' },
+    { label: `${m.CAT_APPS} (${m.CAT_APPS_DESC})`, score: categoryBenchmarks.apps, color: 'bg-amber-500' },
+    { label: `${m.CAT_DATA} (${m.CAT_DATA_DESC})`, score: categoryBenchmarks.data, color: 'bg-emerald-500' },
+  ];
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -87,7 +93,7 @@ export const TenantLeaderboardChart = memo(({
               {m.HEADING_TOP_CHART}
             </h3>
             <span className="rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-              {displayedTenants.length} of {tenants.length}
+              {displayedTenants.length} {m.TXT_PAGINATION_OF} {tenants.length}
             </span>
           </div>
 
@@ -100,17 +106,16 @@ export const TenantLeaderboardChart = memo(({
                 id="top-limit-select"
                 value={topLimit}
                 onChange={(e) => setTopLimit(Number(e.target.value))}
-                aria-label="Adjust number of ranked tenants to display"
+                aria-label={m.LABEL_LIMIT_TOP}
                 className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-2xs dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
               >
-                <option value={10}>{m.OPT_LIMIT_10}</option>
-                <option value={20}>{m.OPT_LIMIT_20}</option>
+                <option value={15}>{m.OPT_LIMIT_15}</option>
                 <option value={30}>{m.OPT_LIMIT_30}</option>
                 <option value={50}>{m.OPT_LIMIT_50}</option>
                 <option value={1000}>{m.OPT_LIMIT_ALL}</option>
               </select>
             </div>
-            <span className="hidden text-xs text-slate-400 sm:inline">Click bar to inspect</span>
+            <span className="hidden text-xs text-slate-400 sm:inline">{m.TXT_CLICK_TO_INSPECT}</span>
           </div>
         </div>
 
@@ -134,11 +139,20 @@ export const TenantLeaderboardChart = memo(({
                   }}
                   tabIndex={0}
                   role="button"
-                  aria-label={`Inspect rank ${tenant.rank} tenant: ${tenant.name}, overall score ${tenant.overallScore}%`}
+                  aria-label={`${m.BTN_INSPECT} ${tenant.name}`}
                   className="group flex cursor-pointer select-none items-center gap-3 rounded-lg p-1.5 transition-colors hover:bg-slate-100/80 dark:hover:bg-slate-800/60 focus-visible:outline-2 focus-visible:outline-blue-600"
                 >
                   {/* Rank indicator */}
                   <span
+                    title={
+                      tenant.rank === 1
+                        ? m.TOOLTIP_RANK_1
+                        : tenant.rank === 2
+                          ? m.TOOLTIP_RANK_2
+                          : tenant.rank === 3
+                            ? m.TOOLTIP_RANK_3
+                            : undefined
+                    }
                     className={cn(
                       'w-6 shrink-0 text-center font-mono text-xs font-black',
                       tenant.rank === 1 && 'text-amber-600 dark:text-amber-400',
@@ -171,16 +185,10 @@ export const TenantLeaderboardChart = memo(({
                     </span>
                   </div>
 
-                  {/* Quick 4-bubble badge count */}
+                  {/* Quick telemetry badge count */}
                   <span className="hidden shrink-0 items-center gap-1 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-600 sm:inline-flex dark:bg-slate-800 dark:text-slate-400">
                     <ShieldCheck className="h-3 w-3 text-emerald-500" aria-hidden="true" />
-                    {[
-                      tenant.statusBubbles.sentinel,
-                      tenant.statusBubbles.mde,
-                      tenant.statusBubbles.mdi,
-                      tenant.statusBubbles.logAnalytics,
-                    ].filter(Boolean).length}
-                    /4
+                    {getActiveSignalCount(tenant.statusBubbles)}/{TOTAL_TELEMETRY_SIGNALS}
                   </span>
                 </div>
               );
@@ -208,7 +216,7 @@ export const TenantLeaderboardChart = memo(({
                   key={bucket.id}
                   type="button"
                   onClick={() => onSelectTier(isSelected ? 'all' : bucket.id)}
-                  aria-label={`Filter by ${bucket.label}: ${bucket.count} tenants`}
+                  aria-label={`${bucket.label}: ${bucket.count} ${m.LABEL_FLEET_UNITS}`}
                   className={cn(
                     'w-full cursor-pointer select-none rounded-lg p-2 text-left transition-all active:scale-[0.98]',
                     isSelected
@@ -246,65 +254,22 @@ export const TenantLeaderboardChart = memo(({
           </div>
 
           <div className="mt-4 space-y-2.5 text-xs">
-            <div className="space-y-1">
-              <div className="flex justify-between font-medium">
-                <span className="text-slate-600 dark:text-slate-400">Device (XDR)</span>
-                <span className="font-mono font-bold text-slate-900 dark:text-white">
-                  {categoryBenchmarks.device}%
-                </span>
+            {benchmarkRows.map((row) => (
+              <div key={row.label} className="space-y-1">
+                <div className="flex justify-between font-medium">
+                  <span className="text-slate-600 dark:text-slate-400">{row.label}</span>
+                  <span className="font-mono font-bold text-slate-900 dark:text-white">
+                    {row.score}%
+                  </span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800">
+                  <div
+                    className={cn('h-full rounded-full', row.color)}
+                    style={{ width: `${row.score}%` }}
+                  />
+                </div>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-                <div
-                  className="h-full rounded-full bg-blue-500"
-                  style={{ width: `${categoryBenchmarks.device}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex justify-between font-medium">
-                <span className="text-slate-600 dark:text-slate-400">Identities (Entra)</span>
-                <span className="font-mono font-bold text-slate-900 dark:text-white">
-                  {categoryBenchmarks.identities}%
-                </span>
-              </div>
-              <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-                <div
-                  className="h-full rounded-full bg-violet-500"
-                  style={{ width: `${categoryBenchmarks.identities}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex justify-between font-medium">
-                <span className="text-slate-600 dark:text-slate-400">Apps (Defender for Cloud Apps)</span>
-                <span className="font-mono font-bold text-slate-900 dark:text-white">
-                  {categoryBenchmarks.apps}%
-                </span>
-              </div>
-              <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-                <div
-                  className="h-full rounded-full bg-amber-500"
-                  style={{ width: `${categoryBenchmarks.apps}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex justify-between font-medium">
-                <span className="text-slate-600 dark:text-slate-400">Data (Purview)</span>
-                <span className="font-mono font-bold text-slate-900 dark:text-white">
-                  {categoryBenchmarks.data}%
-                </span>
-              </div>
-              <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-                <div
-                  className="h-full rounded-full bg-emerald-500"
-                  style={{ width: `${categoryBenchmarks.data}%` }}
-                />
-              </div>
-            </div>
+            ))}
           </div>
         </Card>
       </div>
@@ -313,4 +278,3 @@ export const TenantLeaderboardChart = memo(({
 });
 
 TenantLeaderboardChart.displayName = 'TenantLeaderboardChart';
-

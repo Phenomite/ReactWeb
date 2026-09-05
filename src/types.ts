@@ -134,7 +134,7 @@ export interface TenantStatusBubbles {
 
 // Microsoft Secure Score category breakdowns
 export interface TenantScoreCategories {
-  device: number;        // Device (XDR)
+  device: number;        // Device (Defender XDR)
   identities: number;    // Identities (Entra)
   apps: number;          // Apps (Defender for Cloud Apps)
   data: number;          // Data (Purview)

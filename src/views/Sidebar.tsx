@@ -1,6 +1,7 @@
 import { memo, useCallback } from 'react';
 import { Cuboid, X, LogIn, LogOut } from 'lucide-react';
 import { APP_STRINGS } from '@/strings';
+import { ALL_TENANTS } from '@/constants';
 import { getVisibleViews } from '@/views/views';
 import type { ViewDefinition } from '@/types';
 import { useAuth } from '@/context/AuthContext';
@@ -66,12 +67,12 @@ const SidebarNavItem = memo(({
       </div>
       {view.requiresAuth && (
         <span className="rounded-md bg-purple-100 px-1.5 py-0.5 text-[10px] font-semibold text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">
-          ADMIN
+          {APP_STRINGS.SIDEBAR.BADGE_ADMIN}
         </span>
       )}
       {view.id === 'microsoft' && (
         <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
-          200
+          {ALL_TENANTS.length}
         </span>
       )}
     </button>

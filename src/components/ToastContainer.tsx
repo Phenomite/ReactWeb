@@ -133,7 +133,7 @@ export const ToastContainer = memo(() => {
 
   return (
     <div
-      aria-label="Notifications"
+      aria-label={APP_STRINGS.TOAST.CONTAINER_ARIA_LABEL}
       className="pointer-events-none fixed bottom-5 right-5 z-50 flex max-w-sm w-full flex-col gap-2.5 p-2 sm:p-0"
     >
       {toasts.map((toast) => (

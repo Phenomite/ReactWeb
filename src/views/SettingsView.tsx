@@ -1,5 +1,5 @@
 import { memo, useCallback } from 'react';
-import { Settings, Palette, Bell, Check, Sparkles, Keyboard } from 'lucide-react';
+import { Settings, Palette, Bell, BellRing, Check, Keyboard } from 'lucide-react';
 import { APP_STRINGS } from '@/strings';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
@@ -24,7 +24,7 @@ export const SettingsView = memo(() => {
   const handleTriggerTestToast = useCallback(() => {
     showToast(APP_STRINGS.VIEWS.SETTINGS.TXT_TEST_TOAST_MESSAGE, {
       type: 'success',
-      description: 'Tactile micro-animations and WCAG-compliant status notifications.',
+      description: APP_STRINGS.VIEWS.SETTINGS.TXT_TEST_TOAST_DESC,
     });
   }, [showToast]);
 
@@ -103,9 +103,9 @@ export const SettingsView = memo(() => {
 
           <div className="mt-5 space-y-4">
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Notifications provide instant visual confirmation for authentication, settings changes, and productivity timers.
+              {APP_STRINGS.VIEWS.SETTINGS.TXT_FEEDBACK_NOTE}
             </p>
-            <Button onClick={handleTriggerTestToast} icon={Sparkles} variant="secondary">
+            <Button onClick={handleTriggerTestToast} icon={BellRing} variant="secondary">
               {APP_STRINGS.VIEWS.SETTINGS.BTN_TEST_TOAST}
             </Button>
           </div>
@@ -129,16 +129,16 @@ export const SettingsView = memo(() => {
 
           <div className="mt-5 space-y-2 text-xs">
             <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
-              <span className="text-slate-500">Command Palette</span>
-              <kbd className="font-mono font-semibold text-slate-700 dark:text-slate-300">Ctrl + K</kbd>
+              <span className="text-slate-500">{APP_STRINGS.COMMAND_PALETTE.HEADING_TITLE}</span>
+              <kbd className="font-mono font-semibold text-slate-700 dark:text-slate-300">{APP_STRINGS.VIEWS.SETTINGS.KBD_PALETTE}</kbd>
             </div>
             <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
-              <span className="text-slate-500">Toggle Dark Theme</span>
-              <kbd className="font-mono font-semibold text-slate-700 dark:text-slate-300">T</kbd>
+              <span className="text-slate-500">{APP_STRINGS.SHORTCUTS.LABEL_SHORTCUT_THEME}</span>
+              <kbd className="font-mono font-semibold text-slate-700 dark:text-slate-300">{APP_STRINGS.VIEWS.SETTINGS.KBD_THEME}</kbd>
             </div>
             <div className="flex justify-between py-1">
-              <span className="text-slate-500">All Shortcuts Cheatsheet</span>
-              <kbd className="font-mono font-semibold text-slate-700 dark:text-slate-300">?</kbd>
+              <span className="text-slate-500">{APP_STRINGS.VIEWS.SETTINGS.LABEL_ALL_SHORTCUTS}</span>
+              <kbd className="font-mono font-semibold text-slate-700 dark:text-slate-300">{APP_STRINGS.VIEWS.SETTINGS.KBD_HELP}</kbd>
             </div>
           </div>
         </Card>

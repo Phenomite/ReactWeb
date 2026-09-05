@@ -51,7 +51,7 @@ export const Header = memo(({
           <Search className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
           <span className="hidden sm:inline">{APP_STRINGS.HEADER.INPUT_SEARCH_PLACEHOLDER}</span>
           <kbd className="hidden rounded bg-white px-1.5 py-0.5 font-mono text-[10px] font-semibold text-slate-400 shadow-2xs sm:inline dark:bg-slate-900 dark:text-slate-400">
-            Ctrl+K
+            {APP_STRINGS.HEADER.KBD_SEARCH_SHORTCUT}
           </kbd>
         </button>
 

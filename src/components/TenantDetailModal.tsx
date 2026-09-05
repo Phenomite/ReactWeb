@@ -1,4 +1,4 @@
-import { memo, useEffect, useCallback } from 'react';
+import { memo } from 'react';
 import {
   X,
   Trophy,
@@ -10,12 +10,14 @@ import {
   Building2,
   Globe,
   MapPin,
-  Sparkles,
+  ListChecks,
   ArrowUpRight,
 } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { APP_STRINGS } from '@/strings';
-import { cn } from '@/lib/utils';
+import { cn, getActiveSignalCount } from '@/lib/utils';
+import { TOTAL_TELEMETRY_SIGNALS } from '@/constants';
+import { useEscapeKey } from '@/hooks/useEscapeKey';
 import type { TenantRecord } from '@/types';
 
 interface TenantDetailModalProps {
@@ -27,47 +29,120 @@ interface TenantDetailModalProps {
 export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetailModalProps) => {
   const m = APP_STRINGS.VIEWS.MICROSOFT;
 
-  // Handle escape key to close modal
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    },
-    [onClose]
-  );
-
-  useEffect(() => {
-    if (!isOpen) return;
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, handleKeyDown]);
+  useEscapeKey(isOpen, onClose);
 
   if (!isOpen || !tenant) return null;
 
-  // Active status bubbles count
-  const activeSignalsCount = [
-    tenant.statusBubbles.sentinel,
-    tenant.statusBubbles.mde,
-    tenant.statusBubbles.mdi,
-    tenant.statusBubbles.logAnalytics,
-  ].filter(Boolean).length;
+  const activeSignalsCount = getActiveSignalCount(tenant.statusBubbles);
+
+  const bubbleConfigs = [
+    {
+      name: m.LABEL_BUBBLE_SENTINEL,
+      active: tenant.statusBubbles.sentinel,
+      onText: m.STATUS_SENTINEL_ON,
+      offText: m.STATUS_SENTINEL_OFF,
+    },
+    {
+      name: m.LABEL_BUBBLE_MDE,
+      active: tenant.statusBubbles.mde,
+      onText: m.STATUS_MDE_ON,
+      offText: m.STATUS_MDE_OFF,
+    },
+    {
+      name: m.LABEL_BUBBLE_MDI,
+      active: tenant.statusBubbles.mdi,
+      onText: m.STATUS_MDI_ON,
+      offText: m.STATUS_MDI_OFF,
+    },
+    {
+      name: m.LABEL_BUBBLE_LOG,
+      active: tenant.statusBubbles.logAnalytics,
+      onText: m.STATUS_LOG_ON,
+      offText: m.STATUS_LOG_OFF,
+    },
+  ];
+
+  const categoryConfigs = [
+    {
+      key: 'device' as const,
+      label: m.CAT_DEVICE,
+      desc: m.CAT_DEVICE_DESC,
+      icon: Laptop,
+      score: tenant.categories.device,
+      color: 'bg-blue-500',
+      iconColor: 'text-blue-500',
+      extra: (
+        <div className="flex items-center justify-between pt-0.5 text-[10px] text-slate-500 dark:text-slate-400">
+          <span>
+            {m.LABEL_MDE_SENSOR}: {tenant.statusBubbles.mde ? m.STATUS_ACTIVE : m.STATUS_MISSING}
+          </span>
+          <span>
+            {m.LABEL_DEFENDER_SERVERS}: {tenant.statusBubbles.mde ? m.STATUS_ENROLLED : m.STATUS_PENDING}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: 'identities' as const,
+      label: m.CAT_IDENTITIES,
+      desc: m.CAT_IDENTITIES_DESC,
+      icon: Users,
+      score: tenant.categories.identities,
+      color: 'bg-violet-500',
+      iconColor: 'text-violet-500',
+    },
+    {
+      key: 'apps' as const,
+      label: m.CAT_APPS,
+      desc: m.CAT_APPS_DESC,
+      icon: Cloud,
+      score: tenant.categories.apps,
+      color: 'bg-amber-500',
+      iconColor: 'text-amber-500',
+    },
+    {
+      key: 'data' as const,
+      label: m.CAT_DATA,
+      desc: m.CAT_DATA_DESC,
+      icon: Database,
+      score: tenant.categories.data,
+      color: 'bg-emerald-500',
+      iconColor: 'text-emerald-500',
+    },
+  ];
 
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="tenant-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in"
+      className="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6 flex justify-center animate-in fade-in"
     >
+      {/* Backdrop */}
       <div
-        className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl transition-all dark:border-slate-800 dark:bg-slate-900"
-      >
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Modal Card */}
+      <div className="relative z-10 my-auto flex max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] w-full max-w-2xl flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl transition-all dark:border-slate-800 dark:bg-slate-900">
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4 dark:border-slate-800">
+        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-100 pb-4 dark:border-slate-800">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-black text-amber-700 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+              <span
+                title={
+                  tenant.rank === 1
+                    ? m.TOOLTIP_RANK_1
+                    : tenant.rank === 2
+                      ? m.TOOLTIP_RANK_2
+                      : tenant.rank === 3
+                        ? m.TOOLTIP_RANK_3
+                        : undefined
+                }
+                className="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-black text-amber-700 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
+              >
                 <Trophy className="h-3 w-3" aria-hidden="true" />
                 Rank #{tenant.rank}
               </span>
@@ -89,7 +164,7 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
               </span>
               <span className="flex items-center gap-1">
                 <Building2 className="h-3.5 w-3.5" aria-hidden="true" />
-                {tenant.seatCount.toLocaleString()} Seats
+                {tenant.seatCount.toLocaleString()} {m.LABEL_USERS}
               </span>
             </div>
           </div>
@@ -105,25 +180,33 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
         </div>
 
         {/* Modal Body */}
-        <div className="mt-5 space-y-6 max-h-[70vh] overflow-y-auto pr-1">
+        <div className="mt-5 flex-1 min-h-0 space-y-6 overflow-y-auto pr-1">
           {/* Overall Score Highlight */}
           <div className="flex items-center justify-between rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
             <div>
               <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                Composite Microsoft Secure Score
+                {m.HEADING_COMPOSITE_SCORE}
               </span>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="font-mono text-3xl font-black text-slate-900 dark:text-white">
                   {tenant.overallScore}%
                 </span>
                 <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                  {tenant.overallScore >= 80 ? 'Superior Protection' : tenant.overallScore >= 60 ? 'Moderate Posture' : 'Remediation Required'}
+                  {tenant.overallScore >= 80
+                    ? m.TXT_POSTURE_SUPERIOR
+                    : tenant.overallScore >= 60
+                    ? m.TXT_POSTURE_MODERATE
+                    : m.TXT_POSTURE_CRITICAL}
                 </span>
               </div>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-right shadow-2xs dark:border-slate-700 dark:bg-slate-900">
-              <span className="text-[10px] font-semibold uppercase text-slate-400">Active Telemetry</span>
-              <p className="font-mono text-base font-black text-accent">{activeSignalsCount} / 4</p>
+              <span className="text-[10px] font-semibold uppercase text-slate-400">
+                {m.LABEL_ACTIVE_TELEMETRY}
+              </span>
+              <p className="font-mono text-base font-black text-accent">
+                {activeSignalsCount} / {TOTAL_TELEMETRY_SIGNALS}
+              </p>
             </div>
           </div>
 
@@ -133,157 +216,61 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
               {m.LABEL_BUBBLES_SECTION}
             </h4>
             <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-              <div
-                className={cn(
-                  'rounded-xl border p-3 text-center',
-                  tenant.statusBubbles.sentinel
-                    ? 'border-emerald-200 bg-emerald-50/70 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/50 dark:text-emerald-300'
-                    : 'border-slate-200 bg-slate-50 text-slate-400 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-500'
-                )}
-              >
-                <p className="text-xs font-bold">{m.LABEL_BUBBLE_SENTINEL}</p>
-                <p className="mt-1 text-[10px] font-medium">
-                  {tenant.statusBubbles.sentinel ? 'Ingesting SIEM' : 'Not Connected'}
-                </p>
-              </div>
-
-              <div
-                className={cn(
-                  'rounded-xl border p-3 text-center',
-                  tenant.statusBubbles.mde
-                    ? 'border-emerald-200 bg-emerald-50/70 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/50 dark:text-emerald-300'
-                    : 'border-slate-200 bg-slate-50 text-slate-400 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-500'
-                )}
-              >
-                <p className="text-xs font-bold">{m.LABEL_BUBBLE_MDE}</p>
-                <p className="mt-1 text-[10px] font-medium">
-                  {tenant.statusBubbles.mde ? 'EDR Active' : 'No Sensor'}
-                </p>
-              </div>
-
-              <div
-                className={cn(
-                  'rounded-xl border p-3 text-center',
-                  tenant.statusBubbles.mdi
-                    ? 'border-emerald-200 bg-emerald-50/70 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/50 dark:text-emerald-300'
-                    : 'border-slate-200 bg-slate-50 text-slate-400 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-500'
-                )}
-              >
-                <p className="text-xs font-bold">{m.LABEL_BUBBLE_MDI}</p>
-                <p className="mt-1 text-[10px] font-medium">
-                  {tenant.statusBubbles.mdi ? 'Identity Defense' : 'Sensor Inactive'}
-                </p>
-              </div>
-
-              <div
-                className={cn(
-                  'rounded-xl border p-3 text-center',
-                  tenant.statusBubbles.logAnalytics
-                    ? 'border-emerald-200 bg-emerald-50/70 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/50 dark:text-emerald-300'
-                    : 'border-slate-200 bg-slate-50 text-slate-400 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-500'
-                )}
-              >
-                <p className="text-xs font-bold">{m.LABEL_BUBBLE_LOG}</p>
-                <p className="mt-1 text-[10px] font-medium">
-                  {tenant.statusBubbles.logAnalytics ? 'Audit Streaming' : 'Logs Disabled'}
-                </p>
-              </div>
+              {bubbleConfigs.map((b) => (
+                <div
+                  key={b.name}
+                  className={cn(
+                    'rounded-xl border p-3 text-center',
+                    b.active
+                      ? 'border-emerald-200 bg-emerald-50/70 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/50 dark:text-emerald-300'
+                      : 'border-slate-200 bg-slate-50 text-slate-400 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-500'
+                  )}
+                >
+                  <p className="text-xs font-bold">{b.name}</p>
+                  <p className="mt-1 text-[10px] font-medium">{b.active ? b.onText : b.offText}</p>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Secure Score Categories */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-              Secure Score Category Breakdown
+              {m.HEADING_CATEGORY_BREAKDOWN}
             </h4>
 
             <div className="space-y-3 rounded-xl border border-slate-200 p-4 dark:border-slate-800">
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <Laptop className="h-4 w-4 text-blue-500" aria-hidden="true" />
-                    <span className="font-semibold text-slate-900 dark:text-white">{m.CAT_DEVICE}</span>
-                    <span className="text-[11px] text-slate-400">({m.CAT_DEVICE_DESC})</span>
+              {categoryConfigs.map((cat) => {
+                const Icon = cat.icon;
+                return (
+                  <div key={cat.key} className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <Icon className={cn('h-4 w-4', cat.iconColor)} aria-hidden="true" />
+                        <span className="font-semibold text-slate-900 dark:text-white">{cat.label}</span>
+                        <span className="text-[11px] text-slate-400">({cat.desc})</span>
+                      </div>
+                      <span className="font-mono font-bold text-slate-900 dark:text-white">
+                        {cat.score}%
+                      </span>
+                    </div>
+                    <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800">
+                      <div
+                        className={cn('h-full rounded-full', cat.color)}
+                        style={{ width: `${cat.score}%` }}
+                      />
+                    </div>
+                    {cat.extra}
                   </div>
-                  <span className="font-mono font-bold text-slate-900 dark:text-white">
-                    {tenant.categories.device}%
-                  </span>
-                </div>
-                <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-                  <div
-                    className="h-full rounded-full bg-blue-500"
-                    style={{ width: `${tenant.categories.device}%` }}
-                  />
-                </div>
-                <div className="flex items-center justify-between pt-0.5 text-[10px] text-slate-500 dark:text-slate-400">
-                  <span>MDE Sensor: {tenant.statusBubbles.mde ? 'Active' : 'Missing'}</span>
-                  <span>Defender for Servers: {tenant.statusBubbles.mde ? 'Enrolled' : 'Pending Deployment'}</span>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-violet-500" aria-hidden="true" />
-                    <span className="font-semibold text-slate-900 dark:text-white">{m.CAT_IDENTITIES}</span>
-                    <span className="text-[11px] text-slate-400">({m.CAT_IDENTITIES_DESC})</span>
-                  </div>
-                  <span className="font-mono font-bold text-slate-900 dark:text-white">
-                    {tenant.categories.identities}%
-                  </span>
-                </div>
-                <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-                  <div
-                    className="h-full rounded-full bg-violet-500"
-                    style={{ width: `${tenant.categories.identities}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <Cloud className="h-4 w-4 text-amber-500" aria-hidden="true" />
-                    <span className="font-semibold text-slate-900 dark:text-white">{m.CAT_APPS}</span>
-                    <span className="text-[11px] text-slate-400">({m.CAT_APPS_DESC})</span>
-                  </div>
-                  <span className="font-mono font-bold text-slate-900 dark:text-white">
-                    {tenant.categories.apps}%
-                  </span>
-                </div>
-                <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-                  <div
-                    className="h-full rounded-full bg-amber-500"
-                    style={{ width: `${tenant.categories.apps}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <Database className="h-4 w-4 text-emerald-500" aria-hidden="true" />
-                    <span className="font-semibold text-slate-900 dark:text-white">{m.CAT_DATA}</span>
-                    <span className="text-[11px] text-slate-400">({m.CAT_DATA_DESC})</span>
-                  </div>
-                  <span className="font-mono font-bold text-slate-900 dark:text-white">
-                    {tenant.categories.data}%
-                  </span>
-                </div>
-                <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-                  <div
-                    className="h-full rounded-full bg-emerald-500"
-                    style={{ width: `${tenant.categories.data}%` }}
-                  />
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
 
           {/* Gamified Action Recommendations */}
           <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 dark:border-blue-900/60 dark:bg-blue-950/30">
             <div className="flex items-center gap-2 text-xs font-bold text-blue-900 dark:text-blue-300">
-              <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+              <ListChecks className="h-4 w-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
               <span>{m.HEADING_RECOMMENDED_ACTIONS}</span>
             </div>
             <ul className="mt-2.5 space-y-2 text-xs text-blue-800 dark:text-blue-200">
@@ -292,14 +279,14 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
                 <li className="flex items-start gap-1.5">
                   <ArrowUpRight className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-500" aria-hidden="true" />
                   <span>
-                    <strong>MDE Sensor Category:</strong> {m.TXT_REC_MDE_SERVERS}
+                    <strong>{m.LABEL_REC_MDE_CATEGORY}:</strong> {m.TXT_REC_MDE_SERVERS}
                   </span>
                 </li>
               ) : tenant.categories.device < 92 ? (
                 <li className="flex items-start gap-1.5">
                   <ArrowUpRight className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-500" aria-hidden="true" />
                   <span>
-                    <strong>MDE Sensor Category:</strong> {m.TXT_REC_MDE_SERVERS_EXPAND}
+                    <strong>{m.LABEL_REC_MDE_CATEGORY}:</strong> {m.TXT_REC_MDE_SERVERS_EXPAND}
                   </span>
                 </li>
               ) : null}
@@ -308,7 +295,7 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
                 <li className="flex items-start gap-1.5">
                   <ArrowUpRight className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-500" aria-hidden="true" />
                   <span>
-                    <strong>Identities Category:</strong> {m.TXT_REC_MDI}
+                    <strong>{m.LABEL_REC_IDENTITIES_CATEGORY}:</strong> {m.TXT_REC_MDI}
                   </span>
                 </li>
               )}
@@ -317,7 +304,7 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
                 <li className="flex items-start gap-1.5">
                   <ArrowUpRight className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-500" aria-hidden="true" />
                   <span>
-                    <strong>SIEM Integration:</strong> {m.TXT_REC_SENTINEL}
+                    <strong>{m.LABEL_REC_SIEM_CATEGORY}:</strong> {m.TXT_REC_SENTINEL}
                   </span>
                 </li>
               )}
@@ -326,12 +313,12 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
                 <li className="flex items-start gap-1.5">
                   <ArrowUpRight className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-500" aria-hidden="true" />
                   <span>
-                    <strong>Audit Logging:</strong> {m.TXT_REC_AUDIT}
+                    <strong>{m.LABEL_REC_AUDIT_CATEGORY}:</strong> {m.TXT_REC_AUDIT}
                   </span>
                 </li>
               )}
 
-              {activeSignalsCount === 4 && tenant.categories.device >= 92 && (
+              {activeSignalsCount === TOTAL_TELEMETRY_SIGNALS && tenant.categories.device >= 92 && (
                 <li className="flex items-center gap-1.5">
                   <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-emerald-500" aria-hidden="true" />
                   <span>{m.TXT_REC_FULL_STACK}</span>
@@ -342,7 +329,7 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
         </div>
 
         {/* Footer */}
-        <div className="mt-6 flex justify-end border-t border-slate-100 pt-4 dark:border-slate-800">
+        <div className="mt-6 flex shrink-0 justify-end border-t border-slate-100 pt-4 dark:border-slate-800">
           <Button onClick={onClose} variant="secondary">
             {m.BTN_CLOSE_MODAL}
           </Button>

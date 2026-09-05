@@ -16,7 +16,8 @@ import { Button } from '@/components/Button';
 import { useAuth } from '@/context/AuthContext';
 import { useAccent } from '@/context/AccentContext';
 import { useToast } from '@/context/ToastContext';
-import { cn } from '@/lib/utils';
+import { cn, copyCurrentUrl } from '@/lib/utils';
+import { APP_VERSION } from '@/constants';
 import type { ViewDefinition } from '@/types';
 
 // Renders dynamic time-aware greeting
@@ -35,8 +36,7 @@ export const HomepageView = memo(() => {
   const greeting = getGreeting();
 
   const handleCopyLink = useCallback(() => {
-    navigator.clipboard.writeText(window.location.href);
-    showToast(APP_STRINGS.TOAST.TXT_URL_COPIED, { type: 'success' });
+    copyCurrentUrl(showToast);
   }, [showToast]);
 
   const handleOpenSettings = useCallback(() => {
@@ -59,7 +59,7 @@ export const HomepageView = memo(() => {
         headerRight={
           <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-accent dark:bg-slate-800">
             <CogIcon className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Version 0.0.2</span>
+            <span>Version {APP_VERSION}</span>
           </span>
         }
       />
@@ -118,10 +118,10 @@ export const HomepageView = memo(() => {
             </div>
             <div>
               <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                Productivity Hotkeys
+                {APP_STRINGS.SHORTCUTS.TXT_FOOTER_NOTE}
               </p>
               <p className="text-xs font-bold text-slate-900 dark:text-white">
-                Ctrl + K Palette
+                {APP_STRINGS.VIEWS.HOMEPAGE.TXT_HOTKEY_PALETTE}
               </p>
             </div>
           </div>
@@ -135,7 +135,7 @@ export const HomepageView = memo(() => {
             {APP_STRINGS.VIEWS.HOMEPAGE.HEADING_QUICK_ACTIONS}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Fast navigation and handy shortcuts to optimize your workflow.
+            {APP_STRINGS.VIEWS.HOMEPAGE.TXT_QUICK_ACTIONS_DESC}
           </p>
         </div>
 

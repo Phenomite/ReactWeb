@@ -1,37 +1,10 @@
 import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
-import { INITIAL_SECURITY_INCIDENTS } from '@/constants';
+import { INITIAL_SECURITY_INCIDENTS, SIMULATED_ALERTS } from '@/constants';
 import { useToast } from '@/context/ToastContext';
 import { APP_STRINGS } from '@/strings';
 import type { SecurityIncident, SecurityIncidentContextType, IncidentStatus } from '@/types';
 
 const SecurityIncidentContext = createContext<SecurityIncidentContextType | undefined>(undefined);
-
-const SIMULATED_ALERTS = [
-  {
-    title: 'Anomalous Cross-Origin PostMessage Telemetry Probe',
-    severity: 'high' as const,
-    category: 'Cross-Context Isolation',
-    source: 'Browser Window Messaging Guard',
-    description: 'An untrusted origin attempted to post structured messages without meeting COOP same-origin constraints.',
-    recommendation: 'Verify targetOrigin validation on window.addEventListener handlers.',
-  },
-  {
-    title: 'Repeated PBKDF2 Web Crypto Salt Mismatch Ingestion',
-    severity: 'critical' as const,
-    category: 'Credential Defense',
-    source: 'Client Auth Engine',
-    description: 'Automated rapid-fire hash verification attempts flagged with randomized salt parameters.',
-    recommendation: 'Apply IP rate-limiting and enforce multi-factor authentication policies.',
-  },
-  {
-    title: 'Local Storage State Manipulation Flagged',
-    severity: 'medium' as const,
-    category: 'Data Integrity',
-    source: 'Storage Event Listener',
-    description: 'Direct console manipulation of session storage token detected outside normal application hooks.',
-    recommendation: 'Audit client-side state transitions and rotate signed session key.',
-  },
-];
 
 // Manages client-side Microsoft Defender security incidents and Sentinel exports
 export function SecurityIncidentProvider({ children }: { children: ReactNode }) {
@@ -93,7 +66,7 @@ export function SecurityIncidentProvider({ children }: { children: ReactNode }) 
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `microsoft-sentinel-incidents-${Date.now()}.json`;
+    link.download = `${APP_STRINGS.VIEWS.MICROSOFT.FILE_EXPORT_SENTINEL_JSON_PREFIX}${Date.now()}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
