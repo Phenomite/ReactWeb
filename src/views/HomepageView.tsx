@@ -1,7 +1,7 @@
 import { useCallback, memo } from 'react';
 import {
   Home,
-  Sparkles,
+  CogIcon,
   ShieldCheck,
   ShieldAlert,
   Palette,
@@ -58,8 +58,8 @@ export const HomepageView = memo(() => {
         icon={Home}
         headerRight={
           <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-accent dark:bg-slate-800">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Delight Edition</span>
+            <CogIcon className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Version 0.0.2</span>
           </span>
         }
       />

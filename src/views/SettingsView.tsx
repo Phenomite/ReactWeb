@@ -84,7 +84,7 @@ export const SettingsView = memo(() => {
         </div>
       </Card>
 
-      {/* Delight & Feedback System */}
+      {/* Feedback System */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card className="p-6">
           <div className="flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">

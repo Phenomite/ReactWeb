@@ -1,4 +1,4 @@
-# Implementation Plan: 5 User Delight Features Suite
+# Implementation Plan: 3 Accessibility Features
 
 Add keyboard-first modern SaaS experiences by implementing 3 features in compliance with WCAG accessibility, and project architecture guidelines.
 

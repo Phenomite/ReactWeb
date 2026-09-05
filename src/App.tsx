@@ -14,7 +14,7 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { APP_STRINGS } from '@/strings';
 import type { ViewDefinition } from '@/types';
 
-// Renders the 4-container application layout shell with delight features
+// Renders the 4-container application layout shell
 function AppLayout() {
   const { darkMode, toggleDarkMode } = useTheme();
   const { accent, setAccent } = useAccent();
