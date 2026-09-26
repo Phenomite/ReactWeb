@@ -1,0 +1,110 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: reactweb-database
+  namespace: reactweb
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: "3.7.2"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+    createNamespace: true
+  upgrade:
+    remediation:
+      retries: 3
+  rollback:
+    recreate: true
+    force: true
+  values:
+    controllers:
+      main:
+        type: deployment
+        replicas: 1
+        strategy: Recreate
+        containers:
+          main:
+            image:
+              repository: ghcr.io/phenomite/reactweb-backend
+              tag: latest
+            env:
+              NODE_ENV: production
+              PORT: "3001"
+              HOST: "0.0.0.0"
+              DATA_DIR: "/app/data"
+              ENABLE_SIMULATOR: "false"
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: 10001
+              runAsGroup: 10001
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+              seccompProfile:
+                type: RuntimeDefault
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: 3001
+                  initialDelaySeconds: 5
+                  periodSeconds: 15
+                  timeoutSeconds: 3
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /readyz
+                    port: 3001
+                  initialDelaySeconds: 3
+                  periodSeconds: 10
+                  timeoutSeconds: 3
+                  failureThreshold: 2
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: 3001
+                  initialDelaySeconds: 2
+                  periodSeconds: 5
+                  failureThreshold: 10
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+    service:
+      main:
+        controller: main
+        ports:
+          http:
+            port: 3001
+    persistence:
+      data:
+        enabled: true
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        globalMounts:
+          - path: /app/data
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp

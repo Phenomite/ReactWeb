@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { Menu, Moon, Sun, Search, Keyboard } from 'lucide-react';
 import { useHeaderSlot } from '@/context/HeaderSlotContext';
+import { RealtimeBadge } from '@/components/RealtimeBadge';
 import { APP_STRINGS } from '@/strings';
 
 interface HeaderProps {
@@ -41,6 +42,7 @@ export const Header = memo(({
 
       <div className="flex shrink-0 items-center gap-2.5">
         {customActions}
+        <RealtimeBadge />
         {/* Command palette search trigger */}
         <button
           type="button"

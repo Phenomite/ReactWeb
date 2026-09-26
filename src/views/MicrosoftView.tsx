@@ -23,9 +23,10 @@ import { TenantLeaderboardChart } from '@/components/TenantLeaderboardChart';
 import { TenantDetailModal } from '@/components/TenantDetailModal';
 import { useToast } from '@/context/ToastContext';
 import { useHeaderSlot } from '@/context/HeaderSlotContext';
+import { useRealtime } from '@/context/RealtimeContext';
 import { APP_STRINGS } from '@/strings';
 import { cn, getActiveSignalCount, getTierForScore } from '@/lib/utils';
-import { ALL_TENANTS, TOTAL_TELEMETRY_SIGNALS } from '@/constants';
+import { TOTAL_TELEMETRY_SIGNALS } from '@/constants';
 import type {
   ViewDefinition,
   TenantRecord,
@@ -39,6 +40,7 @@ import type {
 export const MicrosoftView = memo(() => {
   const { showToast } = useToast();
   const { setHeaderSlot } = useHeaderSlot();
+  const { tenants } = useRealtime();
   const m = APP_STRINGS.VIEWS.MICROSOFT;
 
   // View state & tab selection
@@ -54,22 +56,32 @@ export const MicrosoftView = memo(() => {
   // Selected tenant for detailed modal inspection
   const [inspectingTenant, setInspectingTenant] = useState<TenantRecord | null>(null);
 
+  // Keep modal inspection in sync with real-time updates
+  useEffect(() => {
+    if (inspectingTenant) {
+      const latest = tenants.find((t) => t.id === inspectingTenant.id);
+      if (latest && (latest.overallScore !== inspectingTenant.overallScore || latest.rank !== inspectingTenant.rank)) {
+        setInspectingTenant(latest);
+      }
+    }
+  }, [tenants, inspectingTenant]);
+
   // Global KPI aggregates across all tenants
   const globalKpis = useMemo(() => {
-    if (ALL_TENANTS.length === 0) return { avgScore: 0, fullTelemetryCount: 0, fullTelemetryPct: 0, topTenant: null };
+    if (tenants.length === 0) return { avgScore: 0, fullTelemetryCount: 0, fullTelemetryPct: 0, topTenant: null };
 
-    const totalScore = ALL_TENANTS.reduce((sum, t) => sum + t.overallScore, 0);
-    const avgScore = Number((totalScore / ALL_TENANTS.length).toFixed(1));
+    const totalScore = tenants.reduce((sum, t) => sum + t.overallScore, 0);
+    const avgScore = Number((totalScore / tenants.length).toFixed(1));
 
-    const fullTelemetryCount = ALL_TENANTS.filter(
+    const fullTelemetryCount = tenants.filter(
       (t) => getActiveSignalCount(t.statusBubbles) === TOTAL_TELEMETRY_SIGNALS
     ).length;
 
-    const fullTelemetryPct = Number(((fullTelemetryCount / ALL_TENANTS.length) * 100).toFixed(0));
-    const topTenant = ALL_TENANTS[0] ?? null;
+    const fullTelemetryPct = Number(((fullTelemetryCount / tenants.length) * 100).toFixed(0));
+    const topTenant = tenants[0] ?? null;
 
     return { avgScore, fullTelemetryCount, fullTelemetryPct, topTenant };
-  }, []);
+  }, [tenants]);
 
   // Dynamic human-readable label for sort order toggle
   const orderLabel = useMemo(() => {
@@ -86,7 +98,7 @@ export const MicrosoftView = memo(() => {
   const processedTenants = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
 
-    const filtered = ALL_TENANTS.filter((tenant) => {
+    const filtered = tenants.filter((tenant) => {
       // Search matching
       if (q) {
         const matchesName = tenant.name.toLowerCase().includes(q);
@@ -139,7 +151,7 @@ export const MicrosoftView = memo(() => {
     });
 
     return filtered;
-  }, [searchQuery, telemetryFilter, selectedTier, sortField, sortOrder]);
+  }, [tenants, searchQuery, telemetryFilter, selectedTier, sortField, sortOrder]);
 
   // Paginated records for tile and table views
   const totalPages = Math.max(1, Math.ceil(processedTenants.length / pageSize));
@@ -236,7 +248,7 @@ export const MicrosoftView = memo(() => {
               </div>
               <div className="shrink-0 text-right">
                 <span className="font-mono text-xl font-black text-slate-900 dark:text-white">
-                  {ALL_TENANTS.length}
+                  {tenants.length}
                 </span>
                 <p className="text-[9px] font-medium text-slate-400">{m.LABEL_FLEET_UNITS}</p>
               </div>
@@ -267,7 +279,7 @@ export const MicrosoftView = memo(() => {
                   {m.HEADING_FULL_TELEMETRY}
                 </span>
                 <p className="truncate text-[10px] text-slate-400 dark:text-slate-500">
-                  {globalKpis.fullTelemetryCount} {m.TXT_PAGINATION_OF} {ALL_TENANTS.length} {m.TXT_FULL_STACK_STATUS}
+                  {globalKpis.fullTelemetryCount} {m.TXT_PAGINATION_OF} {tenants.length} {m.TXT_FULL_STACK_STATUS}
                 </p>
               </div>
               <div className="shrink-0 text-right">
@@ -290,7 +302,7 @@ export const MicrosoftView = memo(() => {
           </div>
 
           <div className="flex flex-col space-y-2">
-            {ALL_TENANTS.slice(0, 3).map((tenant, idx) => {
+            {tenants.slice(0, 3).map((tenant, idx) => {
               const isFirst = idx === 0;
               const isSecond = idx === 1;
 
@@ -593,7 +605,7 @@ export const MicrosoftView = memo(() => {
                   <option value={12}>12 / {m.TXT_PAGE.toLowerCase()}</option>
                   <option value={24}>24 / {m.TXT_PAGE.toLowerCase()}</option>
                   <option value={48}>48 / {m.TXT_PAGE.toLowerCase()}</option>
-                  <option value={ALL_TENANTS.length || 1000}>{m.OPT_LIMIT_ALL}</option>
+                  <option value={tenants.length || 1000}>{m.OPT_LIMIT_ALL}</option>
                 </select>
               </div>
 

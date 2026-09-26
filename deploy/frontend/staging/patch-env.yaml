@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: reactweb-frontend
+  namespace: reactweb
+spec:
+  targetNamespace: reactweb-staging
+  values:
+    controllers:
+      main:
+        replicas: 1
+        containers:
+          main:
+            resources:
+              requests:
+                cpu: 25m
+                memory: 32Mi
+    ingress:
+      main:
+        hosts:
+          - host: staging.reactweb.example.com
+            paths:
+              - path: /
+                service:
+                  identifier: main
+                  port: http
+        tls:
+          - secretName: reactweb-staging-tls
+            hosts:
+              - staging.reactweb.example.com

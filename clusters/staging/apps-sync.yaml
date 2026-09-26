@@ -1,0 +1,48 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: reactweb-database-staging
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: ./deploy/database/staging
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: reactweb
+  wait: true
+  timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: reactweb-processing-staging
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: ./deploy/processing/staging
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: reactweb
+  dependsOn:
+    - name: reactweb-database-staging
+  wait: true
+  timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: reactweb-frontend-staging
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: ./deploy/frontend/staging
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: reactweb
+  dependsOn:
+    - name: reactweb-database-staging
+  wait: true
+  timeout: 5m

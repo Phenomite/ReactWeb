@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { useState, useCallback, useEffect, memo } from 'react';
 import {
   X,
   Trophy,
@@ -12,12 +12,17 @@ import {
   MapPin,
   ListChecks,
   ArrowUpRight,
+  Edit3,
+  Save,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { APP_STRINGS } from '@/strings';
 import { cn, getActiveSignalCount } from '@/lib/utils';
 import { TOTAL_TELEMETRY_SIGNALS } from '@/constants';
 import { useEscapeKey } from '@/hooks/useEscapeKey';
+import { useRealtime } from '@/context/RealtimeContext';
+import { useAuth } from '@/context/AuthContext';
 import type { TenantRecord } from '@/types';
 
 interface TenantDetailModalProps {
@@ -28,8 +33,91 @@ interface TenantDetailModalProps {
 
 export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetailModalProps) => {
   const m = APP_STRINGS.VIEWS.MICROSOFT;
+  const r = APP_STRINGS.REALTIME;
+  const { updateData } = useRealtime();
+  const { isAuthenticated } = useAuth();
+
+  // Admin edit mode state
+  const [isEditing, setIsEditing] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [score, setScore] = useState(tenant?.overallScore ?? 0);
+  const [deviceScore, setDeviceScore] = useState(tenant?.categories.device ?? 0);
+  const [identitiesScore, setIdentitiesScore] = useState(tenant?.categories.identities ?? 0);
+  const [appsScore, setAppsScore] = useState(tenant?.categories.apps ?? 0);
+  const [dataScore, setDataScore] = useState(tenant?.categories.data ?? 0);
+  const [sentinelActive, setSentinelActive] = useState(tenant?.statusBubbles.sentinel ?? false);
+  const [mdeActive, setMdeActive] = useState(tenant?.statusBubbles.mde ?? false);
+  const [mdiActive, setMdiActive] = useState(tenant?.statusBubbles.mdi ?? false);
+  const [logActive, setLogActive] = useState(tenant?.statusBubbles.logAnalytics ?? false);
+  const [seatCount, setSeatCount] = useState(tenant?.seatCount ?? 0);
+
+  // Sync form inputs when tenant changes or updates via SSE
+  useEffect(() => {
+    if (tenant) {
+      setScore(tenant.overallScore);
+      setDeviceScore(tenant.categories.device);
+      setIdentitiesScore(tenant.categories.identities);
+      setAppsScore(tenant.categories.apps);
+      setDataScore(tenant.categories.data);
+      setSentinelActive(tenant.statusBubbles.sentinel);
+      setMdeActive(tenant.statusBubbles.mde);
+      setMdiActive(tenant.statusBubbles.mdi);
+      setLogActive(tenant.statusBubbles.logAnalytics);
+      setSeatCount(tenant.seatCount);
+    }
+  }, [tenant]);
 
   useEscapeKey(isOpen, onClose);
+
+  const handlePublish = useCallback(async () => {
+    if (!tenant) return;
+    setIsPublishing(true);
+    try {
+      const res = await updateData<TenantRecord>(
+        'tenants',
+        tenant.id,
+        {
+          overallScore: Number(score),
+          seatCount: Number(seatCount),
+          categories: {
+            device: Number(deviceScore),
+            identities: Number(identitiesScore),
+            apps: Number(appsScore),
+            data: Number(dataScore),
+          },
+          statusBubbles: {
+            sentinel: sentinelActive,
+            mde: mdeActive,
+            mdi: mdiActive,
+            logAnalytics: logActive,
+          },
+        },
+        {
+          expectedVersion: tenant.version,
+          successMessage: APP_STRINGS.REALTIME.TXT_PUBLISH_SUCCESS,
+        }
+      );
+
+      if (res.success) {
+        setIsEditing(false);
+      }
+    } finally {
+      setIsPublishing(false);
+    }
+  }, [
+    tenant,
+    updateData,
+    score,
+    seatCount,
+    deviceScore,
+    identitiesScore,
+    appsScore,
+    dataScore,
+    sentinelActive,
+    mdeActive,
+    mdiActive,
+    logActive,
+  ]);
 
   if (!isOpen || !tenant) return null;
 
@@ -130,7 +218,7 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
         {/* Header */}
         <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-100 pb-4 dark:border-slate-800">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span
                 title={
                   tenant.rank === 1
@@ -149,6 +237,14 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
               <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 {tenant.industry}
               </span>
+              <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-mono text-slate-500 dark:border-slate-800 dark:bg-slate-800/60 dark:text-slate-400">
+                rev v{tenant.version ?? 1}
+              </span>
+              {tenant.lastUpdatedBy && (
+                <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
+                  by {tenant.lastUpdatedBy}
+                </span>
+              )}
             </div>
             <h2 id="tenant-modal-title" className="text-lg font-bold text-slate-900 dark:text-white">
               {tenant.name}
@@ -169,18 +265,161 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={m.BTN_CLOSE_MODAL}
-            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 active:scale-95 focus-visible:outline-2 focus-visible:outline-blue-600 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-          >
-            <X className="h-5 w-5" aria-hidden="true" />
-          </button>
+          <div className="flex items-center gap-1.5">
+            {isAuthenticated && (
+              <button
+                type="button"
+                onClick={() => setIsEditing((prev) => !prev)}
+                className={cn(
+                  'flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-all active:scale-95 focus-visible:outline-2 focus-visible:outline-blue-600',
+                  isEditing
+                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                )}
+                aria-label="Toggle admin edit mode"
+              >
+                <Edit3 className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>{isEditing ? 'Cancel Edit' : 'Edit'}</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={m.BTN_CLOSE_MODAL}
+              className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 active:scale-95 focus-visible:outline-2 focus-visible:outline-blue-600 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            >
+              <X className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
         </div>
 
         {/* Modal Body */}
         <div className="mt-5 flex-1 min-h-0 space-y-6 overflow-y-auto pr-1">
+          {/* Admin Edit Mode Panel */}
+          {isEditing && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4 space-y-4 dark:border-amber-900/60 dark:bg-amber-950/30">
+              <div className="flex items-center justify-between border-b border-amber-200 pb-2.5 dark:border-amber-900/60">
+                <div className="flex items-center gap-2 text-xs font-bold text-amber-900 dark:text-amber-200">
+                  <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+                  <span>{r.LABEL_EDIT_MODE} (Multi-Admin Safe)</span>
+                </div>
+                <span className="text-[11px] font-mono text-amber-700 dark:text-amber-400">
+                  Lock Base: v{tenant.version ?? 1}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="text-[11px] font-medium text-slate-700 dark:text-slate-300">
+                    Overall Secure Score (%):
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={score}
+                    onChange={(e) => setScore(Number(e.target.value))}
+                    className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono dark:border-slate-700 dark:bg-slate-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-medium text-slate-700 dark:text-slate-300">
+                    Seat Count:
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={seatCount}
+                    onChange={(e) => setSeatCount(Number(e.target.value))}
+                    className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono dark:border-slate-700 dark:bg-slate-900"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-medium text-slate-700 dark:text-slate-300">
+                  Telemetry Defense Signals:
+                </label>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <button
+                    type="button"
+                    onClick={() => setSentinelActive((prev) => !prev)}
+                    className={cn(
+                      'rounded-md px-2 py-1 text-xs font-semibold border transition-all',
+                      sentinelActive
+                        ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
+                        : 'border-slate-200 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-900'
+                    )}
+                  >
+                    Sentinel: {sentinelActive ? 'ON' : 'OFF'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMdeActive((prev) => !prev)}
+                    className={cn(
+                      'rounded-md px-2 py-1 text-xs font-semibold border transition-all',
+                      mdeActive
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                        : 'border-slate-200 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-900'
+                    )}
+                  >
+                    MDE: {mdeActive ? 'ON' : 'OFF'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMdiActive((prev) => !prev)}
+                    className={cn(
+                      'rounded-md px-2 py-1 text-xs font-semibold border transition-all',
+                      mdiActive
+                        ? 'border-violet-500 bg-violet-50 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300'
+                        : 'border-slate-200 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-900'
+                    )}
+                  >
+                    MDI: {mdiActive ? 'ON' : 'OFF'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setLogActive((prev) => !prev)}
+                    className={cn(
+                      'rounded-md px-2 py-1 text-xs font-semibold border transition-all',
+                      logActive
+                        ? 'border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                        : 'border-slate-200 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-900'
+                    )}
+                  >
+                    Log Analytics: {logActive ? 'ON' : 'OFF'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-amber-200 dark:border-amber-900/60">
+                <Button
+                  variant="secondary"
+                  onClick={() => setIsEditing(false)}
+                  disabled={isPublishing}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handlePublish}
+                  disabled={isPublishing}
+                  className="gap-1.5"
+                  aria-label={r.BTN_PUBLISH_ARIA_LABEL}
+                >
+                  <Save className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>{isPublishing ? 'Publishing...' : r.BTN_PUBLISH_UPDATE}</span>
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Overall Score Highlight */}
           <div className="flex items-center justify-between rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
             <div>
@@ -200,6 +439,7 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
                 </span>
               </div>
             </div>
+
             <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-right shadow-2xs dark:border-slate-700 dark:bg-slate-900">
               <span className="text-[10px] font-semibold uppercase text-slate-400">
                 {m.LABEL_ACTIVE_TELEMETRY}
@@ -210,7 +450,7 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
             </div>
           </div>
 
-          {/* Status Bubbles Details (positioned above categories) */}
+          {/* Telemetry Status Bubbles Inspection */}
           <div className="space-y-2">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
               {m.LABEL_BUBBLES_SECTION}
@@ -233,34 +473,46 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
             </div>
           </div>
 
-          {/* Secure Score Categories */}
+          {/* Category Score Breakdowns */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
               {m.HEADING_CATEGORY_BREAKDOWN}
             </h4>
-
-            <div className="space-y-3 rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+            <div className="mt-3 space-y-3">
               {categoryConfigs.map((cat) => {
                 const Icon = cat.icon;
                 return (
-                  <div key={cat.key} className="space-y-1.5">
+                  <div
+                    key={cat.key}
+                    className="rounded-lg border border-slate-100 bg-slate-50/50 p-3 dark:border-slate-800 dark:bg-slate-800/40"
+                  >
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
                         <Icon className={cn('h-4 w-4', cat.iconColor)} aria-hidden="true" />
-                        <span className="font-semibold text-slate-900 dark:text-white">{cat.label}</span>
-                        <span className="text-[11px] text-slate-400">({cat.desc})</span>
+                        <div>
+                          <span className="font-semibold text-slate-900 dark:text-white">
+                            {cat.label}
+                          </span>
+                          <span className="ml-2 text-[10px] text-slate-400">
+                            {cat.desc}
+                          </span>
+                        </div>
                       </div>
-                      <span className="font-mono font-bold text-slate-900 dark:text-white">
+                      <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
                         {cat.score}%
                       </span>
                     </div>
-                    <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800">
+
+                    {/* Progress Bar */}
+                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
                       <div
-                        className={cn('h-full rounded-full', cat.color)}
+                        className={cn('h-full transition-all duration-300', cat.color)}
                         style={{ width: `${cat.score}%` }}
                       />
                     </div>
-                    {cat.extra}
+
+                    {/* Extra sensor detail */}
+                    {cat.extra && <div className="mt-1.5">{cat.extra}</div>}
                   </div>
                 );
               })}
@@ -274,7 +526,6 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
               <span>{m.HEADING_RECOMMENDED_ACTIONS}</span>
             </div>
             <ul className="mt-2.5 space-y-2 text-xs text-blue-800 dark:text-blue-200">
-              {/* MDE Sensor Category: Defender for Server Deployment */}
               {!tenant.statusBubbles.mde ? (
                 <li className="flex items-start gap-1.5">
                   <ArrowUpRight className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-500" aria-hidden="true" />

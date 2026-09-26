@@ -351,6 +351,38 @@ const MICROSOFT = {
   FILE_EXPORT_SENTINEL_JSON_PREFIX: 'microsoft-sentinel-incidents-',
 } as const;
 
+const REALTIME = {
+  LABEL_CONNECTING: 'Connecting Stream...',
+  LABEL_DISCONNECTED: 'Reconnecting...',
+  LABEL_OFFLINE: 'Offline / Local Cache',
+  LABEL_DB_ENGINE: 'Database Engine',
+  VALUE_DB_ENGINE: 'Node.js + SQLite WAL',
+  LABEL_ACTIVE_VISITORS: 'Active Visitors',
+  LABEL_LAST_SYNC: 'Last Synced',
+  LABEL_SYNC_INTERVAL: 'Keepalive Pulse',
+  VALUE_SYNC_INTERVAL: '15s Heartbeat',
+  BTN_TRIGGER_PULSE: 'Trigger Telemetry Pulse',
+  BTN_TRIGGER_PULSE_ARIA_LABEL: 'Trigger immediate enterprise telemetry pulse',
+  BTN_PUBLISH_UPDATE: 'Publish Update',
+  BTN_PUBLISH_ARIA_LABEL: 'Publish tenant modifications to database server',
+  LABEL_VERSION: 'Record Version',
+  LABEL_LAST_UPDATED_BY: 'Last Updated By',
+  LABEL_EDIT_MODE: 'Admin Quick Editor',
+  TXT_PULSE_SUCCESS: 'Enterprise telemetry pulse dispatched successfully',
+  TXT_SCORE_UPDATED: 'Tenant score synchronized via real-time stream',
+  TXT_PUBLISH_SUCCESS: 'Tenant update committed to database and broadcast to all visitors',
+  TXT_CONFLICT_DETECTED: 'Concurrency conflict: Another admin published an update. Loaded latest revision.',
+  TXT_BATCH_SYNC: 'New data',
+  TXT_THREAT_BROADCAST: 'Security incident saved to database & broadcast live',
+  LABEL_SERVER_STATUS: 'Server Status',
+  LABEL_STATUS_ONLINE: 'Online',
+  LABEL_STATUS_OFFLINE: 'Offline',
+  TXT_SERVER_ONLINE: 'Server is online',
+  TXT_SERVER_OFFLINE: 'Server is offline',
+  MODAL_HEADING_REALTIME: 'ReactWeb Status',
+  MODAL_TXT_DESCRIPTION: 'You\'ll receive automatic updates.',
+} as const;
+
 export const APP_STRINGS = {
   APP: {
     HEADING_TITLE: COMMON.APP_TITLE,
@@ -361,6 +393,7 @@ export const APP_STRINGS = {
   COMMAND_PALETTE,
   SHORTCUTS,
   TOAST,
+  REALTIME,
   VIEWS: {
     HOMEPAGE,
     SETTINGS,

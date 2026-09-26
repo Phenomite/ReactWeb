@@ -7,6 +7,7 @@ import { ToastContainer } from '@/components/ToastContainer';
 import { AuthProvider } from '@/context/AuthContext';
 import { AccentProvider, useAccent } from '@/context/AccentContext';
 import { ToastProvider, useToast } from '@/context/ToastContext';
+import { RealtimeProvider } from '@/context/RealtimeContext';
 import { SecurityIncidentProvider } from '@/context/SecurityIncidentContext';
 import { HeaderSlotProvider } from '@/context/HeaderSlotContext';
 import { useTheme } from '@/hooks/useTheme';
@@ -124,11 +125,13 @@ export function App() {
     <AuthProvider>
       <AccentProvider>
         <ToastProvider>
-          <SecurityIncidentProvider>
-            <HeaderSlotProvider>
-              <AppLayout />
-            </HeaderSlotProvider>
-          </SecurityIncidentProvider>
+          <RealtimeProvider>
+            <SecurityIncidentProvider>
+              <HeaderSlotProvider>
+                <AppLayout />
+              </HeaderSlotProvider>
+            </SecurityIncidentProvider>
+          </RealtimeProvider>
         </ToastProvider>
       </AccentProvider>
     </AuthProvider>

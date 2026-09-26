@@ -1,53 +1,80 @@
 import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
 import { INITIAL_SECURITY_INCIDENTS, SIMULATED_ALERTS } from '@/constants';
 import { useToast } from '@/context/ToastContext';
+import { useRealtime } from '@/context/RealtimeContext';
 import { APP_STRINGS } from '@/strings';
 import type { SecurityIncident, SecurityIncidentContextType, IncidentStatus } from '@/types';
 
 const SecurityIncidentContext = createContext<SecurityIncidentContextType | undefined>(undefined);
 
-// Manages client-side Microsoft Defender security incidents and Sentinel exports
+// Manages Microsoft Defender security incidents with real-time backend synchronization and Sentinel exports
 export function SecurityIncidentProvider({ children }: { children: ReactNode }) {
-  const [incidents, setIncidents] = useState<SecurityIncident[]>(INITIAL_SECURITY_INCIDENTS);
+  const {
+    incidents: realtimeIncidents,
+    simulateThreatSignal: realtimeSimulate,
+    updateData,
+  } = useRealtime();
+  const [localIncidents, setLocalIncidents] = useState<SecurityIncident[]>(INITIAL_SECURITY_INCIDENTS);
   const { showToast } = useToast();
+
+  const incidents = realtimeIncidents.length > 0 ? realtimeIncidents : localIncidents;
 
   const unresolvedCount = useMemo(
     () => incidents.filter((i) => i.status !== 'resolved').length,
     [incidents]
   );
 
-  const logIncident = useCallback((incident: Omit<SecurityIncident, 'id' | 'timestamp'>) => {
+  const logIncident = useCallback(async (incident: Omit<SecurityIncident, 'id' | 'timestamp'>) => {
+    try {
+      const res = await fetch('/api/incidents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(incident),
+      });
+      if (res.ok) return;
+    } catch {
+      // Local fallback
+    }
     const record: SecurityIncident = {
       ...incident,
       id: `inc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       timestamp: Date.now(),
     };
-    setIncidents((prev) => [record, ...prev]);
+    setLocalIncidents((prev) => [record, ...prev]);
   }, []);
 
-  const updateStatus = useCallback((id: string, status: IncidentStatus) => {
-    setIncidents((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status } : item))
-    );
-  }, []);
+  const updateStatus = useCallback(
+    async (id: string, status: IncidentStatus) => {
+      const res = await updateData<SecurityIncident>('incidents', id, { status });
+      if (!res.success) {
+        setLocalIncidents((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, status } : item))
+        );
+      }
+    },
+    [updateData]
+  );
 
-  const simulateThreatSignal = useCallback(() => {
-    const template = SIMULATED_ALERTS[Math.floor(Math.random() * SIMULATED_ALERTS.length)];
-    if (!template) return;
+  const simulateThreatSignal = useCallback(async () => {
+    const success = await realtimeSimulate();
+    if (!success) {
+      const template = SIMULATED_ALERTS[Math.floor(Math.random() * SIMULATED_ALERTS.length)];
+      if (!template) return;
 
-    const record: SecurityIncident = {
-      ...template,
-      id: `inc-${Date.now()}`,
-      status: 'active',
-      timestamp: Date.now(),
-    };
+      const record: SecurityIncident = {
+        ...template,
+        id: `inc-${Date.now()}`,
+        status: 'active',
+        timestamp: Date.now(),
+      };
 
-    setIncidents((prev) => [record, ...prev]);
-    showToast(APP_STRINGS.VIEWS.MICROSOFT.TXT_THREAT_SIMULATED, {
-      type: record.severity === 'critical' ? 'error' : 'warning',
-      description: `${record.title} (${record.severity.toUpperCase()})`,
-    });
-  }, [showToast]);
+      setLocalIncidents((prev) => [record, ...prev]);
+      showToast(APP_STRINGS.VIEWS.MICROSOFT.TXT_THREAT_SIMULATED, {
+        type: record.severity === 'critical' ? 'error' : 'warning',
+        description: `${record.title} (${record.severity.toUpperCase()})`,
+      });
+    }
+  }, [realtimeSimulate, showToast]);
 
   const exportSentinelLog = useCallback(() => {
     const payload = {
@@ -101,4 +128,3 @@ export function useSecurityIncidents(): SecurityIncidentContextType {
   }
   return context;
 }
-

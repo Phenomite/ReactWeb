@@ -5,6 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "node server/index.js",
+    "server:dev": "node --watch server/index.js",
+    "telemetry:cron": "node scripts/k8s-telemetry-generator.js",
+    "telemetry:cron:once": "node scripts/k8s-telemetry-generator.js --once",
     "lint": "tsc --noEmit",
     "build": "pnpm run lint && vite build",
     "preview": "vite preview",

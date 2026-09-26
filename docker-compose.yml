@@ -1,0 +1,52 @@
+services:
+  database:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: reactweb-database
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - HOST=0.0.0.0
+      - DATA_DIR=/app/data
+      - ENABLE_SIMULATOR=false
+    volumes:
+      - reactweb-db-data:/app/data
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+
+  processing:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: reactweb-processing
+    restart: unless-stopped
+    command: ["node", "scripts/k8s-telemetry-generator.js"]
+    environment:
+      - BACKEND_URL=http://reactweb-database:3001
+      - UPDATE_INTERVAL_MS=60000
+    depends_on:
+      - database
+    security_opt:
+      - no-new-privileges:true
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: reactweb-frontend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  reactweb-db-data:
+    driver: local
