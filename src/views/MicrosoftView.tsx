@@ -53,18 +53,18 @@ export const MicrosoftView = memo(() => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
 
-  // Selected tenant for detailed modal inspection
-  const [inspectingTenant, setInspectingTenant] = useState<TenantRecord | null>(null);
+  // Selected tenant ID for detailed modal inspection
+  const [inspectingTenantId, setInspectingTenantId] = useState<string | null>(null);
 
-  // Keep modal inspection in sync with real-time updates
-  useEffect(() => {
-    if (inspectingTenant) {
-      const latest = tenants.find((t) => t.id === inspectingTenant.id);
-      if (latest && (latest.overallScore !== inspectingTenant.overallScore || latest.rank !== inspectingTenant.rank)) {
-        setInspectingTenant(latest);
-      }
-    }
-  }, [tenants, inspectingTenant]);
+  // Dynamically resolve inspecting tenant from live real-time tenants store
+  const inspectingTenant = useMemo(() => {
+    if (!inspectingTenantId) return null;
+    return tenants.find((t) => t.id === inspectingTenantId) ?? null;
+  }, [tenants, inspectingTenantId]);
+
+  const handleInspectTenant = useCallback((tenant: TenantRecord | null) => {
+    setInspectingTenantId(tenant ? tenant.id : null);
+  }, []);
 
   // Global KPI aggregates across all tenants
   const globalKpis = useMemo(() => {
@@ -223,11 +223,11 @@ export const MicrosoftView = memo(() => {
           <div className="flex flex-col space-y-2">
             {/* Tile 1: Total Tenants */}
             <Card
-              onClick={() => globalKpis.topTenant && setInspectingTenant(globalKpis.topTenant)}
+              onClick={() => globalKpis.topTenant && setInspectingTenantId(globalKpis.topTenant.id)}
               onKeyDown={(e) => {
                 if ((e.key === 'Enter' || e.key === ' ') && globalKpis.topTenant) {
                   e.preventDefault();
-                  setInspectingTenant(globalKpis.topTenant);
+                  setInspectingTenantId(globalKpis.topTenant.id);
                 }
               }}
               tabIndex={0}
@@ -309,11 +309,11 @@ export const MicrosoftView = memo(() => {
               return (
                 <Card
                   key={tenant.id}
-                  onClick={() => setInspectingTenant(tenant)}
+                  onClick={() => setInspectingTenantId(tenant.id)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      setInspectingTenant(tenant);
+                      setInspectingTenantId(tenant.id);
                     }
                   }}
                   tabIndex={0}
@@ -568,7 +568,7 @@ export const MicrosoftView = memo(() => {
                 <TenantCard
                   key={tenant.id}
                   tenant={tenant}
-                  onInspect={setInspectingTenant}
+                  onInspect={handleInspectTenant}
                 />
               ))}
             </div>
@@ -641,7 +641,7 @@ export const MicrosoftView = memo(() => {
           tenants={processedTenants}
           selectedTier={selectedTier}
           onSelectTier={setSelectedTier}
-          onInspectTenant={setInspectingTenant}
+          onInspectTenant={handleInspectTenant}
         />
       )}
 
@@ -732,7 +732,7 @@ export const MicrosoftView = memo(() => {
                     <td className="px-4 py-3 text-right">
                       <button
                         type="button"
-                        onClick={() => setInspectingTenant(tenant)}
+                        onClick={() => setInspectingTenantId(tenant.id)}
                         className="cursor-pointer font-bold text-accent hover:underline text-xs"
                       >
                         {m.BTN_INSPECT}
@@ -750,7 +750,7 @@ export const MicrosoftView = memo(() => {
       <TenantDetailModal
         tenant={inspectingTenant}
         isOpen={Boolean(inspectingTenant)}
-        onClose={() => setInspectingTenant(null)}
+        onClose={() => setInspectingTenantId(null)}
       />
     </div>
   );

@@ -79,6 +79,7 @@ Use `pnpm` to run scripts:
 | `pnpm build` | Run TypeScript lint check and build production assets into `dist/` |
 | `pnpm preview` | Locally preview the production build output |
 | `pnpm run auth:hash` | Generate random salt and PBKDF2 hash for a password |
+| `pnpm run dev:modify` | Modify live database records with developer attribution |
 | `pnpm run md:lint` | Lint all markdown files with `markdownlint-cli2` |
 
 ---

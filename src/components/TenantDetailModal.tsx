@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, memo } from 'react';
+import { useState, useCallback, useEffect, useMemo, memo } from 'react';
 import {
   X,
   Trophy,
@@ -31,29 +31,36 @@ interface TenantDetailModalProps {
   onClose: () => void;
 }
 
-export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetailModalProps) => {
+export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose }: TenantDetailModalProps) => {
   const m = APP_STRINGS.VIEWS.MICROSOFT;
   const r = APP_STRINGS.REALTIME;
-  const { updateData } = useRealtime();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, role, username } = useAuth();
+  const { tenants, updateData } = useRealtime();
+  const hasActiveAdminRole = isAuthenticated && role === 'admin';
+
+  // Always resolve the live, real-time tenant record from the context store
+  const tenant = useMemo(() => {
+    if (!initialTenant) return null;
+    return tenants.find((t) => t.id === initialTenant.id) ?? initialTenant;
+  }, [tenants, initialTenant]);
 
   // Admin edit mode state
   const [isEditing, setIsEditing] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
-  const [score, setScore] = useState(tenant?.overallScore ?? 0);
-  const [deviceScore, setDeviceScore] = useState(tenant?.categories.device ?? 0);
-  const [identitiesScore, setIdentitiesScore] = useState(tenant?.categories.identities ?? 0);
-  const [appsScore, setAppsScore] = useState(tenant?.categories.apps ?? 0);
-  const [dataScore, setDataScore] = useState(tenant?.categories.data ?? 0);
-  const [sentinelActive, setSentinelActive] = useState(tenant?.statusBubbles.sentinel ?? false);
-  const [mdeActive, setMdeActive] = useState(tenant?.statusBubbles.mde ?? false);
-  const [mdiActive, setMdiActive] = useState(tenant?.statusBubbles.mdi ?? false);
-  const [logActive, setLogActive] = useState(tenant?.statusBubbles.logAnalytics ?? false);
-  const [seatCount, setSeatCount] = useState(tenant?.seatCount ?? 0);
+  const [score, setScore] = useState<number>(tenant?.overallScore ?? 0);
+  const [deviceScore, setDeviceScore] = useState<number>(tenant?.categories.device ?? 0);
+  const [identitiesScore, setIdentitiesScore] = useState<number>(tenant?.categories.identities ?? 0);
+  const [appsScore, setAppsScore] = useState<number>(tenant?.categories.apps ?? 0);
+  const [dataScore, setDataScore] = useState<number>(tenant?.categories.data ?? 0);
+  const [sentinelActive, setSentinelActive] = useState<boolean>(tenant?.statusBubbles.sentinel ?? false);
+  const [mdeActive, setMdeActive] = useState<boolean>(tenant?.statusBubbles.mde ?? false);
+  const [mdiActive, setMdiActive] = useState<boolean>(tenant?.statusBubbles.mdi ?? false);
+  const [logActive, setLogActive] = useState<boolean>(tenant?.statusBubbles.logAnalytics ?? false);
+  const [seatCount, setSeatCount] = useState<number>(tenant?.seatCount ?? 0);
 
   // Sync form inputs when tenant changes or updates via SSE
   useEffect(() => {
-    if (tenant) {
+    if (tenant && !isEditing) {
       setScore(tenant.overallScore);
       setDeviceScore(tenant.categories.device);
       setIdentitiesScore(tenant.categories.identities);
@@ -65,7 +72,14 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
       setLogActive(tenant.statusBubbles.logAnalytics);
       setSeatCount(tenant.seatCount);
     }
-  }, [tenant]);
+  }, [tenant, isEditing]);
+
+  // Reset editing mode whenever modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setIsEditing(false);
+    }
+  }, [isOpen]);
 
   useEscapeKey(isOpen, onClose);
 
@@ -94,6 +108,7 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
         },
         {
           expectedVersion: tenant.version,
+          updatedBy: username || 'admin',
           successMessage: APP_STRINGS.REALTIME.TXT_PUBLISH_SUCCESS,
         }
       );
@@ -107,6 +122,7 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
   }, [
     tenant,
     updateData,
+    username,
     score,
     seatCount,
     deviceScore,
@@ -266,7 +282,7 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
           </div>
 
           <div className="flex items-center gap-1.5">
-            {isAuthenticated && (
+            {hasActiveAdminRole && (
               <button
                 type="button"
                 onClick={() => setIsEditing((prev) => !prev)}
@@ -281,6 +297,11 @@ export const TenantDetailModal = memo(({ tenant, isOpen, onClose }: TenantDetail
                 <Edit3 className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>{isEditing ? 'Cancel Edit' : 'Edit'}</span>
               </button>
+            )}
+            {isAuthenticated && !hasActiveAdminRole && (
+              <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                Read-Only
+              </span>
             )}
 
             <button

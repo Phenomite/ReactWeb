@@ -1,6 +1,7 @@
 import { useState, useCallback, memo } from 'react';
 import { Users, Database, X } from 'lucide-react';
 import { useRealtime } from '@/context/RealtimeContext';
+import { useEscapeKey } from '@/hooks/useEscapeKey';
 import { APP_STRINGS } from '@/strings';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/Button';
@@ -13,6 +14,8 @@ export const RealtimeBadge = memo(() => {
 
   const handleOpenModal = useCallback(() => setModalOpen(true), []);
   const handleCloseModal = useCallback(() => setModalOpen(false), []);
+
+  useEscapeKey(modalOpen, handleCloseModal);
 
   const isOnline = isLive;
   const hoverLabel = isOnline
@@ -64,9 +67,17 @@ export const RealtimeBadge = memo(() => {
           role="dialog"
           aria-modal="true"
           aria-labelledby="realtime-modal-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in"
         >
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+            onClick={handleCloseModal}
+            aria-hidden="true"
+          />
+
+          {/* Modal Card */}
+          <div className="relative z-10 w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl transition-all dark:border-slate-800 dark:bg-slate-900">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800">
               <div className="flex items-center gap-2.5">
                 <div
@@ -130,7 +141,7 @@ export const RealtimeBadge = memo(() => {
                 <span className="font-medium text-slate-600 dark:text-slate-400">{r.LABEL_ACTIVE_VISITORS}</span>
                 <span className="inline-flex items-center gap-1.5 font-bold text-emerald-600 dark:text-emerald-400">
                   <Users className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span>{activeVisitors} concurrent</span>
+                  <span>{activeVisitors}</span>
                 </span>
               </div>
 

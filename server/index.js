@@ -12,6 +12,7 @@ import {
   updateGenericRecord,
   getDatabaseStats,
 } from './db.js';
+import { authenticateAdminRequest } from './auth.js';
 
 // Configuration
 const PORT = Number.parseInt(process.env.PORT || '3001', 10);
@@ -254,10 +255,17 @@ export const server = createServer(async (req, res) => {
     // Data-Agnostic Entity Update (with Optimistic Concurrency Control & Real-Time Broadcast)
     const genericPatchMatch = pathname.match(/^\/api\/([a-zA-Z0-9_]+)\/([^/]+)$/);
     if (genericPatchMatch && method === 'PATCH' && genericPatchMatch[2] !== 'pulse' && genericPatchMatch[2] !== 'simulate') {
+      const auth = authenticateAdminRequest(req);
+      if (!auth.authorized) {
+        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
+        return;
+      }
+
       const resource = genericPatchMatch[1];
       const entityId = genericPatchMatch[2];
       const body = await parseJsonBody(req);
-      const adminUser = req.headers['x-admin-user'] || body.updatedBy || 'admin';
+      const adminUser = auth.user;
       const expectedVersion = typeof body.expectedVersion === 'number' ? body.expectedVersion : null;
 
       const result = updateGenericRecord(resource, entityId, body, expectedVersion, adminUser);
@@ -305,8 +313,15 @@ export const server = createServer(async (req, res) => {
 
     // High-Throughput Batch Update for In-Cluster Scripts & CronJobs
     if (pathname === '/api/internal/batch-update-tenants' && method === 'POST') {
+      const auth = authenticateAdminRequest(req);
+      if (!auth.authorized) {
+        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
+        return;
+      }
+
       const body = await parseJsonBody(req);
-      const updatedBy = body.updatedBy || req.headers['x-updater-source'] || 'k8s-telemetry-generator';
+      const updatedBy = auth.user || 'k8s-telemetry-generator';
       const result = batchUpdateTenants(body.updates, updatedBy);
 
       // Broadcast batch event over SSE so all open browser tabs update instantly
@@ -331,6 +346,13 @@ export const server = createServer(async (req, res) => {
     // Legacy Update Tenant Score (with Real-Time Broadcast)
     const scoreMatch = pathname.match(/^\/api\/tenants\/([^/]+)\/score$/);
     if (scoreMatch && method === 'PATCH') {
+      const auth = authenticateAdminRequest(req);
+      if (!auth.authorized) {
+        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
+        return;
+      }
+
       const tenantId = scoreMatch[1];
       const body = await parseJsonBody(req);
       const overallScore = Number.parseFloat(body.overallScore);
@@ -340,7 +362,7 @@ export const server = createServer(async (req, res) => {
         return;
       }
 
-      const updated = updateTenantScore(tenantId, overallScore, body.categories || {});
+      const updated = updateTenantScore(tenantId, overallScore, body.categories || {}, auth.user);
       if (!updated) {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Tenant Not Found' }));
@@ -365,6 +387,13 @@ export const server = createServer(async (req, res) => {
 
     // Create Incident (with Real-Time Broadcast)
     if (pathname === '/api/incidents' && method === 'POST') {
+      const auth = authenticateAdminRequest(req);
+      if (!auth.authorized) {
+        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
+        return;
+      }
+
       const body = await parseJsonBody(req);
       if (!body.title) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -383,6 +412,13 @@ export const server = createServer(async (req, res) => {
 
     // Simulate Incident (with Real-Time Broadcast)
     if (pathname === '/api/incidents/simulate' && method === 'POST') {
+      const auth = authenticateAdminRequest(req);
+      if (!auth.authorized) {
+        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
+        return;
+      }
+
       const template = SIMULATED_ALERTS[Math.floor(Math.random() * SIMULATED_ALERTS.length)];
       const incident = {
         ...template,
@@ -401,6 +437,13 @@ export const server = createServer(async (req, res) => {
     // Update Incident Status (with Real-Time Broadcast)
     const incidentStatusMatch = pathname.match(/^\/api\/incidents\/([^/]+)\/status$/);
     if (incidentStatusMatch && method === 'PATCH') {
+      const auth = authenticateAdminRequest(req);
+      if (!auth.authorized) {
+        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
+        return;
+      }
+
       const incidentId = incidentStatusMatch[1];
       const body = await parseJsonBody(req);
       if (!['active', 'investigating', 'resolved'].includes(body.status)) {
@@ -420,13 +463,20 @@ export const server = createServer(async (req, res) => {
 
     // Manual Telemetry Pulse Trigger
     if (pathname === '/api/telemetry/pulse' && method === 'POST') {
+      const auth = authenticateAdminRequest(req);
+      if (!auth.authorized) {
+        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
+        return;
+      }
+
       const tenants = getAllTenants();
       if (tenants.length > 0) {
         // Randomly select one tenant and gently nudge score (+/- 1-2 points)
         const randomTenant = tenants[Math.floor(Math.random() * tenants.length)];
         const delta = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 2) + 1);
         const newScore = Math.min(100, Math.max(20, Math.round((randomTenant.overallScore + delta) * 10) / 10));
-        const updated = updateTenantScore(randomTenant.id, newScore);
+        const updated = updateTenantScore(randomTenant.id, newScore, {}, auth.user);
         if (updated) {
           broadcastEvent('tenant_updated', updated);
         }

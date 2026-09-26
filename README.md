@@ -35,6 +35,7 @@ Used to test agentic harnesses and models understanding of intent, behaviour, an
 | `pnpm build` | Run type-check and build production assets to `dist/` |
 | `pnpm preview` | Locally preview the production build output |
 | `pnpm run auth:hash` | Generate random salt and PBKDF2 hash for a password |
+| `pnpm run dev:modify` | Modify live database records from terminal with developer attribution |
 | `pnpm run md:lint` | Lint all markdown files with markdownlint-cli2 |
 
 ## Authentication Architecture
@@ -336,3 +337,21 @@ runs directly inside the cluster namespace:
   # Run continuous 60-second loop
   pnpm run telemetry:cron
   ```
+
+### 3. Multi-Developer Namespace Authorization & Database Mutations
+
+The application enforces a strict zero-trust role-based authorization model for all database mutations:
+
+- **Multi-Developer Access**: Multiple developers (`admin`, `alice`, `bob`, `charlie`) have distinct accounts to
+  collaborate and publish live database updates.
+- **Strict Role Verification**: Mutations require an active `admin` role in the namespace. Unauthenticated requests
+  and users with `role: 'user'` (e.g. `viewer`) receive `HTTP 403 Forbidden`.
+- **Developer Attribution**: Every mutation records `lastUpdatedBy` in SQLite WAL, displaying the modifying developer
+  in the UI badge pill (e.g. `by alice`).
+- **Live SSE Push to All Visitors**: All mutations immediately broadcast `data_updated` and `tenant_updated` events
+  over Server-Sent Events, instantly reflecting updates across all connected visitor browsers.
+- **Web UI & CLI Mutation**:
+  - **Web UI**: Logging in through `#login` generates an authenticated session token. Active admins see an "Edit"
+    button in tenant detail modals to adjust scores and status flags.
+  - **Developer CLI**: Run `pnpm run dev:modify -- --tenant tenant-001 --score 98.5 --as alice` to execute direct
+    mutations from terminal sessions or Kubernetes pods.

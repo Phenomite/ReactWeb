@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
-import { ALL_TENANTS, INITIAL_SECURITY_INCIDENTS } from '@/constants';
+import { ALL_TENANTS, INITIAL_SECURITY_INCIDENTS, AUTH_CONFIG } from '@/constants';
 import { useToast } from '@/context/ToastContext';
 import { APP_STRINGS } from '@/strings';
 import type {
@@ -261,12 +261,23 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
         }
       }
 
+      // Check active admin session token before dispatching
+      let activeSessionJson: string | null = null;
+      if (typeof window !== 'undefined') {
+        activeSessionJson = localStorage.getItem(AUTH_CONFIG.STORAGE_KEY_SESSION);
+      }
+
       const targetEndpoint =
         options?.endpoint || `/api/${encodeURIComponent(resource)}/${encodeURIComponent(id)}`;
       const httpMethod = options?.method || 'PATCH';
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
+
+      if (activeSessionJson) {
+        headers['Authorization'] = `Bearer ${activeSessionJson}`;
+        headers['X-Auth-Session'] = activeSessionJson;
+      }
       if (options?.updatedBy) {
         headers['X-Admin-User'] = options.updatedBy;
       }
@@ -280,6 +291,19 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
             expectedVersion: options?.expectedVersion,
           }),
         });
+
+        // 2. Handle Unauthorized / Forbidden (Active admin role in namespace required)
+        if (res.status === 401 || res.status === 403) {
+          const errPayload = (await res.json().catch(() => ({}))) as { message?: string; error?: string };
+          const errorMsg =
+            errPayload.message ||
+            'Forbidden: Modifying the database requires an active administrator role in the namespace.';
+          showToast(errorMsg, { type: 'error' });
+          return {
+            success: false,
+            error: errorMsg,
+          };
+        }
 
         // 2. Handle Optimistic Concurrency Conflict (HTTP 409)
         if (res.status === 409) {

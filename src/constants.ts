@@ -9,7 +9,7 @@ import type {
   TenantScoreTier,
 } from '@/types';
 
-// Extensible client-side credential registry for authorized users
+// Extensible client-side credential registry for authorized developers and users
 export const AUTH_USER_REGISTRY: UserCredentialRecord[] = [
   {
     id: 'usr_admin',
@@ -19,7 +19,43 @@ export const AUTH_USER_REGISTRY: UserCredentialRecord[] = [
     hashHex: 'e22f996854f8d016166257a91a47df5da5d7708dc49e4e05914675568f48f4d9',
     iterations: 100000,
     role: 'admin',
-  }
+  },
+  {
+    id: 'usr_alice',
+    username: 'alice',
+    displayName: 'Alice (Dev Lead)',
+    saltHex: 'cbecee9783d8023963889ba7fb83a488',
+    hashHex: 'a4430ede1e0f39c6fd600b23121b3f5834bcbae94c4fe7846337bfefbd09cbbc',
+    iterations: 100000,
+    role: 'admin',
+  },
+  {
+    id: 'usr_bob',
+    username: 'bob',
+    displayName: 'Bob (Core Dev)',
+    saltHex: 'a994ab0fa35e4fe345f99c4858ff6ee6',
+    hashHex: '86c14800d9eff794da4bae4da49d80f950018f78d62d95e585e817d0849df99d',
+    iterations: 100000,
+    role: 'admin',
+  },
+  {
+    id: 'usr_charlie',
+    username: 'charlie',
+    displayName: 'Charlie (DevOps)',
+    saltHex: '217a7aee68e7be2042a24f844de5ba95',
+    hashHex: 'f1d3553193f955749fbe1546a1882e77f13a9d2e98c657cde50bf457794becc4',
+    iterations: 100000,
+    role: 'admin',
+  },
+  {
+    id: 'usr_viewer',
+    username: 'viewer',
+    displayName: 'Guest Viewer',
+    saltHex: '71d5821d7c78799976a0eca445492890',
+    hashHex: '6c99547201234d3d27f2cb2e9a87c88f646f89572e5b24002e09a6634d2517d2',
+    iterations: 100000,
+    role: 'user',
+  },
 ];
 
 // Fallback salt and iteration count used to simulate derivation on unknown usernames
