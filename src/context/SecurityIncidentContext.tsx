@@ -1,80 +1,80 @@
 import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
-import { INITIAL_SECURITY_INCIDENTS } from '@/constants';
+import { INITIAL_SECURITY_INCIDENTS, SIMULATED_ALERTS } from '@/constants';
 import { useToast } from '@/context/ToastContext';
+import { useRealtime } from '@/context/RealtimeContext';
 import { APP_STRINGS } from '@/strings';
 import type { SecurityIncident, SecurityIncidentContextType, IncidentStatus } from '@/types';
 
 const SecurityIncidentContext = createContext<SecurityIncidentContextType | undefined>(undefined);
 
-const SIMULATED_ALERTS = [
-  {
-    title: 'Anomalous Cross-Origin PostMessage Telemetry Probe',
-    severity: 'high' as const,
-    category: 'Cross-Context Isolation',
-    source: 'Browser Window Messaging Guard',
-    description: 'An untrusted origin attempted to post structured messages without meeting COOP same-origin constraints.',
-    recommendation: 'Verify targetOrigin validation on window.addEventListener handlers.',
-  },
-  {
-    title: 'Repeated PBKDF2 Web Crypto Salt Mismatch Ingestion',
-    severity: 'critical' as const,
-    category: 'Credential Defense',
-    source: 'Client Auth Engine',
-    description: 'Automated rapid-fire hash verification attempts flagged with randomized salt parameters.',
-    recommendation: 'Apply IP rate-limiting and enforce multi-factor authentication policies.',
-  },
-  {
-    title: 'Local Storage State Manipulation Flagged',
-    severity: 'medium' as const,
-    category: 'Data Integrity',
-    source: 'Storage Event Listener',
-    description: 'Direct console manipulation of session storage token detected outside normal application hooks.',
-    recommendation: 'Audit client-side state transitions and rotate signed session key.',
-  },
-];
-
-// Manages client-side Microsoft Defender security incidents and Sentinel exports
+// Manages Microsoft Defender security incidents with real-time backend synchronization and Sentinel exports
 export function SecurityIncidentProvider({ children }: { children: ReactNode }) {
-  const [incidents, setIncidents] = useState<SecurityIncident[]>(INITIAL_SECURITY_INCIDENTS);
+  const {
+    incidents: realtimeIncidents,
+    simulateThreatSignal: realtimeSimulate,
+    updateData,
+  } = useRealtime();
+  const [localIncidents, setLocalIncidents] = useState<SecurityIncident[]>(INITIAL_SECURITY_INCIDENTS);
   const { showToast } = useToast();
+
+  const incidents = realtimeIncidents.length > 0 ? realtimeIncidents : localIncidents;
 
   const unresolvedCount = useMemo(
     () => incidents.filter((i) => i.status !== 'resolved').length,
     [incidents]
   );
 
-  const logIncident = useCallback((incident: Omit<SecurityIncident, 'id' | 'timestamp'>) => {
+  const logIncident = useCallback(async (incident: Omit<SecurityIncident, 'id' | 'timestamp'>) => {
+    try {
+      const res = await fetch('/api/incidents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(incident),
+      });
+      if (res.ok) return;
+    } catch {
+      // Local fallback
+    }
     const record: SecurityIncident = {
       ...incident,
       id: `inc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       timestamp: Date.now(),
     };
-    setIncidents((prev) => [record, ...prev]);
+    setLocalIncidents((prev) => [record, ...prev]);
   }, []);
 
-  const updateStatus = useCallback((id: string, status: IncidentStatus) => {
-    setIncidents((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status } : item))
-    );
-  }, []);
+  const updateStatus = useCallback(
+    async (id: string, status: IncidentStatus) => {
+      const res = await updateData<SecurityIncident>('incidents', id, { status });
+      if (!res.success) {
+        setLocalIncidents((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, status } : item))
+        );
+      }
+    },
+    [updateData]
+  );
 
-  const simulateThreatSignal = useCallback(() => {
-    const template = SIMULATED_ALERTS[Math.floor(Math.random() * SIMULATED_ALERTS.length)];
-    if (!template) return;
+  const simulateThreatSignal = useCallback(async () => {
+    const success = await realtimeSimulate();
+    if (!success) {
+      const template = SIMULATED_ALERTS[Math.floor(Math.random() * SIMULATED_ALERTS.length)];
+      if (!template) return;
 
-    const record: SecurityIncident = {
-      ...template,
-      id: `inc-${Date.now()}`,
-      status: 'active',
-      timestamp: Date.now(),
-    };
+      const record: SecurityIncident = {
+        ...template,
+        id: `inc-${Date.now()}`,
+        status: 'active',
+        timestamp: Date.now(),
+      };
 
-    setIncidents((prev) => [record, ...prev]);
-    showToast(APP_STRINGS.VIEWS.MICROSOFT.TXT_THREAT_SIMULATED, {
-      type: record.severity === 'critical' ? 'error' : 'warning',
-      description: `${record.title} (${record.severity.toUpperCase()})`,
-    });
-  }, [showToast]);
+      setLocalIncidents((prev) => [record, ...prev]);
+      showToast(APP_STRINGS.VIEWS.MICROSOFT.TXT_THREAT_SIMULATED, {
+        type: record.severity === 'critical' ? 'error' : 'warning',
+        description: `${record.title} (${record.severity.toUpperCase()})`,
+      });
+    }
+  }, [realtimeSimulate, showToast]);
 
   const exportSentinelLog = useCallback(() => {
     const payload = {
@@ -93,7 +93,7 @@ export function SecurityIncidentProvider({ children }: { children: ReactNode }) 
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `microsoft-sentinel-incidents-${Date.now()}.json`;
+    link.download = `${APP_STRINGS.VIEWS.MICROSOFT.FILE_EXPORT_SENTINEL_JSON_PREFIX}${Date.now()}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -128,4 +128,3 @@ export function useSecurityIncidents(): SecurityIncidentContextType {
   }
   return context;
 }
-

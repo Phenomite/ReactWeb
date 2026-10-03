@@ -7,14 +7,16 @@ import { ToastContainer } from '@/components/ToastContainer';
 import { AuthProvider } from '@/context/AuthContext';
 import { AccentProvider, useAccent } from '@/context/AccentContext';
 import { ToastProvider, useToast } from '@/context/ToastContext';
+import { RealtimeProvider } from '@/context/RealtimeContext';
 import { SecurityIncidentProvider } from '@/context/SecurityIncidentContext';
+import { HeaderSlotProvider } from '@/context/HeaderSlotContext';
 import { useTheme } from '@/hooks/useTheme';
 import { useHashRouting } from '@/hooks/useHashRouting';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { APP_STRINGS } from '@/strings';
 import type { ViewDefinition } from '@/types';
 
-// Renders the 4-container application layout shell with delight features
+// Renders the 4-container application layout shell
 function AppLayout() {
   const { darkMode, toggleDarkMode } = useTheme();
   const { accent, setAccent } = useAccent();
@@ -123,9 +125,13 @@ export function App() {
     <AuthProvider>
       <AccentProvider>
         <ToastProvider>
-          <SecurityIncidentProvider>
-            <AppLayout />
-          </SecurityIncidentProvider>
+          <RealtimeProvider>
+            <SecurityIncidentProvider>
+              <HeaderSlotProvider>
+                <AppLayout />
+              </HeaderSlotProvider>
+            </SecurityIncidentProvider>
+          </RealtimeProvider>
         </ToastProvider>
       </AccentProvider>
     </AuthProvider>

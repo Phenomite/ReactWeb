@@ -1,6 +1,15 @@
-import type { UserCredentialRecord, AccentOption, AccentColor, MsrcAdvisory, SecurityIncident } from '@/types';
+import rawTenantsData from '@/data/tenants.json';
+import type {
+  UserCredentialRecord,
+  AccentOption,
+  AccentColor,
+  MsrcAdvisory,
+  SecurityIncident,
+  TenantRecord,
+  TenantScoreTier,
+} from '@/types';
 
-// Extensible client-side credential registry for authorized users
+// Extensible client-side credential registry for authorized developers and users
 export const AUTH_USER_REGISTRY: UserCredentialRecord[] = [
   {
     id: 'usr_admin',
@@ -10,7 +19,43 @@ export const AUTH_USER_REGISTRY: UserCredentialRecord[] = [
     hashHex: 'e22f996854f8d016166257a91a47df5da5d7708dc49e4e05914675568f48f4d9',
     iterations: 100000,
     role: 'admin',
-  }
+  },
+  {
+    id: 'usr_alice',
+    username: 'alice',
+    displayName: 'Alice (Dev Lead)',
+    saltHex: 'cbecee9783d8023963889ba7fb83a488',
+    hashHex: 'a4430ede1e0f39c6fd600b23121b3f5834bcbae94c4fe7846337bfefbd09cbbc',
+    iterations: 100000,
+    role: 'admin',
+  },
+  {
+    id: 'usr_bob',
+    username: 'bob',
+    displayName: 'Bob (Core Dev)',
+    saltHex: 'a994ab0fa35e4fe345f99c4858ff6ee6',
+    hashHex: '86c14800d9eff794da4bae4da49d80f950018f78d62d95e585e817d0849df99d',
+    iterations: 100000,
+    role: 'admin',
+  },
+  {
+    id: 'usr_charlie',
+    username: 'charlie',
+    displayName: 'Charlie (DevOps)',
+    saltHex: '217a7aee68e7be2042a24f844de5ba95',
+    hashHex: 'f1d3553193f955749fbe1546a1882e77f13a9d2e98c657cde50bf457794becc4',
+    iterations: 100000,
+    role: 'admin',
+  },
+  {
+    id: 'usr_viewer',
+    username: 'viewer',
+    displayName: 'Guest Viewer',
+    saltHex: '71d5821d7c78799976a0eca445492890',
+    hashHex: '6c99547201234d3d27f2cb2e9a87c88f646f89572e5b24002e09a6634d2517d2',
+    iterations: 100000,
+    role: 'user',
+  },
 ];
 
 // Fallback salt and iteration count used to simulate derivation on unknown usernames
@@ -43,9 +88,9 @@ export const ACCENT_CONFIG = {
   DEFAULT_ACCENT: 'blue' as AccentColor,
 } as const;
 
-// Toast notification timeout constants
+// Toast notification timeout constants (configured for 5 seconds per user specification)
 export const TOAST_CONFIG = {
-  DEFAULT_DURATION_MS: 3500,
+  DEFAULT_DURATION_MS: 5000,
 } as const;
 
 // Authentication storage constants
@@ -165,5 +210,83 @@ export const INITIAL_SECURITY_INCIDENTS: SecurityIncident[] = [
     recommendation: 'Route guard functioning normally; no further administrative action required.',
   },
 ];
+
+// Application runtime version metadata
+export const APP_VERSION = '0.0.2';
+
+// Canonical active tenants dataset imported from JSON
+export const ALL_TENANTS: TenantRecord[] = rawTenantsData as TenantRecord[];
+
+// Total number of discrete security telemetry signals
+export const TOTAL_TELEMETRY_SIGNALS = 4;
+
+// Score tier threshold definitions with corresponding styling classes
+export interface ScoreTierDefinition {
+  id: Exclude<TenantScoreTier, 'all'>;
+  min: number;
+  badgeClass: string;
+  barColor: string;
+}
+
+export const TIER_CONFIG: readonly ScoreTierDefinition[] = [
+  {
+    id: 'diamond',
+    min: 90,
+    badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800',
+    barColor: 'bg-emerald-500',
+  },
+  {
+    id: 'gold',
+    min: 80,
+    badgeClass: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800',
+    barColor: 'bg-blue-500',
+  },
+  {
+    id: 'silver',
+    min: 70,
+    badgeClass: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/60 dark:text-violet-300 dark:border-violet-800',
+    barColor: 'bg-violet-500',
+  },
+  {
+    id: 'bronze',
+    min: 50,
+    badgeClass: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
+    barColor: 'bg-amber-500',
+  },
+  {
+    id: 'critical',
+    min: 0,
+    badgeClass: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800',
+    barColor: 'bg-rose-500',
+  },
+] as const;
+
+// Simulated threat signals for client-side adversary alert ingestion
+export const SIMULATED_ALERTS = [
+  {
+    title: 'Anomalous Cross-Origin PostMessage Telemetry Probe',
+    severity: 'high' as const,
+    category: 'Cross-Context Isolation',
+    source: 'Browser Window Messaging Guard',
+    description: 'An untrusted origin attempted to post structured messages without meeting COOP same-origin constraints.',
+    recommendation: 'Verify targetOrigin validation on window.addEventListener handlers.',
+  },
+  {
+    title: 'Repeated PBKDF2 Web Crypto Salt Mismatch Ingestion',
+    severity: 'critical' as const,
+    category: 'Credential Defense',
+    source: 'Client Auth Engine',
+    description: 'Automated rapid-fire hash verification attempts flagged with randomized salt parameters.',
+    recommendation: 'Apply IP rate-limiting and enforce multi-factor authentication policies.',
+  },
+  {
+    title: 'Local Storage State Manipulation Flagged',
+    severity: 'medium' as const,
+    category: 'Data Integrity',
+    source: 'Storage Event Listener',
+    description: 'Direct console manipulation of session storage token detected outside normal application hooks.',
+    recommendation: 'Audit client-side state transitions and rotate signed session key.',
+  },
+] as const;
 
 

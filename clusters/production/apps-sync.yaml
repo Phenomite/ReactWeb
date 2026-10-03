@@ -1,0 +1,48 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: reactweb-database-prod
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: ./deploy/database/production
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: reactweb
+  wait: true
+  timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: reactweb-processing-prod
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: ./deploy/processing/production
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: reactweb
+  dependsOn:
+    - name: reactweb-database-prod
+  wait: true
+  timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: reactweb-frontend-prod
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: ./deploy/frontend/production
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: reactweb
+  dependsOn:
+    - name: reactweb-database-prod
+  wait: true
+  timeout: 5m

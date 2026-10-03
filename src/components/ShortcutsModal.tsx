@@ -1,7 +1,8 @@
-import { useEffect, useCallback, memo } from 'react';
-import { Keyboard, X, Sparkles } from 'lucide-react';
+import { memo } from 'react';
+import { Keyboard, X, Command } from 'lucide-react';
 import { APP_STRINGS } from '@/strings';
 import { Button } from '@/components/Button';
+import { useEscapeKey } from '@/hooks/useEscapeKey';
 
 interface ShortcutsModalProps {
   isOpen: boolean;
@@ -27,23 +28,7 @@ const SHORTCUT_LIST: ShortcutEntry[] = [
 
 // Modal cheatsheet dialog detailing all global keyboard hotkeys
 export const ShortcutsModal = memo(({ isOpen, onClose }: ShortcutsModalProps) => {
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-      }
-    },
-    [onClose]
-  );
-
-  useEffect(() => {
-    if (!isOpen) {
-      return undefined;
-    }
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, handleKeyDown]);
+  useEscapeKey(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -112,8 +97,8 @@ export const ShortcutsModal = memo(({ isOpen, onClose }: ShortcutsModalProps) =>
         {/* Footer */}
         <div className="mt-6 flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-1.5 text-[11px] text-slate-400 dark:text-slate-500">
-            <Sparkles className="h-3.5 w-3.5 text-amber-500" aria-hidden="true" />
-            <span>Productivity Hotkeys</span>
+            <Command className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" aria-hidden="true" />
+            <span>{APP_STRINGS.SHORTCUTS.TXT_FOOTER_NOTE}</span>
           </div>
           <Button onClick={onClose} variant="secondary">
             {APP_STRINGS.SHORTCUTS.BTN_CLOSE}

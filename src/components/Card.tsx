@@ -1,8 +1,8 @@
-import { memo, type ReactNode } from 'react';
+import { memo, type ReactNode, type HTMLAttributes } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface CardProps {
+export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   heading?: string;
   description?: string;
   icon?: LucideIcon;
@@ -13,8 +13,20 @@ interface CardProps {
 }
 
 // Reusable card container component with optional heading, description, and icon badge
-export const Card = memo(({ heading, description, icon: Icon, iconClassName, headerRight, children, className }: CardProps) => (
-  <div className={cn('rounded-xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900', className)}>
+export const Card = memo(({
+  heading,
+  description,
+  icon: Icon,
+  iconClassName,
+  headerRight,
+  children,
+  className,
+  ...rest
+}: CardProps) => (
+  <div
+    className={cn('rounded-xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900', className)}
+    {...rest}
+  >
     {(heading || description || Icon) && (
       <div className={cn('flex flex-col sm:flex-row sm:items-center justify-between gap-4', children && 'border-b border-slate-200 pb-4 dark:border-slate-800')}>
         <div className="flex items-center gap-3">

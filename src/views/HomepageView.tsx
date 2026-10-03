@@ -1,7 +1,7 @@
 import { useCallback, memo } from 'react';
 import {
   Home,
-  Sparkles,
+  CogIcon,
   ShieldCheck,
   ShieldAlert,
   Palette,
@@ -9,14 +9,17 @@ import {
   Settings,
   Terminal,
   Search,
+  Database,
 } from 'lucide-react';
 import { APP_STRINGS } from '@/strings';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { useAuth } from '@/context/AuthContext';
 import { useAccent } from '@/context/AccentContext';
+import { useRealtime } from '@/context/RealtimeContext';
 import { useToast } from '@/context/ToastContext';
-import { cn } from '@/lib/utils';
+import { cn, copyCurrentUrl } from '@/lib/utils';
+import { APP_VERSION } from '@/constants';
 import type { ViewDefinition } from '@/types';
 
 // Renders dynamic time-aware greeting
@@ -31,12 +34,12 @@ function getGreeting(): string {
 export const HomepageView = memo(() => {
   const { isAuthenticated, username } = useAuth();
   const { activeOption } = useAccent();
+  const { isLive, activeVisitors } = useRealtime();
   const { showToast } = useToast();
   const greeting = getGreeting();
 
   const handleCopyLink = useCallback(() => {
-    navigator.clipboard.writeText(window.location.href);
-    showToast(APP_STRINGS.TOAST.TXT_URL_COPIED, { type: 'success' });
+    copyCurrentUrl(showToast);
   }, [showToast]);
 
   const handleOpenSettings = useCallback(() => {
@@ -58,14 +61,15 @@ export const HomepageView = memo(() => {
         icon={Home}
         headerRight={
           <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-accent dark:bg-slate-800">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Delight Edition</span>
+            <CogIcon className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Version {APP_VERSION}</span>
           </span>
         }
       />
 
       {/* Live Status Pulse Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Card 1: Auth Status */}
         <Card className="p-4">
           <div className="flex items-center gap-2.5">
             <div
@@ -95,6 +99,31 @@ export const HomepageView = memo(() => {
           </div>
         </Card>
 
+        {/* Card 2: Live Real-Time Database */}
+        <Card className="p-4">
+          <div className="flex items-center gap-2.5">
+            <div
+              className={cn(
+                'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
+                isLive
+                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400'
+                  : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
+              )}
+            >
+              <Database className="h-4 w-4" aria-hidden="true" />
+            </div>
+            <div>
+              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                {APP_STRINGS.REALTIME.LABEL_DB_ENGINE}
+              </p>
+              <p className="text-xs font-bold text-slate-900 dark:text-white">
+                {isLive ? `(${activeVisitors})` : APP_STRINGS.REALTIME.LABEL_OFFLINE}
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Card 3: Theme Accent */}
         <Card className="p-4">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
@@ -111,6 +140,7 @@ export const HomepageView = memo(() => {
           </div>
         </Card>
 
+        {/* Card 4: Keyboard Hotkey */}
         <Card className="p-4">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400">
@@ -118,10 +148,10 @@ export const HomepageView = memo(() => {
             </div>
             <div>
               <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                Productivity Hotkeys
+                {APP_STRINGS.SHORTCUTS.TXT_FOOTER_NOTE}
               </p>
               <p className="text-xs font-bold text-slate-900 dark:text-white">
-                Ctrl + K Palette
+                {APP_STRINGS.VIEWS.HOMEPAGE.TXT_HOTKEY_PALETTE}
               </p>
             </div>
           </div>
@@ -135,7 +165,7 @@ export const HomepageView = memo(() => {
             {APP_STRINGS.VIEWS.HOMEPAGE.HEADING_QUICK_ACTIONS}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Fast navigation and handy shortcuts to optimize your workflow.
+            {APP_STRINGS.VIEWS.HOMEPAGE.TXT_QUICK_ACTIONS_DESC}
           </p>
         </div>
 

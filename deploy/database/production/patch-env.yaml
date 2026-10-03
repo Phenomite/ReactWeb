@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: reactweb-database
+  namespace: reactweb
+spec:
+  targetNamespace: reactweb-prod
+  values:
+    controllers:
+      main:
+        replicas: 1
+        containers:
+          main:
+            resources:
+              requests:
+                cpu: 250m
+                memory: 256Mi
+              limits:
+                cpu: 1000m
+                memory: 1Gi
+    persistence:
+      data:
+        size: 5Gi

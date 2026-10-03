@@ -7,6 +7,7 @@ import { useSecurityIncidents } from '@/context/SecurityIncidentContext';
 import { Card } from '@/components/Card';
 import { InputField } from '@/components/InputField';
 import { Button } from '@/components/Button';
+import { resetLocalStorageAndReload } from '@/lib/utils';
 import type { ViewDefinition } from '@/types';
 
 // Renders the authentication form and active user session card
@@ -54,9 +55,7 @@ export const LoginView = memo(() => {
 
   const handleGoToDebug = useCallback(() => { window.location.hash = APP_STRINGS.VIEWS.DEBUG.NAV_HASH; }, []);
   const handleClearStorage = useCallback(() => {
-    localStorage.clear();
-    showToast(APP_STRINGS.TOAST.TXT_STORAGE_CLEARED, { type: 'info' });
-    window.location.reload();
+    resetLocalStorageAndReload(showToast);
   }, [showToast]);
 
   // Renders authenticated session status card
@@ -75,7 +74,7 @@ export const LoginView = memo(() => {
             </p>
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
               <CheckCircle2 className="h-4 w-4 text-emerald-500" aria-hidden="true" />
-              <span>Debug view is unlocked in your sidebar.</span>
+              <span>{APP_STRINGS.VIEWS.LOGIN.TXT_DEBUG_UNLOCKED}</span>
             </div>
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
@@ -107,7 +106,7 @@ export const LoginView = memo(() => {
           <p className="text-[11px] text-slate-500 dark:text-slate-400">{APP_STRINGS.VIEWS.LOGIN.TXT_AUTH_NOTICE}</p>
           <div className="flex flex-col gap-2 pt-1">
             <Button type="submit" disabled={isLoading} icon={LogIn} className="w-full">
-              {isLoading ? 'Verifying...' : APP_STRINGS.VIEWS.LOGIN.BTN_SUBMIT}
+              {isLoading ? APP_STRINGS.VIEWS.LOGIN.BTN_SUBMIT_LOADING : APP_STRINGS.VIEWS.LOGIN.BTN_SUBMIT}
             </Button>
             <Button onClick={handleClearStorage} variant="secondary" icon={RotateCcw} aria-label={APP_STRINGS.VIEWS.LOGIN.BTN_CLEAR_STORAGE_ARIA_LABEL} className="w-full">
               {APP_STRINGS.VIEWS.LOGIN.BTN_CLEAR_STORAGE}

@@ -32,16 +32,9 @@ export function ToastProvider({ children }: ToastProviderProps) {
       };
 
       setToasts((prev) => [...prev, newToast]);
-
-      if (durationMs > 0) {
-        window.setTimeout(() => {
-          dismissToast(id);
-        }, durationMs);
-      }
-
       return id;
     },
-    [dismissToast]
+    []
   );
 
   const contextValue = useMemo<ToastContextType>(

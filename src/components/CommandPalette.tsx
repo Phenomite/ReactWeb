@@ -14,14 +14,15 @@ import {
   X,
   Shield,
   Download,
-  Sparkles,
+  ShieldAlert,
 } from 'lucide-react';
 import { APP_STRINGS } from '@/strings';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { useSecurityIncidents } from '@/context/SecurityIncidentContext';
 import { ACCENT_OPTIONS } from '@/constants';
-import { cn } from '@/lib/utils';
+import { cn, copyCurrentUrl, resetLocalStorageAndReload } from '@/lib/utils';
+import { useEscapeKey } from '@/hooks/useEscapeKey';
 import type { CommandItem, AccentColor } from '@/types';
 
 interface CommandPaletteProps {
@@ -50,6 +51,8 @@ export const CommandPalette = memo(({
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
+  useEscapeKey(isOpen, onClose);
+
   // Focus input on open and reset query
   useEffect(() => {
     if (isOpen) {
@@ -61,7 +64,7 @@ export const CommandPalette = memo(({
 
   // Copy current URL action
   const handleCopyUrl = useCallback(() => {
-    navigator.clipboard.writeText(window.location.href);
+    copyCurrentUrl();
     showToast(APP_STRINGS.TOAST.TXT_URL_COPIED, { type: 'success' });
     onClose();
   }, [showToast, onClose]);
@@ -77,10 +80,9 @@ export const CommandPalette = memo(({
 
   // Clear storage helper
   const handleClearStorage = useCallback(() => {
-    localStorage.clear();
     showToast(APP_STRINGS.TOAST.TXT_STORAGE_CLEARED, { type: 'info' });
     onClose();
-    window.location.reload();
+    resetLocalStorageAndReload();
   }, [showToast, onClose]);
 
   // Build commands list
@@ -138,7 +140,7 @@ export const CommandPalette = memo(({
     // Appearance
     list.push({
       id: 'action-theme',
-      title: darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+      title: darkMode ? APP_STRINGS.COMMAND_PALETTE.CMD_THEME_LIGHT : APP_STRINGS.COMMAND_PALETTE.CMD_THEME_DARK,
       category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_APPEARANCE,
       icon: darkMode ? Sun : Moon,
       shortcut: 'T',
@@ -156,7 +158,7 @@ export const CommandPalette = memo(({
     ACCENT_OPTIONS.forEach((opt) => {
       list.push({
         id: `accent-${opt.id}`,
-        title: `Set Accent: ${opt.label}${opt.id === currentAccent ? ' (Active)' : ''}`,
+        title: `${APP_STRINGS.COMMAND_PALETTE.CMD_SET_ACCENT_PREFIX}${opt.label}${opt.id === currentAccent ? ' (Active)' : ''}`,
         category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_APPEARANCE,
         icon: Palette,
         action: () => {
@@ -170,7 +172,7 @@ export const CommandPalette = memo(({
     // Quick Actions
     list.push({
       id: 'action-copy-url',
-      title: 'Copy Current Page URL',
+      title: APP_STRINGS.COMMAND_PALETTE.CMD_COPY_URL,
       category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_ACTIONS,
       icon: Copy,
       action: handleCopyUrl,
@@ -192,7 +194,7 @@ export const CommandPalette = memo(({
 
     list.push({
       id: 'action-export-sentinel',
-      title: 'Export Microsoft Sentinel Security Log',
+      title: APP_STRINGS.COMMAND_PALETTE.CMD_EXPORT_SENTINEL,
       category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_ACTIONS,
       icon: Download,
       action: () => {
@@ -203,9 +205,9 @@ export const CommandPalette = memo(({
 
     list.push({
       id: 'action-simulate-threat',
-      title: 'Simulate Defender Security Alert',
+      title: APP_STRINGS.COMMAND_PALETTE.CMD_SIMULATE_ALERT,
       category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_ACTIONS,
-      icon: Sparkles,
+      icon: ShieldAlert,
       action: () => {
         simulateThreatSignal();
         onClose();
@@ -214,7 +216,7 @@ export const CommandPalette = memo(({
 
     list.push({
       id: 'action-clear-storage',
-      title: 'Reset Local Storage Cache',
+      title: APP_STRINGS.COMMAND_PALETTE.CMD_RESET_STORAGE,
       category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_ACTIONS,
       icon: Trash2,
       action: handleClearStorage,
@@ -394,7 +396,7 @@ export const CommandPalette = memo(({
           <span>{APP_STRINGS.COMMAND_PALETTE.TXT_FOOTER_HINT}</span>
           <div className="flex items-center gap-1.5">
             <kbd className="rounded border border-slate-200 bg-white px-1 font-mono text-[10px] dark:border-slate-800 dark:bg-slate-800">
-              Esc
+              {APP_STRINGS.COMMAND_PALETTE.KBD_ESC}
             </kbd>
           </div>
         </div>

@@ -1,10 +1,10 @@
 import { memo, useCallback } from 'react';
 import { Cuboid, X, LogIn, LogOut } from 'lucide-react';
 import { APP_STRINGS } from '@/strings';
+import { ALL_TENANTS } from '@/constants';
 import { getVisibleViews } from '@/views/views';
 import type { ViewDefinition } from '@/types';
 import { useAuth } from '@/context/AuthContext';
-import { useSecurityIncidents } from '@/context/SecurityIncidentContext';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
 import { UserBadge } from '@/components/UserBadge';
 import { Button } from '@/components/Button';
@@ -42,12 +42,10 @@ const SidebarNavItem = memo(({
   view,
   isActive,
   onSelect,
-  unresolvedCount,
 }: {
   view: ViewDefinition;
   isActive: boolean;
   onSelect: (v: ViewDefinition) => void;
-  unresolvedCount?: number;
 }) => {
   const Icon = view.icon;
   return (
@@ -69,12 +67,12 @@ const SidebarNavItem = memo(({
       </div>
       {view.requiresAuth && (
         <span className="rounded-md bg-purple-100 px-1.5 py-0.5 text-[10px] font-semibold text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">
-          ADMIN
+          {APP_STRINGS.SIDEBAR.BADGE_ADMIN}
         </span>
       )}
-      {view.id === 'microsoft' && unresolvedCount !== undefined && unresolvedCount > 0 && (
-        <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">
-          {unresolvedCount}
+      {view.id === 'microsoft' && (
+        <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
+          {ALL_TENANTS.length}
         </span>
       )}
     </button>
@@ -84,7 +82,6 @@ const SidebarNavItem = memo(({
 // Main sidebar container rendering header, view navigation, user identity badge, and theme switch
 export const Sidebar = memo(({ isOpen, onClose, darkMode, onToggleDarkMode, activeViewId, onSelectView }: SidebarProps) => {
   const { isAuthenticated, username, role, logout } = useAuth();
-  const { unresolvedCount } = useSecurityIncidents();
   const visibleViews = getVisibleViews(isAuthenticated);
 
   const handleLogout = useCallback(() => {
@@ -115,7 +112,6 @@ export const Sidebar = memo(({ isOpen, onClose, darkMode, onToggleDarkMode, acti
               view={view}
               isActive={activeViewId === view.id}
               onSelect={onSelectView}
-              unresolvedCount={unresolvedCount}
             />
           ))}
         </nav>

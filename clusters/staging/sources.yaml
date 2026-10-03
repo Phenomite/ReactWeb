@@ -1,0 +1,22 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: reactweb
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/Phenomite/ReactWeb
+  ref:
+    branch: main
+  ignore: |
+    /*
+    !/deploy
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: bjw-s
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://bjw-s-labs.github.io/helm-charts

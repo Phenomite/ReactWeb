@@ -1,0 +1,33 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: reactweb-frontend
+  namespace: reactweb
+spec:
+  targetNamespace: reactweb-prod
+  values:
+    controllers:
+      main:
+        replicas: 3
+        containers:
+          main:
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+    ingress:
+      main:
+        hosts:
+          - host: reactweb.phenomite.dev
+            paths:
+              - path: /
+                service:
+                  identifier: main
+                  port: http
+        tls:
+          - secretName: reactweb-prod-tls
+            hosts:
+              - reactweb.phenomite.dev
