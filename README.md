@@ -35,9 +35,12 @@ Used to test agentic harnesses and models understanding of intent, behaviour, an
 | `pnpm build` | Run type-check and build production assets to `dist/` |
 | `pnpm preview` | Locally preview the production build output |
 | `pnpm run dev:modify` | Modify live database records from terminal with developer attribution |
+| `pnpm run lint:md` | Lint all markdown files with markdownlint-cli2 |
+
 ## Anchor Hash Routing
 
-All application views (`#homepage`, `#microsoft`, `#settings`, `#debug`) route directly via browser URL hashes and are immediately accessible in the UI.
+All application views (`#homepage`, `#microsoft`, `#settings`, `#debug`) route directly via browser URL hashes
+and are immediately accessible in the UI.
 
 ---
 

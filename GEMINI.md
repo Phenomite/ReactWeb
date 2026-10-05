@@ -59,6 +59,7 @@ Use `pnpm` to run scripts:
 | `pnpm run telemetry:cron` | Run real-time background cluster telemetry generator with Bun |
 | `pnpm run telemetry:cron:once` | Execute a single batch telemetry perturbation update with Bun |
 | `pnpm run dev:modify` | Modify live database records with developer attribution using Bun |
+| `pnpm run lint:md` | Lint all markdown files with markdownlint-cli2 |
 
 ---
 

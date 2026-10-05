@@ -5,16 +5,17 @@
 	"type": "module",
 	"scripts": {
 		"build": "pnpm run lint && vite build",
+		"check": "biome check --write .",
 		"dev:modify": "bun scripts/dev-modify-db.js",
 		"dev": "vite",
-		"lint": "tsc --noEmit && biome lint --write .",
+		"format": "biome format --write .",
+		"lint:md": "markdownlint-cli2 \"**/*.md\" !node_modules !.agents --fix",
+		"lint": "tsc --noEmit && biome lint --write . && pnpm run lint:md",
 		"preview": "vite preview",
 		"server:dev": "bun --watch server/index.js",
 		"server": "bun server/index.js",
 		"telemetry:cron:once": "bun scripts/k8s-telemetry-generator.js --once",
-		"telemetry:cron": "bun scripts/k8s-telemetry-generator.js",
-		"format": "biome format --write .",
-		"check": "biome check --write ."
+		"telemetry:cron": "bun scripts/k8s-telemetry-generator.js"
 	},
 	"dependencies": {
 		"clsx": "~2.1.1",
@@ -30,6 +31,7 @@
 		"@types/react": "~19.3.0",
 		"@types/react-dom": "~19.3.0",
 		"@vitejs/plugin-react": "~6.1.1",
+		"markdownlint-cli2": "0.23.3",
 		"tailwindcss": "~4.3.3",
 		"typescript": "~7.0.2",
 		"vite": "~8.3.2"

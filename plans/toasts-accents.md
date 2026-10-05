@@ -1,13 +1,16 @@
 # Implementation Plan: 3 Accessibility Features
 
-Add keyboard-first modern SaaS experiences by implementing 3 features in compliance with WCAG accessibility, and project architecture guidelines.
+Add keyboard-first modern SaaS experiences by implementing 3 features in compliance with WCAG accessibility,
+and project architecture guidelines.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> All 3 features will be seamlessly integrated without adding heavy third-party dependencies (keeping bundle lean with native tooling).
+> All 3 features will be seamlessly integrated without adding heavy third-party dependencies
+> (keeping bundle lean with native tooling).
 >
-> - **Keyboard Hotkeys**: `Cmd/Ctrl+K` for Command Palette, `?` for Shortcuts modal, `T` for theme toggle, `G H`/`G S`/`G D`/`G L` for two-key sequence navigation.
+> - **Keyboard Hotkeys**: `Cmd/Ctrl+K` for Command Palette, `?` for Shortcuts modal, `T` for theme toggle,
+>   `G H`/`G S`/`G D`/`G L` for two-key sequence navigation.
 > - **Accent Colors**: 5 curated palettes (Blue, Violet, Emerald, Rose, Amber) persisted in local storage.
 > - **Sound / Toasts**: Toasts display non-intrusively in the bottom-right corner with auto-dismiss and accessible announcements.
 
@@ -55,7 +58,8 @@ Add keyboard-first modern SaaS experiences by implementing 3 features in complia
 
 #### [MODIFY] [index.css](index.css)
 
-- Define CSS variables for `--color-accent` and `--color-accent-hover` for each `data-accent` theme, integrating seamlessly with Tailwind.
+- Define CSS variables for `--color-accent` and `--color-accent-hover` for each `data-accent` theme,
+  integrating seamlessly with Tailwind.
 
 ---
 
@@ -63,7 +67,8 @@ Add keyboard-first modern SaaS experiences by implementing 3 features in complia
 
 #### [NEW] [CommandPalette.tsx](CommandPalette.tsx)
 
-- Accessible modal dialog using `<dialog>` with backdrop-blur, light-dismiss (`closedby="any"` pattern with click fallback), and focus trapping.
+- Accessible modal dialog using `<dialog>` with backdrop-blur, light-dismiss (`closedby="any"` pattern with click
+  fallback), and focus trapping.
 - Instant search filter for views, actions (toggle dark mode, switch accent, clear storage, copy URL, sign in/out).
 - Keyboard navigation: `ArrowDown`, `ArrowUp`, `Enter`, `Escape`.
 
@@ -73,7 +78,8 @@ Add keyboard-first modern SaaS experiences by implementing 3 features in complia
 
 #### [NEW] [useKeyboardShortcuts.ts](useKeyboardShortcuts.ts)
 
-- Listens for `Cmd+K` / `Ctrl+K` (Command Palette), `?` (Shortcuts), `t` (Theme), and two-key navigation sequences (`g` followed by `h`/`s`/`d`/`l`).
+- Listens for `Cmd+K` / `Ctrl+K` (Command Palette), `?` (Shortcuts), `t` (Theme), and two-key navigation
+  sequences (`g` followed by `h`/`s`/`d`/`l`).
 - Ignores keypresses when user is actively typing inside an `<input>` or `<textarea>`.
 
 #### [MODIFY] [Header.tsx](Header.tsx)
