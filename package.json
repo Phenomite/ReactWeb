@@ -1,39 +1,39 @@
 {
-	"name": "reactweb",
-	"private": true,
-	"version": "0.2.0",
-	"type": "module",
-	"scripts": {
-		"build": "pnpm run lint && vite build",
-		"check": "biome check --write .",
-		"dev:modify": "bun scripts/dev-modify-db.js",
-		"dev": "vite",
-		"format": "biome format --write .",
-		"lint:md": "markdownlint-cli2 \"**/*.md\" !node_modules !.agents --fix",
-		"lint": "tsc --noEmit && biome lint --write . && pnpm run lint:md",
-		"preview": "vite preview",
-		"server:dev": "bun --watch server/index.js",
-		"server": "bun server/index.js",
-		"telemetry:cron:once": "bun scripts/k8s-telemetry-generator.js --once",
-		"telemetry:cron": "bun scripts/k8s-telemetry-generator.js"
-	},
-	"dependencies": {
-		"clsx": "~2.1.1",
-		"lucide-react": "~1.51.0",
-		"react": "~19.3.0",
-		"react-dom": "~19.3.0",
-		"tailwind-merge": "~3.7.0"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "~2.5.15",
-		"@tailwindcss/vite": "~4.3.3",
-		"@types/bun": "~1.4.2",
-		"@types/react": "~19.3.0",
-		"@types/react-dom": "~19.3.0",
-		"@vitejs/plugin-react": "~6.1.1",
-		"markdownlint-cli2": "0.23.3",
-		"tailwindcss": "~4.3.3",
-		"typescript": "~7.0.2",
-		"vite": "~8.3.2"
-	}
+  "name": "reactweb",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm run lint && vite build",
+    "check": "biome check --write .",
+    "dev:modify": "bun scripts/dev-modify-db.js",
+    "dev": "vite",
+    "format": "biome format --write .",
+    "lint:md": "markdownlint-cli2 \"**/*.md\" !node_modules !.agents --fix",
+    "lint": "tsc --noEmit && biome lint --write . && pnpm run lint:md",
+    "preview": "vite preview",
+    "server:dev": "bun --watch server/index.js",
+    "server": "bun server/index.js",
+    "telemetry:cron:once": "bun scripts/k8s-telemetry-generator.js --once",
+    "telemetry:cron": "bun scripts/k8s-telemetry-generator.js"
+  },
+  "dependencies": {
+    "clsx": "~2.1.1",
+    "lucide-react": "~1.51.0",
+    "react": "~19.3.0",
+    "react-dom": "~19.3.0",
+    "tailwind-merge": "~3.7.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "~2.5.15",
+    "@tailwindcss/vite": "~4.3.3",
+    "@types/bun": "~1.4.2",
+    "@types/react": "~19.3.0",
+    "@types/react-dom": "~19.3.0",
+    "@vitejs/plugin-react": "~6.1.1",
+    "markdownlint-cli2": "0.23.3",
+    "tailwindcss": "~4.3.3",
+    "typescript": "~7.0.2",
+    "vite": "~8.3.2"
+  }
 }

@@ -11,14 +11,14 @@ export const DEFAULT_VIEW = homepageView;
 
 // Filters view array for sidebar display
 export function getVisibleViews(): ViewDefinition[] {
-	return APP_VIEWS.filter((v) => !v.hideInSidebar);
+  return APP_VIEWS.filter((v) => !v.hideInSidebar);
 }
 
 // Returns matching view by anchor hash or returns the default view
 export function getViewByHash(hash: string): ViewDefinition {
-	const normalized = hash.toLowerCase();
-	return (
-		APP_VIEWS.find((v) => v.hash.toLowerCase() === normalized || `#${v.id.toLowerCase()}` === normalized) ||
-		DEFAULT_VIEW
-	);
+  const normalized = hash.toLowerCase();
+  return (
+    APP_VIEWS.find((v) => v.hash.toLowerCase() === normalized || `#${v.id.toLowerCase()}` === normalized) ||
+    DEFAULT_VIEW
+  );
 }

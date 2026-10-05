@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 // Database path resolution with environment override for Kubernetes PVC
 const DB_DIR = process.env.DATA_DIR || join(__dirname, '../data');
 if (!existsSync(DB_DIR)) {
-	mkdirSync(DB_DIR, { recursive: true });
+  mkdirSync(DB_DIR, { recursive: true });
 }
 const DB_PATH = process.env.DATABASE_URL || join(DB_DIR, 'reactweb.db');
 
@@ -71,18 +71,18 @@ db.exec(`
 
 // Migration safety: Ensure version and lastUpdatedBy columns exist on pre-existing tables
 try {
-	const columns = db
-		.prepare('PRAGMA table_info(tenants)')
-		.all()
-		.map((c) => c.name);
-	if (!columns.includes('version')) {
-		db.exec('ALTER TABLE tenants ADD COLUMN version INTEGER NOT NULL DEFAULT 1');
-	}
-	if (!columns.includes('lastUpdatedBy')) {
-		db.exec("ALTER TABLE tenants ADD COLUMN lastUpdatedBy TEXT NOT NULL DEFAULT 'system'");
-	}
+  const columns = db
+    .prepare('PRAGMA table_info(tenants)')
+    .all()
+    .map((c) => c.name);
+  if (!columns.includes('version')) {
+    db.exec('ALTER TABLE tenants ADD COLUMN version INTEGER NOT NULL DEFAULT 1');
+  }
+  if (!columns.includes('lastUpdatedBy')) {
+    db.exec("ALTER TABLE tenants ADD COLUMN lastUpdatedBy TEXT NOT NULL DEFAULT 'system'");
+  }
 } catch {
-	// Columns already present
+  // Columns already present
 }
 
 // Prepared statements
@@ -140,180 +140,180 @@ const stmtCountIncidents = db.prepare('SELECT COUNT(*) as count FROM incidents')
 
 // Map database row to TenantRecord format
 function rowToTenant(row) {
-	return {
-		id: row.id,
-		name: row.name,
-		domain: row.domain,
-		industry: row.industry,
-		region: row.region,
-		seatCount: row.seatCount,
-		statusBubbles: {
-			sentinel: Boolean(row.sentinel),
-			mde: Boolean(row.mde),
-			mdi: Boolean(row.mdi),
-			logAnalytics: Boolean(row.logAnalytics),
-		},
-		categories: {
-			device: row.device,
-			identities: row.identities,
-			apps: row.apps,
-			data: row.data,
-		},
-		overallScore: row.overallScore,
-		rank: row.rank,
-		version: row.version ?? 1,
-		lastUpdatedBy: row.lastUpdatedBy ?? 'system',
-		updatedAt: row.updatedAt,
-	};
+  return {
+    id: row.id,
+    name: row.name,
+    domain: row.domain,
+    industry: row.industry,
+    region: row.region,
+    seatCount: row.seatCount,
+    statusBubbles: {
+      sentinel: Boolean(row.sentinel),
+      mde: Boolean(row.mde),
+      mdi: Boolean(row.mdi),
+      logAnalytics: Boolean(row.logAnalytics),
+    },
+    categories: {
+      device: row.device,
+      identities: row.identities,
+      apps: row.apps,
+      data: row.data,
+    },
+    overallScore: row.overallScore,
+    rank: row.rank,
+    version: row.version ?? 1,
+    lastUpdatedBy: row.lastUpdatedBy ?? 'system',
+    updatedAt: row.updatedAt,
+  };
 }
 
 // Seed initial tenants and incidents if database is empty
 export function seedDatabaseIfEmpty() {
-	const tenantCount = stmtCountTenants.get().count;
-	if (tenantCount === 0) {
-		const tenantsJsonPath = join(__dirname, '../src/data/tenants.json');
-		if (existsSync(tenantsJsonPath)) {
-			const rawData = JSON.parse(readFileSync(tenantsJsonPath, 'utf8'));
-			const now = Date.now();
-			db.exec('BEGIN IMMEDIATE;');
-			for (const t of rawData) {
-				stmtInsertTenant.run(
-					t.id,
-					t.name,
-					t.domain,
-					t.industry,
-					t.region,
-					t.seatCount,
-					t.statusBubbles?.sentinel ? 1 : 0,
-					t.statusBubbles?.mde ? 1 : 0,
-					t.statusBubbles?.mdi ? 1 : 0,
-					t.statusBubbles?.logAnalytics ? 1 : 0,
-					t.categories?.device ?? 0,
-					t.categories?.identities ?? 0,
-					t.categories?.apps ?? 0,
-					t.categories?.data ?? 0,
-					t.overallScore,
-					t.rank,
-					1,
-					'system_seed',
-					now,
-				);
-			}
-			db.exec('COMMIT;');
-			console.log(`[Database] Seeded ${rawData.length} tenant records into SQLite.`);
-		}
-	}
+  const tenantCount = stmtCountTenants.get().count;
+  if (tenantCount === 0) {
+    const tenantsJsonPath = join(__dirname, '../src/data/tenants.json');
+    if (existsSync(tenantsJsonPath)) {
+      const rawData = JSON.parse(readFileSync(tenantsJsonPath, 'utf8'));
+      const now = Date.now();
+      db.exec('BEGIN IMMEDIATE;');
+      for (const t of rawData) {
+        stmtInsertTenant.run(
+          t.id,
+          t.name,
+          t.domain,
+          t.industry,
+          t.region,
+          t.seatCount,
+          t.statusBubbles?.sentinel ? 1 : 0,
+          t.statusBubbles?.mde ? 1 : 0,
+          t.statusBubbles?.mdi ? 1 : 0,
+          t.statusBubbles?.logAnalytics ? 1 : 0,
+          t.categories?.device ?? 0,
+          t.categories?.identities ?? 0,
+          t.categories?.apps ?? 0,
+          t.categories?.data ?? 0,
+          t.overallScore,
+          t.rank,
+          1,
+          'system_seed',
+          now,
+        );
+      }
+      db.exec('COMMIT;');
+      console.log(`[Database] Seeded ${rawData.length} tenant records into SQLite.`);
+    }
+  }
 
-	const incidentCount = stmtCountIncidents.get().count;
-	if (incidentCount === 0) {
-		const initialIncidents = [
-			{
-				id: 'inc-101',
-				title: 'Anomalous API Rate Threshold Exceeded',
-				severity: 'high',
-				status: 'active',
-				category: 'Traffic Anomaly',
-				source: 'Rate Limiter Service',
-				timestamp: Date.now() - 1000 * 60 * 18,
-				description: 'Multiple rapid mutation requests detected from external IP violating rate limit threshold.',
-				recommendation: 'Inspect source IP address and verify rate-limiting rules.',
-			},
-			{
-				id: 'inc-102',
-				title: 'Local Storage Security Boundary Reset',
-				severity: 'medium',
-				status: 'investigating',
-				category: 'Data Integrity',
-				source: 'Storage Management API',
-				timestamp: Date.now() - 1000 * 60 * 65,
-				description:
-					'Complete cache flush invoked via client administration trigger outside of scheduled maintenance windows.',
-				recommendation: 'Verify administrator audit trail and inspect state persistence.',
-			},
-			{
-				id: 'inc-103',
-				title: 'Ingress TLS Certificate Renewal Scheduled',
-				severity: 'low',
-				status: 'resolved',
-				category: 'Transport Security',
-				source: 'Certificate Manager',
-				timestamp: Date.now() - 1000 * 60 * 180,
-				description: 'Edge TLS certificate renewal automatically negotiated via ACME challenge before 30-day window.',
-				recommendation: 'Certificate successfully renewed; no further administrative action required.',
-			},
-		];
+  const incidentCount = stmtCountIncidents.get().count;
+  if (incidentCount === 0) {
+    const initialIncidents = [
+      {
+        id: 'inc-101',
+        title: 'Anomalous API Rate Threshold Exceeded',
+        severity: 'high',
+        status: 'active',
+        category: 'Traffic Anomaly',
+        source: 'Rate Limiter Service',
+        timestamp: Date.now() - 1000 * 60 * 18,
+        description: 'Multiple rapid mutation requests detected from external IP violating rate limit threshold.',
+        recommendation: 'Inspect source IP address and verify rate-limiting rules.',
+      },
+      {
+        id: 'inc-102',
+        title: 'Local Storage Security Boundary Reset',
+        severity: 'medium',
+        status: 'investigating',
+        category: 'Data Integrity',
+        source: 'Storage Management API',
+        timestamp: Date.now() - 1000 * 60 * 65,
+        description:
+          'Complete cache flush invoked via client administration trigger outside of scheduled maintenance windows.',
+        recommendation: 'Verify administrator audit trail and inspect state persistence.',
+      },
+      {
+        id: 'inc-103',
+        title: 'Ingress TLS Certificate Renewal Scheduled',
+        severity: 'low',
+        status: 'resolved',
+        category: 'Transport Security',
+        source: 'Certificate Manager',
+        timestamp: Date.now() - 1000 * 60 * 180,
+        description: 'Edge TLS certificate renewal automatically negotiated via ACME challenge before 30-day window.',
+        recommendation: 'Certificate successfully renewed; no further administrative action required.',
+      },
+    ];
 
-		db.exec('BEGIN IMMEDIATE;');
-		for (const inc of initialIncidents) {
-			stmtInsertIncident.run(
-				inc.id,
-				inc.title,
-				inc.severity,
-				inc.status,
-				inc.category,
-				inc.source,
-				inc.timestamp,
-				inc.description,
-				inc.recommendation,
-			);
-		}
-		db.exec('COMMIT;');
-		console.log(`[Database] Seeded ${initialIncidents.length} security incident records into SQLite.`);
-	}
+    db.exec('BEGIN IMMEDIATE;');
+    for (const inc of initialIncidents) {
+      stmtInsertIncident.run(
+        inc.id,
+        inc.title,
+        inc.severity,
+        inc.status,
+        inc.category,
+        inc.source,
+        inc.timestamp,
+        inc.description,
+        inc.recommendation,
+      );
+    }
+    db.exec('COMMIT;');
+    console.log(`[Database] Seeded ${initialIncidents.length} security incident records into SQLite.`);
+  }
 }
 
 // Read queries
 export function getAllTenants() {
-	const rows = stmtSelectAllTenants.all();
-	return rows.map(rowToTenant);
+  const rows = stmtSelectAllTenants.all();
+  return rows.map(rowToTenant);
 }
 
 export function getTenantById(id) {
-	const row = stmtSelectTenantById.get(id);
-	return row ? rowToTenant(row) : null;
+  const row = stmtSelectTenantById.get(id);
+  return row ? rowToTenant(row) : null;
 }
 
 // Multi-admin safe tenant update with optimistic concurrency control
 export function publishTenantUpdate(id, updates = {}, expectedVersion = null, updatedBy = 'admin') {
-	db.exec('BEGIN IMMEDIATE;');
-	try {
-		const existing = stmtSelectTenantById.get(id);
-		if (!existing) {
-			db.exec('ROLLBACK;');
-			return { notFound: true };
-		}
+  db.exec('BEGIN IMMEDIATE;');
+  try {
+    const existing = stmtSelectTenantById.get(id);
+    if (!existing) {
+      db.exec('ROLLBACK;');
+      return { notFound: true };
+    }
 
-		// Check optimistic concurrency conflict
-		if (expectedVersion !== null && expectedVersion !== undefined && existing.version !== expectedVersion) {
-			db.exec('ROLLBACK;');
-			return {
-				conflict: true,
-				current: rowToTenant(existing),
-			};
-		}
+    // Check optimistic concurrency conflict
+    if (expectedVersion !== null && expectedVersion !== undefined && existing.version !== expectedVersion) {
+      db.exec('ROLLBACK;');
+      return {
+        conflict: true,
+        current: rowToTenant(existing),
+      };
+    }
 
-		const nextScore = typeof updates.overallScore === 'number' ? updates.overallScore : existing.overallScore;
-		const nextDevice = updates.categories?.device ?? existing.device;
-		const nextIdentities = updates.categories?.identities ?? existing.identities;
-		const nextApps = updates.categories?.apps ?? existing.apps;
-		const nextData = updates.categories?.data ?? existing.data;
-		const nextSeatCount = typeof updates.seatCount === 'number' ? updates.seatCount : existing.seatCount;
+    const nextScore = typeof updates.overallScore === 'number' ? updates.overallScore : existing.overallScore;
+    const nextDevice = updates.categories?.device ?? existing.device;
+    const nextIdentities = updates.categories?.identities ?? existing.identities;
+    const nextApps = updates.categories?.apps ?? existing.apps;
+    const nextData = updates.categories?.data ?? existing.data;
+    const nextSeatCount = typeof updates.seatCount === 'number' ? updates.seatCount : existing.seatCount;
 
-		const nextSentinel =
-			updates.statusBubbles?.sentinel !== undefined ? (updates.statusBubbles.sentinel ? 1 : 0) : existing.sentinel;
-		const nextMde = updates.statusBubbles?.mde !== undefined ? (updates.statusBubbles.mde ? 1 : 0) : existing.mde;
-		const nextMdi = updates.statusBubbles?.mdi !== undefined ? (updates.statusBubbles.mdi ? 1 : 0) : existing.mdi;
-		const nextLog =
-			updates.statusBubbles?.logAnalytics !== undefined
-				? updates.statusBubbles.logAnalytics
-					? 1
-					: 0
-				: existing.logAnalytics;
+    const nextSentinel =
+      updates.statusBubbles?.sentinel !== undefined ? (updates.statusBubbles.sentinel ? 1 : 0) : existing.sentinel;
+    const nextMde = updates.statusBubbles?.mde !== undefined ? (updates.statusBubbles.mde ? 1 : 0) : existing.mde;
+    const nextMdi = updates.statusBubbles?.mdi !== undefined ? (updates.statusBubbles.mdi ? 1 : 0) : existing.mdi;
+    const nextLog =
+      updates.statusBubbles?.logAnalytics !== undefined
+        ? updates.statusBubbles.logAnalytics
+          ? 1
+          : 0
+        : existing.logAnalytics;
 
-		const nextVersion = (existing.version || 1) + 1;
-		const now = Date.now();
+    const nextVersion = (existing.version || 1) + 1;
+    const now = Date.now();
 
-		const stmtUpdate = db.prepare(`
+    const stmtUpdate = db.prepare(`
       UPDATE tenants
       SET overallScore = ?,
           device = ?,
@@ -331,50 +331,50 @@ export function publishTenantUpdate(id, updates = {}, expectedVersion = null, up
       WHERE id = ?
     `);
 
-		stmtUpdate.run(
-			nextScore,
-			nextDevice,
-			nextIdentities,
-			nextApps,
-			nextData,
-			nextSeatCount,
-			nextSentinel,
-			nextMde,
-			nextMdi,
-			nextLog,
-			nextVersion,
-			updatedBy,
-			now,
-			id,
-		);
+    stmtUpdate.run(
+      nextScore,
+      nextDevice,
+      nextIdentities,
+      nextApps,
+      nextData,
+      nextSeatCount,
+      nextSentinel,
+      nextMde,
+      nextMdi,
+      nextLog,
+      nextVersion,
+      updatedBy,
+      now,
+      id,
+    );
 
-		stmtRecalculateRanks.run();
-		db.exec('COMMIT;');
+    stmtRecalculateRanks.run();
+    db.exec('COMMIT;');
 
-		return {
-			success: true,
-			tenant: getTenantById(id),
-		};
-	} catch (err) {
-		db.exec('ROLLBACK;');
-		throw err;
-	}
+    return {
+      success: true,
+      tenant: getTenantById(id),
+    };
+  } catch (err) {
+    db.exec('ROLLBACK;');
+    throw err;
+  }
 }
 
 // Legacy simple score update
 export function updateTenantScore(id, overallScore, categories = {}, updatedBy = 'system') {
-	const result = publishTenantUpdate(id, { overallScore, categories }, null, updatedBy);
-	return result.tenant || null;
+  const result = publishTenantUpdate(id, { overallScore, categories }, null, updatedBy);
+  return result.tenant || null;
 }
 
 // Batch update from in-cluster telemetry generators or CronJobs
 export function batchUpdateTenants(updates = null, updatedBy = 'k8s-telemetry-generator') {
-	db.exec('BEGIN IMMEDIATE;');
-	try {
-		const now = Date.now();
-		let updatedCount = 0;
+  db.exec('BEGIN IMMEDIATE;');
+  try {
+    const now = Date.now();
+    let updatedCount = 0;
 
-		const stmtUpdate = db.prepare(`
+    const stmtUpdate = db.prepare(`
       UPDATE tenants
       SET overallScore = ?,
           device = ?,
@@ -391,192 +391,192 @@ export function batchUpdateTenants(updates = null, updatedBy = 'k8s-telemetry-ge
       WHERE id = ?
     `);
 
-		if (Array.isArray(updates) && updates.length > 0) {
-			for (const u of updates) {
-				const existing = stmtSelectTenantById.get(u.id);
-				if (!existing) continue;
+    if (Array.isArray(updates) && updates.length > 0) {
+      for (const u of updates) {
+        const existing = stmtSelectTenantById.get(u.id);
+        if (!existing) continue;
 
-				const score = typeof u.overallScore === 'number' ? u.overallScore : existing.overallScore;
-				const dev = u.categories?.device ?? existing.device;
-				const iden = u.categories?.identities ?? existing.identities;
-				const app = u.categories?.apps ?? existing.apps;
-				const dat = u.categories?.data ?? existing.data;
+        const score = typeof u.overallScore === 'number' ? u.overallScore : existing.overallScore;
+        const dev = u.categories?.device ?? existing.device;
+        const iden = u.categories?.identities ?? existing.identities;
+        const app = u.categories?.apps ?? existing.apps;
+        const dat = u.categories?.data ?? existing.data;
 
-				const sent = u.statusBubbles?.sentinel !== undefined ? (u.statusBubbles.sentinel ? 1 : 0) : existing.sentinel;
-				const mde = u.statusBubbles?.mde !== undefined ? (u.statusBubbles.mde ? 1 : 0) : existing.mde;
-				const mdi = u.statusBubbles?.mdi !== undefined ? (u.statusBubbles.mdi ? 1 : 0) : existing.mdi;
-				const log =
-					u.statusBubbles?.logAnalytics !== undefined ? (u.statusBubbles.logAnalytics ? 1 : 0) : existing.logAnalytics;
+        const sent = u.statusBubbles?.sentinel !== undefined ? (u.statusBubbles.sentinel ? 1 : 0) : existing.sentinel;
+        const mde = u.statusBubbles?.mde !== undefined ? (u.statusBubbles.mde ? 1 : 0) : existing.mde;
+        const mdi = u.statusBubbles?.mdi !== undefined ? (u.statusBubbles.mdi ? 1 : 0) : existing.mdi;
+        const log =
+          u.statusBubbles?.logAnalytics !== undefined ? (u.statusBubbles.logAnalytics ? 1 : 0) : existing.logAnalytics;
 
-				stmtUpdate.run(score, dev, iden, app, dat, sent, mde, mdi, log, updatedBy, now, u.id);
-				updatedCount += 1;
-			}
-		} else {
-			// Automatic realistic random perturbation across all tenants (random number generator simulation)
-			const allRows = stmtSelectAllTenants.all();
-			for (const row of allRows) {
-				// Random score adjustment [-1.5, +1.5]
-				const delta = Math.round((Math.random() * 3 - 1.5) * 10) / 10;
-				const newScore = Math.min(100, Math.max(10, Math.round((row.overallScore + delta) * 10) / 10));
+        stmtUpdate.run(score, dev, iden, app, dat, sent, mde, mdi, log, updatedBy, now, u.id);
+        updatedCount += 1;
+      }
+    } else {
+      // Automatic realistic random perturbation across all tenants (random number generator simulation)
+      const allRows = stmtSelectAllTenants.all();
+      for (const row of allRows) {
+        // Random score adjustment [-1.5, +1.5]
+        const delta = Math.round((Math.random() * 3 - 1.5) * 10) / 10;
+        const newScore = Math.min(100, Math.max(10, Math.round((row.overallScore + delta) * 10) / 10));
 
-				// Category adjustments
-				const newDev = Math.min(100, Math.max(10, Math.round((row.device + (Math.random() * 2 - 1)) * 10) / 10));
-				const newIden = Math.min(100, Math.max(10, Math.round((row.identities + (Math.random() * 2 - 1)) * 10) / 10));
-				const newApp = Math.min(100, Math.max(10, Math.round((row.apps + (Math.random() * 2 - 1)) * 10) / 10));
-				const newData = Math.min(100, Math.max(10, Math.round((row.data + (Math.random() * 2 - 1)) * 10) / 10));
+        // Category adjustments
+        const newDev = Math.min(100, Math.max(10, Math.round((row.device + (Math.random() * 2 - 1)) * 10) / 10));
+        const newIden = Math.min(100, Math.max(10, Math.round((row.identities + (Math.random() * 2 - 1)) * 10) / 10));
+        const newApp = Math.min(100, Math.max(10, Math.round((row.apps + (Math.random() * 2 - 1)) * 10) / 10));
+        const newData = Math.min(100, Math.max(10, Math.round((row.data + (Math.random() * 2 - 1)) * 10) / 10));
 
-				// Rare toggle of telemetry signal (5% chance)
-				const sent = Math.random() < 0.05 ? (row.sentinel ? 0 : 1) : row.sentinel;
-				const mde = Math.random() < 0.05 ? (row.mde ? 0 : 1) : row.mde;
-				const mdi = Math.random() < 0.05 ? (row.mdi ? 0 : 1) : row.mdi;
-				const log = Math.random() < 0.05 ? (row.logAnalytics ? 0 : 1) : row.logAnalytics;
+        // Rare toggle of telemetry signal (5% chance)
+        const sent = Math.random() < 0.05 ? (row.sentinel ? 0 : 1) : row.sentinel;
+        const mde = Math.random() < 0.05 ? (row.mde ? 0 : 1) : row.mde;
+        const mdi = Math.random() < 0.05 ? (row.mdi ? 0 : 1) : row.mdi;
+        const log = Math.random() < 0.05 ? (row.logAnalytics ? 0 : 1) : row.logAnalytics;
 
-				stmtUpdate.run(newScore, newDev, newIden, newApp, newData, sent, mde, mdi, log, updatedBy, now, row.id);
-				updatedCount += 1;
-			}
-		}
+        stmtUpdate.run(newScore, newDev, newIden, newApp, newData, sent, mde, mdi, log, updatedBy, now, row.id);
+        updatedCount += 1;
+      }
+    }
 
-		stmtRecalculateRanks.run();
-		db.exec('COMMIT;');
+    stmtRecalculateRanks.run();
+    db.exec('COMMIT;');
 
-		return {
-			updatedCount,
-			tenants: getAllTenants(),
-			timestamp: now,
-		};
-	} catch (err) {
-		db.exec('ROLLBACK;');
-		throw err;
-	}
+    return {
+      updatedCount,
+      tenants: getAllTenants(),
+      timestamp: now,
+    };
+  } catch (err) {
+    db.exec('ROLLBACK;');
+    throw err;
+  }
 }
 
 export function getAllIncidents() {
-	return stmtSelectAllIncidents.all();
+  return stmtSelectAllIncidents.all();
 }
 
 export function addIncident(incident) {
-	const id = incident.id || `inc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-	const timestamp = incident.timestamp || Date.now();
-	stmtInsertIncident.run(
-		id,
-		incident.title,
-		incident.severity || 'medium',
-		incident.status || 'active',
-		incident.category || 'General',
-		incident.source || 'Sentinel Engine',
-		timestamp,
-		incident.description || '',
-		incident.recommendation || '',
-	);
-	return {
-		id,
-		title: incident.title,
-		severity: incident.severity || 'medium',
-		status: incident.status || 'active',
-		category: incident.category || 'General',
-		source: incident.source || 'Sentinel Engine',
-		timestamp,
-		description: incident.description || '',
-		recommendation: incident.recommendation || '',
-	};
+  const id = incident.id || `inc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+  const timestamp = incident.timestamp || Date.now();
+  stmtInsertIncident.run(
+    id,
+    incident.title,
+    incident.severity || 'medium',
+    incident.status || 'active',
+    incident.category || 'General',
+    incident.source || 'Sentinel Engine',
+    timestamp,
+    incident.description || '',
+    incident.recommendation || '',
+  );
+  return {
+    id,
+    title: incident.title,
+    severity: incident.severity || 'medium',
+    status: incident.status || 'active',
+    category: incident.category || 'General',
+    source: incident.source || 'Sentinel Engine',
+    timestamp,
+    description: incident.description || '',
+    recommendation: incident.recommendation || '',
+  };
 }
 
 export function updateIncidentStatus(id, status) {
-	stmtUpdateIncidentStatus.run(status, id);
-	return { id, status };
+  stmtUpdateIncidentStatus.run(status, id);
+  return { id, status };
 }
 
 // Data-agnostic record updater scaling across any database table in SQLite
 export function updateGenericRecord(tableName, id, updates = {}, expectedVersion = null, updatedBy = 'admin') {
-	// Validate table name to prevent SQL injection
-	if (!/^[a-zA-Z0-9_]+$/.test(tableName)) {
-		throw new Error('Invalid table identifier');
-	}
+  // Validate table name to prevent SQL injection
+  if (!/^[a-zA-Z0-9_]+$/.test(tableName)) {
+    throw new Error('Invalid table identifier');
+  }
 
-	// Delegate domain-specific tenants table to its specialized handler with rank recalculation
-	if (tableName === 'tenants') {
-		const res = publishTenantUpdate(id, updates, expectedVersion, updatedBy);
-		return {
-			...res,
-			record: res.tenant,
-		};
-	}
+  // Delegate domain-specific tenants table to its specialized handler with rank recalculation
+  if (tableName === 'tenants') {
+    const res = publishTenantUpdate(id, updates, expectedVersion, updatedBy);
+    return {
+      ...res,
+      record: res.tenant,
+    };
+  }
 
-	db.exec('BEGIN IMMEDIATE;');
-	try {
-		const columnsInfo = db.prepare(`PRAGMA table_info(${tableName})`).all();
-		if (!columnsInfo || columnsInfo.length === 0) {
-			db.exec('ROLLBACK;');
-			return { notFound: true, error: `Table '${tableName}' does not exist` };
-		}
+  db.exec('BEGIN IMMEDIATE;');
+  try {
+    const columnsInfo = db.prepare(`PRAGMA table_info(${tableName})`).all();
+    if (!columnsInfo || columnsInfo.length === 0) {
+      db.exec('ROLLBACK;');
+      return { notFound: true, error: `Table '${tableName}' does not exist` };
+    }
 
-		const columnSet = new Set(columnsInfo.map((c) => c.name));
-		const existing = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(id);
+    const columnSet = new Set(columnsInfo.map((c) => c.name));
+    const existing = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(id);
 
-		if (!existing) {
-			db.exec('ROLLBACK;');
-			return { notFound: true };
-		}
+    if (!existing) {
+      db.exec('ROLLBACK;');
+      return { notFound: true };
+    }
 
-		// Verify optimistic concurrency version if version column exists
-		if (columnSet.has('version') && expectedVersion !== null && expectedVersion !== undefined) {
-			if (existing.version !== expectedVersion) {
-				db.exec('ROLLBACK;');
-				return {
-					conflict: true,
-					current: existing,
-				};
-			}
-		}
+    // Verify optimistic concurrency version if version column exists
+    if (columnSet.has('version') && expectedVersion !== null && expectedVersion !== undefined) {
+      if (existing.version !== expectedVersion) {
+        db.exec('ROLLBACK;');
+        return {
+          conflict: true,
+          current: existing,
+        };
+      }
+    }
 
-		const assignments = [];
-		const params = [];
+    const assignments = [];
+    const params = [];
 
-		for (const [key, value] of Object.entries(updates)) {
-			if (key !== 'id' && columnSet.has(key)) {
-				assignments.push(`${key} = ?`);
-				params.push(value);
-			}
-		}
+    for (const [key, value] of Object.entries(updates)) {
+      if (key !== 'id' && columnSet.has(key)) {
+        assignments.push(`${key} = ?`);
+        params.push(value);
+      }
+    }
 
-		if (columnSet.has('version')) {
-			assignments.push('version = version + 1');
-		}
-		if (columnSet.has('updatedAt')) {
-			assignments.push('updatedAt = ?');
-			params.push(Date.now());
-		}
-		if (columnSet.has('lastUpdatedBy')) {
-			assignments.push('lastUpdatedBy = ?');
-			params.push(updatedBy);
-		}
+    if (columnSet.has('version')) {
+      assignments.push('version = version + 1');
+    }
+    if (columnSet.has('updatedAt')) {
+      assignments.push('updatedAt = ?');
+      params.push(Date.now());
+    }
+    if (columnSet.has('lastUpdatedBy')) {
+      assignments.push('lastUpdatedBy = ?');
+      params.push(updatedBy);
+    }
 
-		if (assignments.length > 0) {
-			params.push(id);
-			db.prepare(`UPDATE ${tableName} SET ${assignments.join(', ')} WHERE id = ?`).run(...params);
-		}
+    if (assignments.length > 0) {
+      params.push(id);
+      db.prepare(`UPDATE ${tableName} SET ${assignments.join(', ')} WHERE id = ?`).run(...params);
+    }
 
-		db.exec('COMMIT;');
+    db.exec('COMMIT;');
 
-		const updated = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(id);
-		return {
-			success: true,
-			record: updated,
-		};
-	} catch (err) {
-		db.exec('ROLLBACK;');
-		throw err;
-	}
+    const updated = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(id);
+    return {
+      success: true,
+      record: updated,
+    };
+  } catch (err) {
+    db.exec('ROLLBACK;');
+    throw err;
+  }
 }
 
 export function getDatabaseStats() {
-	const tenantCount = stmtCountTenants.get().count;
-	const incidentCount = stmtCountIncidents.get().count;
-	const avgRow = db.prepare('SELECT AVG(overallScore) as avgScore FROM tenants').get();
-	return {
-		tenantCount,
-		incidentCount,
-		avgScore: avgRow?.avgScore ? Math.round(avgRow.avgScore * 10) / 10 : 0,
-		dbPath: DB_PATH,
-	};
+  const tenantCount = stmtCountTenants.get().count;
+  const incidentCount = stmtCountIncidents.get().count;
+  const avgRow = db.prepare('SELECT AVG(overallScore) as avgScore FROM tenants').get();
+  return {
+    tenantCount,
+    incidentCount,
+    avgScore: avgRow?.avgScore ? Math.round(avgRow.avgScore * 10) / 10 : 0,
+    dbPath: DB_PATH,
+  };
 }

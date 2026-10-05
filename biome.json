@@ -1,45 +1,47 @@
 {
-	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-	"vcs": {
-		"enabled": true,
-		"clientKind": "git",
-		"useIgnoreFile": true
-	},
-	"css": {
-		"parser": {
-			"tailwindDirectives": true
-		}
-	},
-	"linter": {
-		"enabled": true,
-		"rules": {
-			"preset": "recommended",
-			"suspicious": {
-				"noExplicitAny": "error"
-			},
-			"correctness": {
-				"useExhaustiveDependencies": "error"
-			},
-			"performance": {
-				"noJsxPropsBind": "warn"
-			}
-		}
-	},
-	"formatter": {
-		"enabled": true,
-		"lineWidth": 120
-	},
-	"javascript": {
-		"formatter": {
-			"quoteStyle": "single"
-		}
-	},
-	"overrides": [
-		{
-			"includes": ["**/*.md", "*.md"],
-			"formatter": {
-				"lineWidth": 120
-			}
-		}
-	]
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "suspicious": {
+        "noExplicitAny": "error"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "error"
+      },
+      "performance": {
+        "noJsxPropsBind": "warn"
+      }
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "lineWidth": 120,
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.md", "*.md"],
+      "formatter": {
+        "lineWidth": 120
+      }
+    }
+  ]
 }

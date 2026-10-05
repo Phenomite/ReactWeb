@@ -5,11 +5,11 @@ import App from './App';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
-	throw new Error('Failed to find root element with id "root"');
+  throw new Error('Failed to find root element with id "root"');
 }
 
 createRoot(rootElement).render(
-	<StrictMode>
-		<App />
-	</StrictMode>,
+  <StrictMode>
+    <App />
+  </StrictMode>,
 );
