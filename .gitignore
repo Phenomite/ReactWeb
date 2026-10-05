@@ -1,7 +1,11 @@
-node_modules
-public/
-dist/
+.agents/skills/
 *.log
 data/*.db
-data/*.db-wal
 data/*.db-shm
+data/*.db-wal
+dist/
+node_modules
+public/
+test-results/
+playwright-report/
+blob-report/

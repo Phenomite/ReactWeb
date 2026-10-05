@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from 'clsx';
+import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { TIER_CONFIG, type ScoreTierDefinition } from '@/constants';
+import { type ScoreTierDefinition, TIER_CONFIG } from '@/constants';
 import { APP_STRINGS } from '@/strings';
-import type { TenantStatusBubbles, TenantScoreTier } from '@/types';
+import type { TenantScoreTier, TenantStatusBubbles } from '@/types';
 
 // Merges class names and resolves Tailwind CSS rule conflicts
 export function cn(...inputs: ClassValue[]): string {
@@ -11,18 +11,19 @@ export function cn(...inputs: ClassValue[]): string {
 
 // Computes the number of active telemetry security signals without array allocation
 export function getActiveSignalCount(bubbles: TenantStatusBubbles): number {
-  return (
-    (bubbles.sentinel ? 1 : 0) +
-    (bubbles.mde ? 1 : 0) +
-    (bubbles.mdi ? 1 : 0) +
-    (bubbles.logAnalytics ? 1 : 0)
-  );
+  return (bubbles.sentinel ? 1 : 0) + (bubbles.mde ? 1 : 0) + (bubbles.mdi ? 1 : 0) + (bubbles.logAnalytics ? 1 : 0);
 }
 
 // Resolves the corresponding score tier configuration and styling for a given score
 export function getTierForScore(score: number): ScoreTierDefinition & { label: string } {
   const m = APP_STRINGS.VIEWS.MICROSOFT;
-  const tier = TIER_CONFIG.find((t) => score >= t.min) ?? TIER_CONFIG[TIER_CONFIG.length - 1]!;
+  const defaultTier: ScoreTierDefinition = {
+    id: 'critical',
+    min: 0,
+    badgeClass: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800',
+    barColor: 'bg-rose-500',
+  };
+  const tier = TIER_CONFIG.find((t) => score >= t.min) ?? TIER_CONFIG[TIER_CONFIG.length - 1] ?? defaultTier;
   const labelMap: Record<Exclude<TenantScoreTier, 'all'>, string> = {
     diamond: m.TIER_DIAMOND,
     gold: m.TIER_GOLD,
@@ -38,7 +39,7 @@ export function getTierForScore(score: number): ScoreTierDefinition & { label: s
 
 // Clears all browser local storage cache, presents a feedback toast, and reloads the application
 export function resetLocalStorageAndReload(
-  showToast?: (message: string, options?: { type?: 'info' | 'success' | 'warning' | 'error' }) => void
+  showToast?: (message: string, options?: { type?: 'info' | 'success' | 'warning' | 'error' }) => void,
 ): void {
   try {
     localStorage.clear();
@@ -53,7 +54,7 @@ export function resetLocalStorageAndReload(
 
 // Copies the active window URL to clipboard and presents a confirmation toast
 export async function copyCurrentUrl(
-  showToast?: (message: string, options?: { type?: 'info' | 'success' | 'warning' | 'error' }) => void
+  showToast?: (message: string, options?: { type?: 'info' | 'success' | 'warning' | 'error' }) => void,
 ): Promise<void> {
   try {
     await navigator.clipboard.writeText(window.location.href);
@@ -62,4 +63,3 @@ export async function copyCurrentUrl(
     // Clipboard write failed or denied
   }
 }
-

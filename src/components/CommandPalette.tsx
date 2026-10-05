@@ -1,29 +1,21 @@
-import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
+import { Bug, Copy, Download, Home, Moon, Palette, Settings, Shield, ShieldAlert, Sun, Trash2 } from 'lucide-react';
+import { memo, useCallback, useMemo } from 'react';
 import {
-  Search,
-  Home,
-  Settings,
-  Bug,
-  LogIn,
-  LogOut,
-  Moon,
-  Sun,
-  Copy,
-  Trash2,
-  Palette,
-  X,
-  Shield,
-  Download,
-  ShieldAlert,
-} from 'lucide-react';
-import { APP_STRINGS } from '@/strings';
-import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/context/ToastContext';
-import { useSecurityIncidents } from '@/context/SecurityIncidentContext';
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from '@/components/ui/command';
 import { ACCENT_OPTIONS } from '@/constants';
-import { cn, copyCurrentUrl, resetLocalStorageAndReload } from '@/lib/utils';
-import { useEscapeKey } from '@/hooks/useEscapeKey';
-import type { CommandItem, AccentColor } from '@/types';
+import { useSecurityIncidents } from '@/context/SecurityIncidentContext';
+import { useToast } from '@/context/ToastContext';
+import { copyCurrentUrl, resetLocalStorageAndReload } from '@/lib/utils';
+import { APP_STRINGS } from '@/strings';
+import type { AccentColor, CommandItem as CommandItemDef } from '@/types';
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -34,374 +26,218 @@ interface CommandPaletteProps {
   onSelectAccent: (accent: AccentColor) => void;
 }
 
-// Global modal command launcher providing fuzzy search and hotkey actions
-export const CommandPalette = memo(({
-  isOpen,
-  onClose,
-  darkMode,
-  onToggleDarkMode,
-  currentAccent,
-  onSelectAccent,
-}: CommandPaletteProps) => {
-  const { isAuthenticated, logout } = useAuth();
-  const { showToast } = useToast();
-  const { exportSentinelLog, simulateThreatSignal } = useSecurityIncidents();
-  const [query, setQuery] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
+interface AccentCommandItemProps {
+  opt: (typeof ACCENT_OPTIONS)[number];
+  currentAccent: AccentColor;
+  onSelect: (opt: (typeof ACCENT_OPTIONS)[number]) => void;
+}
 
-  useEscapeKey(isOpen, onClose);
-
-  // Focus input on open and reset query
-  useEffect(() => {
-    if (isOpen) {
-      setQuery('');
-      setSelectedIndex(0);
-      window.setTimeout(() => inputRef.current?.focus(), 50);
-    }
-  }, [isOpen]);
-
-  // Copy current URL action
-  const handleCopyUrl = useCallback(() => {
-    copyCurrentUrl();
-    showToast(APP_STRINGS.TOAST.TXT_URL_COPIED, { type: 'success' });
-    onClose();
-  }, [showToast, onClose]);
-
-  // Navigate helper
-  const navigateTo = useCallback(
-    (hash: string) => {
-      window.location.hash = hash;
-      onClose();
-    },
-    [onClose]
-  );
-
-  // Clear storage helper
-  const handleClearStorage = useCallback(() => {
-    showToast(APP_STRINGS.TOAST.TXT_STORAGE_CLEARED, { type: 'info' });
-    onClose();
-    resetLocalStorageAndReload();
-  }, [showToast, onClose]);
-
-  // Build commands list
-  const commands = useMemo<CommandItem[]>(() => {
-    const list: CommandItem[] = [
-      // Navigation
-      {
-        id: 'nav-home',
-        title: APP_STRINGS.VIEWS.HOMEPAGE.NAV_TITLE,
-        category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_NAVIGATION,
-        icon: Home,
-        shortcut: 'G H',
-        action: () => navigateTo(APP_STRINGS.VIEWS.HOMEPAGE.NAV_HASH),
-      },
-      {
-        id: 'nav-microsoft',
-        title: APP_STRINGS.VIEWS.MICROSOFT.NAV_TITLE,
-        category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_NAVIGATION,
-        icon: Shield,
-        shortcut: 'G M',
-        action: () => navigateTo(APP_STRINGS.VIEWS.MICROSOFT.NAV_HASH),
-      },
-      {
-        id: 'nav-settings',
-        title: APP_STRINGS.VIEWS.SETTINGS.NAV_TITLE,
-        category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_NAVIGATION,
-        icon: Settings,
-        shortcut: 'G S',
-        action: () => navigateTo(APP_STRINGS.VIEWS.SETTINGS.NAV_HASH),
-      },
-    ];
-
-    if (isAuthenticated) {
-      list.push({
-        id: 'nav-debug',
-        title: APP_STRINGS.VIEWS.DEBUG.NAV_TITLE,
-        category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_NAVIGATION,
-        icon: Bug,
-        shortcut: 'G D',
-        action: () => navigateTo(APP_STRINGS.VIEWS.DEBUG.NAV_HASH),
-      });
-    }
-
-    if (!isAuthenticated) {
-      list.push({
-        id: 'nav-login',
-        title: APP_STRINGS.VIEWS.LOGIN.NAV_TITLE,
-        category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_NAVIGATION,
-        icon: LogIn,
-        shortcut: 'G L',
-        action: () => navigateTo(APP_STRINGS.VIEWS.LOGIN.NAV_HASH),
-      });
-    }
-
-    // Appearance
-    list.push({
-      id: 'action-theme',
-      title: darkMode ? APP_STRINGS.COMMAND_PALETTE.CMD_THEME_LIGHT : APP_STRINGS.COMMAND_PALETTE.CMD_THEME_DARK,
-      category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_APPEARANCE,
-      icon: darkMode ? Sun : Moon,
-      shortcut: 'T',
-      action: () => {
-        onToggleDarkMode();
-        showToast(
-          darkMode ? APP_STRINGS.TOAST.TXT_THEME_LIGHT : APP_STRINGS.TOAST.TXT_THEME_DARK,
-          { type: 'info' }
-        );
-        onClose();
-      },
-    });
-
-    // Accent colors
-    ACCENT_OPTIONS.forEach((opt) => {
-      list.push({
-        id: `accent-${opt.id}`,
-        title: `${APP_STRINGS.COMMAND_PALETTE.CMD_SET_ACCENT_PREFIX}${opt.label}${opt.id === currentAccent ? ' (Active)' : ''}`,
-        category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_APPEARANCE,
-        icon: Palette,
-        action: () => {
-          onSelectAccent(opt.id);
-          showToast(`${APP_STRINGS.TOAST.TXT_ACCENT_CHANGED} ${opt.label}`, { type: 'success' });
-          onClose();
-        },
-      });
-    });
-
-    // Quick Actions
-    list.push({
-      id: 'action-copy-url',
-      title: APP_STRINGS.COMMAND_PALETTE.CMD_COPY_URL,
-      category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_ACTIONS,
-      icon: Copy,
-      action: handleCopyUrl,
-    });
-
-    if (isAuthenticated) {
-      list.push({
-        id: 'action-logout',
-        title: APP_STRINGS.SIDEBAR.BTN_LOGOUT_TEXT,
-        category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_ACTIONS,
-        icon: LogOut,
-        action: () => {
-          logout();
-          showToast(APP_STRINGS.TOAST.TXT_LOGGED_OUT, { type: 'info' });
-          navigateTo(APP_STRINGS.VIEWS.HOMEPAGE.NAV_HASH);
-        },
-      });
-    }
-
-    list.push({
-      id: 'action-export-sentinel',
-      title: APP_STRINGS.COMMAND_PALETTE.CMD_EXPORT_SENTINEL,
-      category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_ACTIONS,
-      icon: Download,
-      action: () => {
-        exportSentinelLog();
-        onClose();
-      },
-    });
-
-    list.push({
-      id: 'action-simulate-threat',
-      title: APP_STRINGS.COMMAND_PALETTE.CMD_SIMULATE_ALERT,
-      category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_ACTIONS,
-      icon: ShieldAlert,
-      action: () => {
-        simulateThreatSignal();
-        onClose();
-      },
-    });
-
-    list.push({
-      id: 'action-clear-storage',
-      title: APP_STRINGS.COMMAND_PALETTE.CMD_RESET_STORAGE,
-      category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_ACTIONS,
-      icon: Trash2,
-      action: handleClearStorage,
-    });
-
-    return list;
-  }, [
-    isAuthenticated,
-    darkMode,
-    currentAccent,
-    navigateTo,
-    onToggleDarkMode,
-    showToast,
-    onClose,
-    onSelectAccent,
-    handleCopyUrl,
-    logout,
-    handleClearStorage,
-    exportSentinelLog,
-    simulateThreatSignal,
-  ]);
-
-  // Filter commands by search query
-  const filteredCommands = useMemo(() => {
-    const trimmed = query.trim().toLowerCase();
-    if (!trimmed) return commands;
-    return commands.filter(
-      (cmd) =>
-        cmd.title.toLowerCase().includes(trimmed) ||
-        cmd.category.toLowerCase().includes(trimmed)
-    );
-  }, [commands, query]);
-
-  // Reset selected index when query changes
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
-
-  // Keyboard navigation inside palette
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setSelectedIndex((prev) =>
-          filteredCommands.length > 0 ? (prev + 1) % filteredCommands.length : 0
-        );
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setSelectedIndex((prev) =>
-          filteredCommands.length > 0
-            ? (prev - 1 + filteredCommands.length) % filteredCommands.length
-            : 0
-        );
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        const selected = filteredCommands[selectedIndex];
-        if (selected) {
-          selected.action();
-        }
-      }
-    },
-    [filteredCommands, selectedIndex, onClose]
-  );
-
-  // Keep selected item scrolled into view
-  useEffect(() => {
-    if (listRef.current) {
-      const selectedEl = listRef.current.querySelector('[data-selected="true"]');
-      if (selectedEl) {
-        selectedEl.scrollIntoView({ block: 'nearest' });
-      }
-    }
-  }, [selectedIndex]);
-
-  if (!isOpen) return null;
+const AccentCommandItem = memo(({ opt, currentAccent, onSelect }: AccentCommandItemProps) => {
+  const handleSelect = useCallback(() => {
+    onSelect(opt);
+  }, [onSelect, opt]);
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={APP_STRINGS.COMMAND_PALETTE.HEADING_TITLE}
-      className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 sm:pt-24"
-    >
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+    <CommandItem value={`accent color ${opt.label}`} onSelect={handleSelect}>
+      <Palette className="mr-2 h-4 w-4" aria-hidden="true" />
+      <span>
+        {APP_STRINGS.COMMAND_PALETTE.CMD_SET_ACCENT_PREFIX}
+        {opt.label}
+        {opt.id === currentAccent ? APP_STRINGS.COMMAND_PALETTE.TXT_ACTIVE_SUFFIX : ''}
+      </span>
+    </CommandItem>
+  );
+});
+AccentCommandItem.displayName = 'AccentCommandItem';
 
-      {/* Palette Container */}
-      <div
-        onKeyDown={handleKeyDown}
-        className="relative z-10 flex w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl transition-all dark:border-slate-800 dark:bg-slate-900"
+// Global modal command launcher using shadcn Command and cmdk headless combobox
+export const CommandPalette = memo(
+  ({ isOpen, onClose, darkMode, onToggleDarkMode, currentAccent, onSelectAccent }: CommandPaletteProps) => {
+    const { showToast } = useToast();
+    const { exportSentinelLog, simulateThreatSignal } = useSecurityIncidents();
+
+    const handleOpenChange = useCallback(
+      (open: boolean) => {
+        if (!open) onClose();
+      },
+      [onClose],
+    );
+
+    // Copy current URL action
+    const handleCopyUrl = useCallback(() => {
+      copyCurrentUrl();
+      showToast(APP_STRINGS.TOAST.TXT_URL_COPIED, { type: 'success' });
+      onClose();
+    }, [showToast, onClose]);
+
+    // Navigate helper
+    const navigateTo = useCallback(
+      (hash: string) => {
+        window.location.hash = hash;
+        onClose();
+      },
+      [onClose],
+    );
+
+    // Clear storage helper
+    const handleClearStorage = useCallback(() => {
+      showToast(APP_STRINGS.TOAST.TXT_STORAGE_CLEARED, { type: 'info' });
+      onClose();
+      resetLocalStorageAndReload();
+    }, [showToast, onClose]);
+
+    const handleToggleTheme = useCallback(() => {
+      onToggleDarkMode();
+      showToast(darkMode ? APP_STRINGS.TOAST.TXT_THEME_LIGHT : APP_STRINGS.TOAST.TXT_THEME_DARK, { type: 'info' });
+      onClose();
+    }, [darkMode, onToggleDarkMode, showToast, onClose]);
+
+    const handleExport = useCallback(() => {
+      exportSentinelLog();
+      onClose();
+    }, [exportSentinelLog, onClose]);
+
+    const handleSimulateThreat = useCallback(() => {
+      simulateThreatSignal();
+      onClose();
+    }, [simulateThreatSignal, onClose]);
+
+    const handleSelectAccentOption = useCallback(
+      (opt: (typeof ACCENT_OPTIONS)[number]) => {
+        onSelectAccent(opt.id);
+        showToast(`${APP_STRINGS.TOAST.TXT_ACCENT_CHANGED} ${opt.label}`, { type: 'success' });
+        onClose();
+      },
+      [onSelectAccent, showToast, onClose],
+    );
+
+    const navigationItems = useMemo<CommandItemDef[]>(
+      () => [
+        {
+          id: 'nav-home',
+          title: APP_STRINGS.VIEWS.HOMEPAGE.NAV_TITLE,
+          category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_NAVIGATION,
+          icon: Home,
+          shortcut: 'G H',
+          action: () => navigateTo(APP_STRINGS.VIEWS.HOMEPAGE.NAV_HASH),
+        },
+        {
+          id: 'nav-microsoft',
+          title: APP_STRINGS.VIEWS.MICROSOFT.NAV_TITLE,
+          category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_NAVIGATION,
+          icon: Shield,
+          shortcut: 'G M',
+          action: () => navigateTo(APP_STRINGS.VIEWS.MICROSOFT.NAV_HASH),
+        },
+        {
+          id: 'nav-settings',
+          title: APP_STRINGS.VIEWS.SETTINGS.NAV_TITLE,
+          category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_NAVIGATION,
+          icon: Settings,
+          shortcut: 'G S',
+          action: () => navigateTo(APP_STRINGS.VIEWS.SETTINGS.NAV_HASH),
+        },
+        {
+          id: 'nav-debug',
+          title: APP_STRINGS.VIEWS.DEBUG.NAV_TITLE,
+          category: APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_NAVIGATION,
+          icon: Bug,
+          shortcut: 'G D',
+          action: () => navigateTo(APP_STRINGS.VIEWS.DEBUG.NAV_HASH),
+        },
+      ],
+      [navigateTo],
+    );
+
+    return (
+      <CommandDialog
+        open={isOpen}
+        onOpenChange={handleOpenChange}
+        title={APP_STRINGS.COMMAND_PALETTE.HEADING_TITLE}
+        description="Search commands, navigate views, or adjust preferences"
       >
-        {/* Search Input Bar */}
-        <div className="flex h-14 items-center gap-3 border-b border-slate-200 px-4 dark:border-slate-800">
-          <Search className="h-5 w-5 shrink-0 text-slate-400" aria-hidden="true" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={APP_STRINGS.COMMAND_PALETTE.INPUT_SEARCH_PLACEHOLDER}
-            className="flex-1 bg-transparent text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-white dark:placeholder:text-slate-500"
-          />
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={APP_STRINGS.COMMAND_PALETTE.BTN_CLOSE_ARIA_LABEL}
-            className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-300"
-          >
-            <X className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </div>
+        <CommandInput placeholder={APP_STRINGS.COMMAND_PALETTE.INPUT_SEARCH_PLACEHOLDER} />
+        <CommandList>
+          <CommandEmpty>{APP_STRINGS.COMMAND_PALETTE.TXT_NO_RESULTS}</CommandEmpty>
 
-        {/* Results List */}
-        <div ref={listRef} className="max-h-80 overflow-y-auto p-2">
-          {filteredCommands.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
-              {APP_STRINGS.COMMAND_PALETTE.TXT_NO_RESULTS}
-            </div>
-          ) : (
-            filteredCommands.map((cmd, idx) => {
-              const isSelected = idx === selectedIndex;
-              const Icon = cmd.icon;
+          {/* Navigation Group */}
+          <CommandGroup heading={APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_NAVIGATION}>
+            {navigationItems.map((item) => {
+              const Icon = item.icon;
               return (
-                <button
-                  key={cmd.id}
-                  type="button"
-                  data-selected={isSelected ? 'true' : 'false'}
-                  onClick={() => cmd.action()}
-                  onMouseEnter={() => setSelectedIndex(idx)}
-                  className={cn(
-                    'flex w-full cursor-pointer select-none items-center justify-between rounded-xl px-3 py-2.5 text-xs transition-colors',
-                    isSelected
-                      ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                      : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60'
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg',
-                        isSelected
-                          ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/60 dark:text-blue-400'
-                          : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
-                      )}
-                    >
-                      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                    </div>
-                    <div className="flex flex-col text-left">
-                      <span className="font-semibold text-slate-900 dark:text-white">
-                        {cmd.title}
-                      </span>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500">
-                        {cmd.category}
-                      </span>
-                    </div>
-                  </div>
-                  {cmd.shortcut && (
-                    <kbd className="rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-mono text-[10px] text-slate-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-400">
-                      {cmd.shortcut}
-                    </kbd>
-                  )}
-                </button>
+                <CommandItem key={item.id} value={`${item.title} navigation`} onSelect={item.action}>
+                  <Icon className="mr-2 h-4 w-4" aria-hidden="true" />
+                  <span>{item.title}</span>
+                  <CommandShortcut>{item.shortcut}</CommandShortcut>
+                </CommandItem>
               );
-            })
-          )}
-        </div>
+            })}
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          {/* Appearance Group */}
+          <CommandGroup heading={APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_APPEARANCE}>
+            <CommandItem value={`theme ${darkMode ? 'light' : 'dark'}`} onSelect={handleToggleTheme}>
+              {darkMode ? (
+                <Sun className="mr-2 h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Moon className="mr-2 h-4 w-4" aria-hidden="true" />
+              )}
+              <span>
+                {darkMode ? APP_STRINGS.COMMAND_PALETTE.CMD_THEME_LIGHT : APP_STRINGS.COMMAND_PALETTE.CMD_THEME_DARK}
+              </span>
+              <CommandShortcut>T</CommandShortcut>
+            </CommandItem>
+
+            {ACCENT_OPTIONS.map((opt) => (
+              <AccentCommandItem
+                key={opt.id}
+                opt={opt}
+                currentAccent={currentAccent}
+                onSelect={handleSelectAccentOption}
+              />
+            ))}
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          {/* Actions Group */}
+          <CommandGroup heading={APP_STRINGS.COMMAND_PALETTE.TXT_CATEGORY_ACTIONS}>
+            <CommandItem value="copy current share url link" onSelect={handleCopyUrl}>
+              <Copy className="mr-2 h-4 w-4" aria-hidden="true" />
+              <span>{APP_STRINGS.COMMAND_PALETTE.CMD_COPY_URL}</span>
+            </CommandItem>
+
+            <CommandItem value="export sentinel audit incident log json" onSelect={handleExport}>
+              <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+              <span>{APP_STRINGS.COMMAND_PALETTE.CMD_EXPORT_SENTINEL}</span>
+            </CommandItem>
+
+            <CommandItem value="simulate threat signal perturbation" onSelect={handleSimulateThreat}>
+              <ShieldAlert className="mr-2 h-4 w-4" aria-hidden="true" />
+              <span>{APP_STRINGS.COMMAND_PALETTE.CMD_SIMULATE_ALERT}</span>
+            </CommandItem>
+
+            <CommandItem value="reset clear local storage cache" onSelect={handleClearStorage}>
+              <Trash2 className="mr-2 h-4 w-4" aria-hidden="true" />
+              <span>{APP_STRINGS.COMMAND_PALETTE.CMD_RESET_STORAGE}</span>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
 
         {/* Footer Hint */}
-        <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50/70 px-4 py-2 text-[11px] text-slate-500 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-400">
+        <div className="flex items-center justify-between border-border border-t bg-muted/60 px-4 py-2 text-[11px] text-muted-foreground">
           <span>{APP_STRINGS.COMMAND_PALETTE.TXT_FOOTER_HINT}</span>
           <div className="flex items-center gap-1.5">
-            <kbd className="rounded border border-slate-200 bg-white px-1 font-mono text-[10px] dark:border-slate-800 dark:bg-slate-800">
+            <kbd className="rounded border border-border bg-card px-1 font-mono text-[10px] text-muted-foreground">
               {APP_STRINGS.COMMAND_PALETTE.KBD_ESC}
             </kbd>
           </div>
         </div>
-      </div>
-    </div>
-  );
-});
+      </CommandDialog>
+    );
+  },
+);
 
+CommandPalette.displayName = 'CommandPalette';

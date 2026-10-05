@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { ViewDefinition } from '@/types';
-import { getViewByHash, DEFAULT_VIEW } from '@/views/views';
+import { DEFAULT_VIEW, getViewByHash } from '@/views/views';
 
 // Synchronizes active view selection with the browser URL location hash
 export function useHashRouting() {

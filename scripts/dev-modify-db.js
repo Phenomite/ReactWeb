@@ -1,19 +1,18 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 /**
  * Developer In-Namespace Database Mutation CLI
  *
- * Enables authorized developers within the cluster namespace (or local dev environment)
+ * Enables developers within the cluster namespace (or local dev environment)
  * to modify records in the live running server database, with immediate real-time SSE
  * propagation across all connected visitors.
  *
  * Usage:
- *   node scripts/dev-modify-db.js --tenant tenant-067 --score 98.5 --as alice
- *   node scripts/dev-modify-db.js --collection incidents --id inc-1 --field status --value resolved --as bob
+ *   bun scripts/dev-modify-db.js --tenant tenant-067 --score 98.5 --as alice
+ *   bun scripts/dev-modify-db.js --collection incidents --id inc-1 --field status --value resolved --as bob
  *   pnpm run dev:modify -- --tenant tenant-001 --score 95 --as charlie
  */
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://127.0.0.1:3001';
-const NAMESPACE_SECRET = process.env.NAMESPACE_ADMIN_SECRET || 'k8s-namespace-admin';
 
 // Parse command-line flags
 function parseArgs() {
@@ -26,8 +25,6 @@ function parseArgs() {
     field: null,
     value: null,
     user: 'admin',
-    password: '',
-    useNamespaceSecret: false,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -47,21 +44,9 @@ function parseArgs() {
       options.value = args[++i];
     } else if ((arg === '--as' || arg === '--user') && args[i + 1]) {
       options.user = args[++i];
-    } else if (arg === '--password' && args[i + 1]) {
-      options.password = args[++i];
     } else if (arg === '--url' && args[i + 1]) {
       options.url = args[++i];
-    } else if (arg === '--use-namespace-secret') {
-      options.useNamespaceSecret = true;
     }
-  }
-
-  // Set default known passwords for standard developer accounts
-  if (!options.password) {
-    if (options.user === 'admin') options.password = 'password';
-    else if (['alice', 'bob', 'charlie'].includes(options.user)) options.password = 'developer123';
-    else if (options.user === 'viewer') options.password = 'viewer123';
-    else options.password = 'developer123';
   }
 
   return options;
@@ -72,13 +57,9 @@ async function main() {
 
   if (!opts.id) {
     console.error('Error: Target record ID is required. Use --tenant <id> or --id <id>');
-    console.error('Example: node scripts/dev-modify-db.js --tenant tenant-067 --score 98.5 --as alice');
+    console.error('Example: bun scripts/dev-modify-db.js --tenant tenant-067 --score 98.5 --as alice');
     process.exit(1);
   }
-
-  console.log(`[Developer DB CLI] Connecting to server at ${opts.url}...`);
-  console.log(`[Developer DB CLI] Developer Identity: ${opts.user}`);
-  console.log(`[Developer DB CLI] Target Resource: ${opts.collection}/${opts.id}`);
 
   // Build updates payload
   const updates = {};
@@ -93,21 +74,10 @@ async function main() {
     updates.overallScore = 97.5;
   }
 
-  // Build authentication headers
   const headers = {
     'Content-Type': 'application/json',
+    'X-Admin-User': opts.user,
   };
-
-  if (opts.useNamespaceSecret) {
-    headers['X-Namespace-Secret'] = NAMESPACE_SECRET;
-    headers['X-Admin-User'] = opts.user;
-    console.log('[Developer DB CLI] Authenticating via Kubernetes namespace secret token');
-  } else {
-    // Authenticate via Basic Auth with developer credentials
-    const basicToken = Buffer.from(`${opts.user}:${opts.password}`).toString('base64');
-    headers['Authorization'] = `Basic ${basicToken}`;
-    console.log(`[Developer DB CLI] Authenticating with developer credentials (${opts.user})`);
-  }
 
   try {
     const res = await fetch(`${opts.url}/api/${opts.collection}/${encodeURIComponent(opts.id)}`, {
@@ -118,16 +88,14 @@ async function main() {
 
     if (res.status === 403 || res.status === 401) {
       const err = await res.json().catch(() => ({}));
-      console.error(
-        `[ACCESS DENIED] HTTP ${res.status}: ${err.message || 'Active admin role in namespace required.'}`
-      );
+      console.error(`[ACCESS DENIED] HTTP ${res.status}: ${err.message || 'Access denied.'}`);
       process.exit(1);
     }
 
     if (res.status === 409) {
       const conflict = await res.json();
       console.error(
-        `[OCC CONFLICT] Record was concurrently updated by another admin. Current version: v${conflict.current?.version}`
+        `[OCC CONFLICT] Record was concurrently updated by another admin. Current version: v${conflict.current?.version}`,
       );
       process.exit(1);
     }
@@ -139,20 +107,7 @@ async function main() {
     }
 
     const result = await res.json();
-    const record = result.data || result.tenant || result;
-
-    console.log('\n======================================================');
-    console.log('✓ Database Mutation Successfully Committed to SQLite');
-    console.log('======================================================');
-    console.log(`Resource:        ${opts.collection}/${opts.id}`);
-    console.log(`Modified By:     ${record.lastUpdatedBy || opts.user}`);
-    console.log(`Record Version:  v${record.version || 'N/A'}`);
-    if (record.overallScore !== undefined) console.log(`Overall Score:   ${record.overallScore}`);
-    if (record.rank !== undefined) console.log(`Leaderboard Rank: #${record.rank}`);
-    if (record.status !== undefined) console.log(`Status:          ${record.status}`);
-    console.log('------------------------------------------------------');
-    console.log('⚡ Real-time SSE event broadcast dispatched to ALL active visitor browsers.');
-    console.log('======================================================\n');
+    const _record = result.data || result.tenant || result;
   } catch (err) {
     console.error('[Connection Error]', err.message);
     process.exit(1);

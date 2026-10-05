@@ -1,0 +1,98 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "a11y": {
+        "noNoninteractiveElementInteractions": "warn"
+      },
+      "complexity": {
+        "noForEach": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noConsole": {
+          "level": "warn",
+          "options": { "allow": ["warn", "error"] }
+        },
+        "noConstantBinaryExpressions": "error",
+        "noShadow": "warn"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "error",
+        "noNestedComponentDefinitions": "error",
+        "noNodejsModules": "error",
+        "useUniqueElementIds": "warn"
+      },
+      "security": {
+        "noSecrets": "warn"
+      },
+      "style": {
+        "noProcessEnv": "error",
+        "useSelfClosingElements": "warn"
+      },
+      "performance": {
+        "noJsxPropsBind": "warn",
+        "noDelete": "error",
+        "useTopLevelRegex": "warn",
+        "noBarrelFile": "warn",
+        "noReExportAll": "error",
+        "noNamespaceImport": "warn",
+        "noDynamicNamespaceImportAccess": "error",
+        "noAwaitInLoops": "warn"
+      },
+      "nursery": {
+        "useSortedClasses": {
+          "level": "warn",
+          "options": {
+            "attributes": ["classList", "className"],
+            "functions": ["cn", "clsx", "twMerge"]
+          }
+        }
+      }
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "lineWidth": 120,
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["scripts/**", "server/**", "e2e/**", "playwright.config.ts"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noNodejsModules": "off"
+          },
+          "style": {
+            "noProcessEnv": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/*.md", "*.md"],
+      "formatter": {
+        "lineWidth": 120
+      }
+    }
+  ]
+}

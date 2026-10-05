@@ -1,8 +1,23 @@
 # Web Sloplication (ReactWeb)
 
-A modern React 19 web application built with Vite 8, Tailwind CSS v4, Lucide React icons, and TypeScript.
+This repo is intended to test agentic harnesses and models to benchmark changes against
+design, behaviour, refactoring, and understanding of intent across long-horizon web
+& cloud deploy code.
 
-Used to test agentic harnesses and models understanding of intent, behaviour, and design across multiple refactors.
+A modern ReactJS web application built with:
+
+- TypeScript
+- Tailwind CSS
+- shadcn/ui (components)
+- Lucide (icons)
+
+Via:
+
+- pnpm for package management
+- Vite for production build and development (HMR ftw)
+- Biome, Knip, and markdownlint-cli2 for Linting / Checking / Formatting
+- Playwright for testing
+- Bun (JSC) for runtime and database API
 
 ## Prerequisites
 
@@ -29,134 +44,18 @@ Used to test agentic harnesses and models understanding of intent, behaviour, an
 | Command | Description |
 | :--- | :--- |
 | `pnpm dev` | Start the local Vite development server with HMR |
-| `pnpm run server` | Start the secure Node.js SQLite WAL backend server |
+| `pnpm run server` | Start the native Bun SQLite WAL backend server |
 | `pnpm run server:dev` | Start the backend server in watch mode with automatic restart |
 | `pnpm lint` | Type-check and lint the TypeScript codebase with `tsc --noEmit` |
 | `pnpm build` | Run type-check and build production assets to `dist/` |
 | `pnpm preview` | Locally preview the production build output |
-| `pnpm run auth:hash` | Generate random salt and PBKDF2 hash for a password |
 | `pnpm run dev:modify` | Modify live database records from terminal with developer attribution |
-| `pnpm run md:lint` | Lint all markdown files with markdownlint-cli2 |
+| `pnpm run lint:md` | Lint all markdown files with markdownlint-cli2 |
 
-## Authentication Architecture
+## Anchor Hash Routing
 
-The application implements a client-side cryptographic authentication system using the Web Crypto API.
-
-### Authentication Flow Diagram
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User
-    participant LoginView as LoginView
-    participant AuthContext as AuthProvider
-    participant Crypto as crypto.ts (Web Crypto)
-    participant Storage as localStorage
-    participant Navigation as HashRouter / Views
-
-    User->>LoginView: Submits username & password
-    LoginView->>AuthContext: login(username, password)
-    AuthContext->>Crypto: verifyCredentials(username, password)
-
-    rect rgb(240, 248, 255)
-        Note over Crypto: 1. findUserByUsername (case-insensitive search)
-        Note over Crypto: 2. Fallback to dummy salt if user not found
-        Note over Crypto: 3. Derive key via PBKDF2-HMAC-SHA256 (100k iters)
-        Note over Crypto: 4. Constant-time byte equality comparison
-    end
-
-    Crypto-->>AuthContext: UserCredentialRecord (or null)
-
-    alt Invalid Credentials
-        AuthContext-->>LoginView: false
-        LoginView->>User: Displays invalid credentials alert
-    else Valid Credentials
-        AuthContext->>Crypto: createSession(user)
-        Crypto->>Crypto: generateSessionSignature(user, issuedAt, expiresAt, displayName, role)
-        Crypto-->>AuthContext: AuthSession { username, displayName, role, issuedAt, expiresAt, signature }
-        AuthContext->>Storage: setItem("app_auth_session", JSON.stringify(session))
-        AuthContext->>AuthContext: setIsAuthenticated(true), setUsername(name), setRole(role)
-        AuthContext-->>LoginView: true
-        LoginView->>Navigation: Navigate to #debug
-        Navigation->>User: Renders unlocked DebugView & reveals Admin navigation
-    end
-```
-
-### Considerations
-
-#### 1. Credential Verification (`src/lib/crypto.ts`)
-
-- **Array-Based Registry & Resilient Search**: `AUTH_USER_REGISTRY` is structured as a `UserCredentialRecord[]` array.
-  Lookups use `findUserByUsername`, performing case-insensitive, whitespace-trimmed matching that fully supports
-  usernames containing digits, underscores, dashes, emails, and symbols (e.g. `user_123`, `admin@domain.com`).
-- **PBKDF2 Key Derivation**: Passwords are mathematically derived using PBKDF2-HMAC-SHA256 with 100,000 iterations
-  and per-user cryptographic salts.
-- **Timing Attack Mitigation**: Credential verification executes dummy key derivation (`DUMMY_SALT_HEX` and
-  `DUMMY_ITERATIONS`) on invalid or non-existent usernames. This guarantees uniform execution duration, preventing
-  user enumeration via timing analysis.
-- **Constant-Time Comparison**: Byte buffers are compared using bitwise XOR (`constantTimeEqual`) to prevent
-  early-exit timing leaks during hash comparisons.
-
-#### 2. Tamper-Proof Session Management
-
-- **Cryptographic Signatures**: Upon successful verification, an `AuthSession` object is generated with a SHA-256
-  signature binding identity fields, roles, credentials, and timestamps:
-  `user.username:displayName:role:saltHex:hashHex:issuedAt:expiresAt`.
-- **Expiration & Validation**: Sessions are valid for 7 days (`AUTH_SESSION_DURATION_MS = 604,800,000 ms`). On startup
-  and cross-tab storage events, `validateSession` verifies data structure, role consistency, temporal bounds, and
-  signature integrity before authenticating. Any tampering or expiration purges the session.
-- **Multi-Tab Synchronization**: `AuthProvider` listens for window `storage` events to synchronize authentication
-  state across browser tabs in real-time.
-
-#### 3. Protected Routing & Dynamic Navigation
-
-- **Anchor Hash Routing**: Views route via anchor hashes (e.g. `#homepage`, `#settings`, `#login`, `#debug`).
-- **Dynamic View Exposure**: Authenticated state unlocks protected views such as `#debug` (`requiresAuth: true`) in the
-  sidebar navigation. Direct hash navigation to protected views when unauthenticated renders an unauthorized banner.
-
-### Adding New Users
-
-To register a new user in the client-side credential registry (`AUTH_USER_REGISTRY` in `src/constants.ts`),
-generate a unique 16-byte cryptographic salt and derive the PBKDF2-HMAC-SHA256 hash using 100,000 iterations.
-
-#### 1/2: Run the Hash Generation Command
-
-Execute the credential hashing utility using `pnpm`, passing the desired password as an argument:
-
-```bash
-pnpm auth:hash -- "<PASSWORD>"
-```
-
-The command outputs a JSON object containing the generated `saltHex` and `hashHex`:
-
-```json
-{
-  "saltHex": "3d20ec6d0b3760e268f68921d27a80f7",
-  "hashHex": "f09eb45c8184758639b5c1910a4d382838103538d78439823aa6511266f1ec22"
-}
-```
-
-#### 2/2: Add the User Record to `src/constants.ts`
-
-Open `src/constants.ts` and append the new user record to `AUTH_USER_REGISTRY`:
-
-```typescript
-export const AUTH_USER_REGISTRY: UserCredentialRecord[] = [
-  // Existing users...
-  {
-    id: 'usr_alice',
-    username: 'alice_99@domain.com',
-    displayName: 'Alice Cooper',
-    saltHex: 'value-from-output',
-    hashHex: 'value-from-output',
-    iterations: 100000,
-    role: 'user',
-  },
-];
-```
-
-The registry fully supports usernames containing numbers, symbols, and special characters (e.g. `user_123`,
-`admin@domain.com`, `ops-lead+01`). Matching is case-insensitive and whitespace-trimmed during sign-in.
+All application views (`#homepage`, `#microsoft`, `#settings`, `#debug`) route directly via browser URL hashes
+and are immediately accessible in the UI.
 
 ---
 
@@ -170,7 +69,7 @@ sequenceDiagram
     actor VisitorA as Visitor Browser A
     actor VisitorB as Visitor Browser B
     participant Ingress as Ingress / NGINX
-    participant Backend as Backend Service (Node.js)
+    participant Backend as Backend Service (Bun)
     participant SQLite as SQLite WAL Database
 
     VisitorA->>Ingress: Connect to /api/events (SSE)
@@ -194,10 +93,10 @@ sequenceDiagram
 
 ### Architectural Highlights
 
-- **Embedded High-Performance SQLite**: Powered by Node 22+ native `node:sqlite` (`DatabaseSync`). Write-Ahead
-  Logging (WAL) mode enables concurrent reads without locking write operations.
-- **Zero-Dependency Security**: The backend server uses standard Node.js built-in modules (`node:http`,
-  `node:sqlite`, `node:fs`). Zero runtime npm packages means zero CVE vulnerability attack surface.
+- **Embedded High-Performance SQLite**: Powered by native SQLite WAL mode enabling concurrent reads without locking
+  write operations.
+- **Zero-Dependency Security**: The backend server uses standard Bun built-in modules and Web Standards
+  (Request/Response). Zero runtime npm packages means zero CVE vulnerability attack surface.
 - **Server-Sent Events (SSE)**: Visitors establish a persistent HTTP streaming connection via `GET /api/events`.
   Whenever a tenant score changes or a threat incident triggers, updates are pushed to all open visitor browsers.
 - **Live Visitor Telemetry**: Tracks active concurrent browser sessions and broadcasts presence changes in real time.
@@ -292,7 +191,7 @@ kubectl kustomize deploy/frontend/staging
 - **RuntimeDefault Seccomp**: Pods enforce standard system call filtration.
 - **Zero-Trust Network Policies**: Ingress traffic to the database backend is restricted exclusively to frontend pods.
 - **HTTP Security Headers**: Strict CSP, HSTS, X-Frame-Options (`DENY`), X-Content-Type-Options (`nosniff`), and
-  Referrer-Policy headers are enforced at both NGINX and Node.js layers.
+  Referrer-Policy headers are enforced at both NGINX and Bun application layers.
 
 ---
 
@@ -319,10 +218,10 @@ multiple administrators simultaneously:
 
 ### 2. In-Cluster Telemetry Generator (Processing Pod Daemon)
 
-A Kubernetes-native telemetry generator script ([`scripts/k8s-telemetry-generator.js`](file:///c:/Users/Bob/Documents/GitHub/ReactWeb/scripts/k8s-telemetry-generator.js))
+A Kubernetes-native telemetry generator script ([`scripts/k8s-telemetry-generator.js`](scripts/k8s-telemetry-generator.js))
 runs directly inside the cluster namespace:
 
-- **Schedule**: Deployed via Flux [`HelmRelease`](file:///c:/Users/Bob/Documents/GitHub/ReactWeb/deploy/processing/helmrelease.yaml)
+- **Schedule**: Deployed via Flux [`HelmRelease`](deploy/processing/helmrelease.yaml)
   running as a continuous processing daemon with periodic heartbeat health checks.
 - **Batch Processing**: Dispatches atomic mutations to `POST /api/internal/batch-update-tenants`. The server executes
   a single SQLite transaction updating all 200 rows and re-ranking the entire leaderboard in under 35ms.
@@ -338,20 +237,17 @@ runs directly inside the cluster namespace:
   pnpm run telemetry:cron
   ```
 
-### 3. Multi-Developer Namespace Authorization & Database Mutations
+### 3. Multi-Developer Attribution & Database Mutations
 
-The application enforces a strict zero-trust role-based authorization model for all database mutations:
+The database layer coordinates multi-developer updates while preserving operator attribution across all mutations:
 
-- **Multi-Developer Access**: Multiple developers (`admin`, `alice`, `bob`, `charlie`) have distinct accounts to
-  collaborate and publish live database updates.
-- **Strict Role Verification**: Mutations require an active `admin` role in the namespace. Unauthenticated requests
-  and users with `role: 'user'` (e.g. `viewer`) receive `HTTP 403 Forbidden`.
-- **Developer Attribution**: Every mutation records `lastUpdatedBy` in SQLite WAL, displaying the modifying developer
-  in the UI badge pill (e.g. `by alice`).
+- **Multi-Developer Access**: Multiple operators (e.g. `admin`, `alice`, `bob`, `charlie`) can collaborate and publish live
+  database updates.
+- **Developer Attribution**: Every mutation records `lastUpdatedBy` in SQLite WAL, displaying the modifying operator
+  in the UI badge pill (e.g. `by alice`), attributed from the `X-Admin-User` header or `--as` flag.
 - **Live SSE Push to All Visitors**: All mutations immediately broadcast `data_updated` and `tenant_updated` events
   over Server-Sent Events, instantly reflecting updates across all connected visitor browsers.
 - **Web UI & CLI Mutation**:
-  - **Web UI**: Logging in through `#login` generates an authenticated session token. Active admins see an "Edit"
-    button in tenant detail modals to adjust scores and status flags.
+  - **Web UI**: Operators click "Edit" in tenant detail modals to adjust scores and status flags with live broadcast.
   - **Developer CLI**: Run `pnpm run dev:modify -- --tenant tenant-001 --score 98.5 --as alice` to execute direct
     mutations from terminal sessions or Kubernetes pods.

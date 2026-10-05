@@ -1,77 +1,22 @@
 import rawTenantsData from '@/data/tenants.json';
-import type {
-  UserCredentialRecord,
-  AccentOption,
-  AccentColor,
-  MsrcAdvisory,
-  SecurityIncident,
-  TenantRecord,
-  TenantScoreTier,
-} from '@/types';
-
-// Extensible client-side credential registry for authorized developers and users
-export const AUTH_USER_REGISTRY: UserCredentialRecord[] = [
-  {
-    id: 'usr_admin',
-    username: 'admin',
-    displayName: 'Admin',
-    saltHex: '87b880683d1e1c14f6358c000f55dbd4',
-    hashHex: 'e22f996854f8d016166257a91a47df5da5d7708dc49e4e05914675568f48f4d9',
-    iterations: 100000,
-    role: 'admin',
-  },
-  {
-    id: 'usr_alice',
-    username: 'alice',
-    displayName: 'Alice (Dev Lead)',
-    saltHex: 'cbecee9783d8023963889ba7fb83a488',
-    hashHex: 'a4430ede1e0f39c6fd600b23121b3f5834bcbae94c4fe7846337bfefbd09cbbc',
-    iterations: 100000,
-    role: 'admin',
-  },
-  {
-    id: 'usr_bob',
-    username: 'bob',
-    displayName: 'Bob (Core Dev)',
-    saltHex: 'a994ab0fa35e4fe345f99c4858ff6ee6',
-    hashHex: '86c14800d9eff794da4bae4da49d80f950018f78d62d95e585e817d0849df99d',
-    iterations: 100000,
-    role: 'admin',
-  },
-  {
-    id: 'usr_charlie',
-    username: 'charlie',
-    displayName: 'Charlie (DevOps)',
-    saltHex: '217a7aee68e7be2042a24f844de5ba95',
-    hashHex: 'f1d3553193f955749fbe1546a1882e77f13a9d2e98c657cde50bf457794becc4',
-    iterations: 100000,
-    role: 'admin',
-  },
-  {
-    id: 'usr_viewer',
-    username: 'viewer',
-    displayName: 'Guest Viewer',
-    saltHex: '71d5821d7c78799976a0eca445492890',
-    hashHex: '6c99547201234d3d27f2cb2e9a87c88f646f89572e5b24002e09a6634d2517d2',
-    iterations: 100000,
-    role: 'user',
-  },
-];
-
-// Fallback salt and iteration count used to simulate derivation on unknown usernames
-export const DUMMY_SALT_HEX = 'e0d1b4c798a2f356417b809cfdae1234';
-export const DUMMY_ITERATIONS = 100000;
-
-// Session validity duration configured for 7 days (1 week) in milliseconds
-export const AUTH_SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 7;
+import type { AccentColor, AccentOption, SecurityIncident, TenantRecord, TenantScoreTier, ThemeOption } from '@/types';
 
 // Theme configuration constants
 export const THEME_CONFIG = {
   STORAGE_KEY: 'theme',
   MODE_DARK: 'dark',
   MODE_LIGHT: 'light',
+  MODE_OCEAN: 'ocean',
   QUERY_PREFERS_DARK: '(prefers-color-scheme: dark)',
+  AVAILABLE_THEMES: ['light', 'dark', 'ocean'] as const,
 } as const;
+
+// Predefined semantic theme mode options
+export const THEME_OPTIONS: ThemeOption[] = [
+  { id: 'light', label: 'Light' },
+  { id: 'dark', label: 'Dark' },
+  { id: 'ocean', label: 'Ocean' },
+];
 
 // Accent palette definitions
 export const ACCENT_OPTIONS: AccentOption[] = [
@@ -88,104 +33,23 @@ export const ACCENT_CONFIG = {
   DEFAULT_ACCENT: 'blue' as AccentColor,
 } as const;
 
-// Toast notification timeout constants (configured for 5 seconds per user specification)
+// Default toast notification display duration of 5000 milliseconds
 export const TOAST_CONFIG = {
   DEFAULT_DURATION_MS: 5000,
 } as const;
-
-// Authentication storage constants
-export const AUTH_CONFIG = {
-  STORAGE_KEY_SESSION: 'app_auth_session',
-} as const;
-
-// Microsoft Security Response Center (MSRC) curated vulnerability dataset
-export const MSRC_CVE_DATASET: MsrcAdvisory[] = [
-  {
-    cveId: 'CVE-2025-21345',
-    title: 'Microsoft Edge Chromium V8 Remote Code Execution Vulnerability',
-    severity: 'Critical',
-    cvssScore: 9.8,
-    affectedProduct: 'Microsoft Edge (Chromium)',
-    publishedDate: '2025-02-11',
-    description: 'An integer overflow flaw in the V8 WebAssembly runtime allows arbitrary memory write via crafted web payloads.',
-    mitigation: 'Update Microsoft Edge to build 133.0.3065.59 or later immediately.',
-    kbArticle: 'KB5051280',
-    isZeroDay: true,
-  },
-  {
-    cveId: 'CVE-2025-24081',
-    title: 'Microsoft Entra ID OAuth Token Replay and Scope Escalation',
-    severity: 'High',
-    cvssScore: 8.5,
-    affectedProduct: 'Azure Entra ID',
-    publishedDate: '2025-01-14',
-    description: 'Improper validation of refresh token binding in client applications could permit token replay across unauthorized tenants.',
-    mitigation: 'Enforce Continuous Access Evaluation (CAE) and device-bound refresh tokens in tenant Conditional Access.',
-    kbArticle: 'KB5049301',
-    isZeroDay: false,
-  },
-  {
-    cveId: 'CVE-2024-49033',
-    title: 'Windows Web Threat Defense Security Feature Bypass Vulnerability',
-    severity: 'High',
-    cvssScore: 7.8,
-    affectedProduct: 'Windows Web Defense',
-    publishedDate: '2024-11-12',
-    description: 'Malicious web assets can evade Mark-of-the-Web (MotW) inspection by exploiting an alternate data stream handling issue.',
-    mitigation: 'Deploy Microsoft Security Update KB5046613 and enable SmartScreen Network Protection.',
-    kbArticle: 'KB5046613',
-    isZeroDay: true,
-  },
-  {
-    cveId: 'CVE-2025-21298',
-    title: 'Microsoft 365 Web Apps Cross-Origin Isolation Policy Bypass',
-    severity: 'Medium',
-    cvssScore: 6.5,
-    affectedProduct: 'Microsoft 365 Web Apps',
-    publishedDate: '2025-02-04',
-    description: 'A missing Cross-Origin-Opener-Policy (COOP) enforcement check permits cross-context document inspection in shared tabs.',
-    mitigation: 'Verify hosting container transmits COOP: same-origin and COEP: require-corp headers.',
-    kbArticle: 'KB5050442',
-    isZeroDay: false,
-  },
-  {
-    cveId: 'CVE-2024-38112',
-    title: 'MSHTML Platform Spoofing and Remote Code Execution Zero-Day',
-    severity: 'Critical',
-    cvssScore: 8.8,
-    affectedProduct: 'Windows Internet Platform',
-    publishedDate: '2024-07-09',
-    description: 'Attackers can redirect execution through legacy MSHTML wrappers to bypass Microsoft Edge browser isolation defenses.',
-    mitigation: 'Apply July Cumulative Update KB5040442; block .url files pointing to non-standard protocols.',
-    kbArticle: 'KB5040442',
-    isZeroDay: true,
-  },
-  {
-    cveId: 'CVE-2025-21319',
-    title: 'Microsoft Defender for Cloud Client-Side Telemetry Tampering',
-    severity: 'Medium',
-    cvssScore: 5.9,
-    affectedProduct: 'Microsoft Defender XDR',
-    publishedDate: '2025-01-28',
-    description: 'Flawed input sanitization in client-side telemetry collectors can lead to suppressed incident alert events.',
-    mitigation: 'Update Microsoft Defender sensor agents and audit client script verification hash integrity.',
-    kbArticle: 'KB5048820',
-    isZeroDay: false,
-  },
-];
 
 // Seed security incidents for client-side Microsoft Defender triage telemetry
 export const INITIAL_SECURITY_INCIDENTS: SecurityIncident[] = [
   {
     id: 'inc-101',
-    title: 'Suspicious Credential Velocity on Client Login',
+    title: 'Anomalous API Rate Threshold Exceeded',
     severity: 'high',
     status: 'active',
-    category: 'Identity & Access',
-    source: 'Auth PBKDF2 Engine',
+    category: 'Traffic Anomaly',
+    source: 'Rate Limiter Service',
     timestamp: Date.now() - 1000 * 60 * 18,
-    description: 'Multiple rapid cryptographic derivation attempts detected without matching registered salt parameters.',
-    recommendation: 'Enforce exponential derivation delay and inspect origin IP reputation.',
+    description: 'Multiple rapid mutation requests detected from external IP violating rate limit threshold.',
+    recommendation: 'Inspect source IP address and verify rate-limiting rules.',
   },
   {
     id: 'inc-102',
@@ -195,19 +59,20 @@ export const INITIAL_SECURITY_INCIDENTS: SecurityIncident[] = [
     category: 'Data Integrity',
     source: 'Storage Management API',
     timestamp: Date.now() - 1000 * 60 * 65,
-    description: 'Complete cache flush invoked via client administration trigger outside of scheduled maintenance windows.',
-    recommendation: 'Verify authenticated administrator audit trail and validate session token signature.',
+    description:
+      'Complete cache flush invoked via client administration trigger outside of scheduled maintenance windows.',
+    recommendation: 'Verify administrator audit trail and inspect state persistence.',
   },
   {
     id: 'inc-103',
-    title: 'Unauthorized Protected Anchor Navigation Trapped',
+    title: 'Ingress TLS Certificate Renewal Scheduled',
     severity: 'low',
     status: 'resolved',
-    category: 'Route Authorization Guard',
-    source: 'Client Hash Router',
+    category: 'Transport Security',
+    source: 'Certificate Manager',
     timestamp: Date.now() - 1000 * 60 * 180,
-    description: 'Unauthenticated browser navigation to #debug route intercepted and redirected to guest access notice.',
-    recommendation: 'Route guard functioning normally; no further administrative action required.',
+    description: 'Edge TLS certificate renewal automatically negotiated via ACME challenge before 30-day window.',
+    recommendation: 'Certificate successfully renewed; no further administrative action required.',
   },
 ];
 
@@ -232,7 +97,8 @@ export const TIER_CONFIG: readonly ScoreTierDefinition[] = [
   {
     id: 'diamond',
     min: 90,
-    badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800',
+    badgeClass:
+      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800',
     barColor: 'bg-emerald-500',
   },
   {
@@ -244,13 +110,15 @@ export const TIER_CONFIG: readonly ScoreTierDefinition[] = [
   {
     id: 'silver',
     min: 70,
-    badgeClass: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/60 dark:text-violet-300 dark:border-violet-800',
+    badgeClass:
+      'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/60 dark:text-violet-300 dark:border-violet-800',
     barColor: 'bg-violet-500',
   },
   {
     id: 'bronze',
     min: 50,
-    badgeClass: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
+    badgeClass:
+      'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
     barColor: 'bg-amber-500',
   },
   {
@@ -268,25 +136,24 @@ export const SIMULATED_ALERTS = [
     severity: 'high' as const,
     category: 'Cross-Context Isolation',
     source: 'Browser Window Messaging Guard',
-    description: 'An untrusted origin attempted to post structured messages without meeting COOP same-origin constraints.',
+    description:
+      'An untrusted origin attempted to post structured messages without meeting COOP same-origin constraints.',
     recommendation: 'Verify targetOrigin validation on window.addEventListener handlers.',
   },
   {
-    title: 'Repeated PBKDF2 Web Crypto Salt Mismatch Ingestion',
+    title: 'Anomalous API Rate Threshold Exceeded',
     severity: 'critical' as const,
-    category: 'Credential Defense',
-    source: 'Client Auth Engine',
-    description: 'Automated rapid-fire hash verification attempts flagged with randomized salt parameters.',
-    recommendation: 'Apply IP rate-limiting and enforce multi-factor authentication policies.',
+    category: 'Traffic Anomaly',
+    source: 'Rate Limiter Service',
+    description: 'Automated rapid mutation requests flagged from external IP violating rate limit window.',
+    recommendation: 'Inspect source IP address and verify edge rate-limiting rules.',
   },
   {
     title: 'Local Storage State Manipulation Flagged',
     severity: 'medium' as const,
     category: 'Data Integrity',
     source: 'Storage Event Listener',
-    description: 'Direct console manipulation of session storage token detected outside normal application hooks.',
-    recommendation: 'Audit client-side state transitions and rotate signed session key.',
+    description: 'Direct console modification of local storage keys detected outside normal application hooks.',
+    recommendation: 'Audit client-side state transitions and verify stored preference schema.',
   },
 ] as const;
-
-

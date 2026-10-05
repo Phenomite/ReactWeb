@@ -1,28 +1,21 @@
-import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 import { INITIAL_SECURITY_INCIDENTS, SIMULATED_ALERTS } from '@/constants';
-import { useToast } from '@/context/ToastContext';
 import { useRealtime } from '@/context/RealtimeContext';
+import { useToast } from '@/context/ToastContext';
 import { APP_STRINGS } from '@/strings';
-import type { SecurityIncident, SecurityIncidentContextType, IncidentStatus } from '@/types';
+import type { IncidentStatus, SecurityIncident, SecurityIncidentContextType } from '@/types';
 
 const SecurityIncidentContext = createContext<SecurityIncidentContextType | undefined>(undefined);
 
 // Manages Microsoft Defender security incidents with real-time backend synchronization and Sentinel exports
 export function SecurityIncidentProvider({ children }: { children: ReactNode }) {
-  const {
-    incidents: realtimeIncidents,
-    simulateThreatSignal: realtimeSimulate,
-    updateData,
-  } = useRealtime();
+  const { incidents: realtimeIncidents, simulateThreatSignal: realtimeSimulate, updateData } = useRealtime();
   const [localIncidents, setLocalIncidents] = useState<SecurityIncident[]>(INITIAL_SECURITY_INCIDENTS);
   const { showToast } = useToast();
 
   const incidents = realtimeIncidents.length > 0 ? realtimeIncidents : localIncidents;
 
-  const unresolvedCount = useMemo(
-    () => incidents.filter((i) => i.status !== 'resolved').length,
-    [incidents]
-  );
+  const unresolvedCount = useMemo(() => incidents.filter((i) => i.status !== 'resolved').length, [incidents]);
 
   const logIncident = useCallback(async (incident: Omit<SecurityIncident, 'id' | 'timestamp'>) => {
     try {
@@ -47,12 +40,10 @@ export function SecurityIncidentProvider({ children }: { children: ReactNode }) 
     async (id: string, status: IncidentStatus) => {
       const res = await updateData<SecurityIncident>('incidents', id, { status });
       if (!res.success) {
-        setLocalIncidents((prev) =>
-          prev.map((item) => (item.id === id ? { ...item, status } : item))
-        );
+        setLocalIncidents((prev) => prev.map((item) => (item.id === id ? { ...item, status } : item)));
       }
     },
-    [updateData]
+    [updateData],
   );
 
   const simulateThreatSignal = useCallback(async () => {
@@ -111,14 +102,10 @@ export function SecurityIncidentProvider({ children }: { children: ReactNode }) 
       simulateThreatSignal,
       exportSentinelLog,
     }),
-    [incidents, unresolvedCount, logIncident, updateStatus, simulateThreatSignal, exportSentinelLog]
+    [incidents, unresolvedCount, logIncident, updateStatus, simulateThreatSignal, exportSentinelLog],
   );
 
-  return (
-    <SecurityIncidentContext.Provider value={contextValue}>
-      {children}
-    </SecurityIncidentContext.Provider>
-  );
+  return <SecurityIncidentContext.Provider value={contextValue}>{children}</SecurityIncidentContext.Provider>;
 }
 
 export function useSecurityIncidents(): SecurityIncidentContextType {

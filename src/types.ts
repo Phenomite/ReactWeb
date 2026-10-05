@@ -1,38 +1,5 @@
 import type { ComponentType } from 'react';
 
-// Registered user credential format
-export interface UserCredentialRecord {
-  id: string;
-  username: string;
-  displayName: string;
-  saltHex: string;
-  hashHex: string;
-  iterations: number;
-  role: string;
-}
-
-// Extensible user registry format (array list or dictionary map)
-export type UserRegistry = UserCredentialRecord[] | Record<string, UserCredentialRecord>;
-
-// Signed session token stored in localStorage
-export interface AuthSession {
-  username: string;
-  displayName: string;
-  role: string;
-  issuedAt: number;
-  expiresAt: number;
-  signature: string;
-}
-
-// Authentication context state and methods
-export interface AuthContextType {
-  isAuthenticated: boolean;
-  username: string | null;
-  role: string | null;
-  login: (name: string, pass: string) => Promise<boolean>;
-  logout: () => void;
-}
-
 // Unified view definition with routing metadata and component
 export interface ViewDefinition {
   id: string;
@@ -40,8 +7,6 @@ export interface ViewDefinition {
   hash: string;
   icon: ComponentType<{ className?: string }>;
   component: ComponentType;
-  requiresAuth?: boolean;
-  hideWhenAuth?: boolean;
   hideInSidebar?: boolean;
 }
 
@@ -61,6 +26,14 @@ export interface ToastContextType {
   toasts: ToastMessage[];
   showToast: (title: string, options?: { description?: string; type?: ToastType; durationMs?: number }) => string;
   dismissToast: (id: string) => void;
+}
+
+// Supported application theme mode options
+export type ThemeMode = 'light' | 'dark' | 'ocean';
+
+export interface ThemeOption {
+  id: ThemeMode;
+  label: string;
 }
 
 // Curated accent color identifiers
@@ -84,7 +57,7 @@ export interface CommandItem {
 }
 
 // Security incident severity levels and lifecycle status
-export type IncidentSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info';
+type IncidentSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info';
 export type IncidentStatus = 'active' | 'investigating' | 'resolved';
 
 // Client-side security incident telemetry record
@@ -100,20 +73,6 @@ export interface SecurityIncident {
   recommendation: string;
 }
 
-// MSRC Vulnerability and CVE advisory record
-export interface MsrcAdvisory {
-  cveId: string;
-  title: string;
-  severity: 'Critical' | 'High' | 'Medium';
-  cvssScore: number;
-  affectedProduct: string;
-  publishedDate: string;
-  description: string;
-  mitigation: string;
-  kbArticle: string;
-  isZeroDay: boolean;
-}
-
 // Security incident context state and methods
 export interface SecurityIncidentContextType {
   incidents: SecurityIncident[];
@@ -126,18 +85,18 @@ export interface SecurityIncidentContextType {
 
 // Security service telemetry bubbles present above score categories
 export interface TenantStatusBubbles {
-  sentinel: boolean;     // Microsoft Sentinel
-  mde: boolean;          // Microsoft Defender for Endpoint
-  mdi: boolean;          // Microsoft Defender for Identity
+  sentinel: boolean; // Microsoft Sentinel
+  mde: boolean; // Microsoft Defender for Endpoint
+  mdi: boolean; // Microsoft Defender for Identity
   logAnalytics: boolean; // Azure Log Analytics Audit Logging
 }
 
 // Microsoft Secure Score category breakdowns
 export interface TenantScoreCategories {
-  device: number;        // Device (Defender XDR)
-  identities: number;    // Identities (Entra)
-  apps: number;          // Apps (Defender for Cloud Apps)
-  data: number;          // Data (Purview)
+  device: number; // Device (Defender XDR)
+  identities: number; // Identities (Entra)
+  apps: number; // Apps (Defender for Cloud Apps)
+  data: number; // Data (Purview)
 }
 
 // Tenant record for Microsoft Secure Score leaderboard
@@ -206,7 +165,7 @@ export interface RealtimeContextType {
     resource: string,
     id: string,
     updates: Partial<T> | Record<string, unknown>,
-    options?: DataUpdateOptions<T>
+    options?: DataUpdateOptions<T>,
   ) => Promise<DataUpdateResult<T>>;
   /** Retrieve all records for any resource collection dynamically */
   getResourceData: <T = unknown>(resource: string) => T[];
@@ -216,12 +175,9 @@ export interface RealtimeContextType {
   publishTenantUpdate: (
     id: string,
     updates: Partial<TenantRecord>,
-    expectedVersion?: number | undefined
+    expectedVersion?: number | undefined,
   ) => Promise<{ success: boolean; conflict?: boolean | undefined; current?: TenantRecord | undefined }>;
   simulateThreatSignal: () => Promise<boolean>;
   updateIncidentStatus: (id: string, status: IncidentStatus) => Promise<boolean>;
   triggerTelemetryPulse: () => Promise<boolean>;
 }
-
-
-

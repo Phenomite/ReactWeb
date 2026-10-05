@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 
 // Configures Vite plugins, base path, resolve aliases, and build chunking
 export default defineConfig({
@@ -10,10 +10,7 @@ export default defineConfig({
       '@': new URL('./src', import.meta.url).pathname,
     },
   },
-  plugins: [
-    react(),
-    tailwindcss(),
-  ],
+  plugins: [react(), tailwindcss()],
   server: {
     port: 5173,
     proxy: {

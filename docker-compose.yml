@@ -25,7 +25,7 @@ services:
       dockerfile: Dockerfile.backend
     container_name: reactweb-processing
     restart: unless-stopped
-    command: ["node", "scripts/k8s-telemetry-generator.js"]
+    command: ["bun", "scripts/k8s-telemetry-generator.js"]
     environment:
       - BACKEND_URL=http://reactweb-database:3001
       - UPDATE_INTERVAL_MS=60000

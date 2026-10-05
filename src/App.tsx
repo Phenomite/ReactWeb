@@ -1,20 +1,20 @@
-import { useState, useCallback } from 'react';
-import { Sidebar } from '@/views/Sidebar';
-import { Header } from '@/components/Header';
+import { useCallback, useState } from 'react';
 import { CommandPalette } from '@/components/CommandPalette';
+import { Header } from '@/components/Header';
 import { ShortcutsModal } from '@/components/ShortcutsModal';
 import { ToastContainer } from '@/components/ToastContainer';
-import { AuthProvider } from '@/context/AuthContext';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { AccentProvider, useAccent } from '@/context/AccentContext';
-import { ToastProvider, useToast } from '@/context/ToastContext';
+import { HeaderSlotProvider } from '@/context/HeaderSlotContext';
 import { RealtimeProvider } from '@/context/RealtimeContext';
 import { SecurityIncidentProvider } from '@/context/SecurityIncidentContext';
-import { HeaderSlotProvider } from '@/context/HeaderSlotContext';
-import { useTheme } from '@/hooks/useTheme';
+import { ThemeProvider, useTheme } from '@/context/ThemeContext';
+import { ToastProvider, useToast } from '@/context/ToastContext';
 import { useHashRouting } from '@/hooks/useHashRouting';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { APP_STRINGS } from '@/strings';
 import type { ViewDefinition } from '@/types';
+import { Sidebar } from '@/views/Sidebar';
 
 // Renders the 4-container application layout shell
 function AppLayout() {
@@ -38,10 +38,7 @@ function AppLayout() {
 
   const handleToggleDarkMode = useCallback(() => {
     toggleDarkMode();
-    showToast(
-      darkMode ? APP_STRINGS.TOAST.TXT_THEME_LIGHT : APP_STRINGS.TOAST.TXT_THEME_DARK,
-      { type: 'info' }
-    );
+    showToast(darkMode ? APP_STRINGS.TOAST.TXT_THEME_LIGHT : APP_STRINGS.TOAST.TXT_THEME_DARK, { type: 'info' });
   }, [darkMode, toggleDarkMode, showToast]);
 
   const handleSelectView = useCallback(
@@ -49,26 +46,20 @@ function AppLayout() {
       navigateToView(view);
       setSidebarOpen(false);
     },
-    [navigateToView]
+    [navigateToView],
   );
 
   // Wire global keyboard shortcuts
   useKeyboardShortcuts({
-    onToggleCommandPalette: useCallback(
-      () => setCommandPaletteOpen((prev) => !prev),
-      []
-    ),
-    onToggleShortcutsModal: useCallback(
-      () => setShortcutsModalOpen((prev) => !prev),
-      []
-    ),
+    onToggleCommandPalette: useCallback(() => setCommandPaletteOpen((prev) => !prev), []),
+    onToggleShortcutsModal: useCallback(() => setShortcutsModalOpen((prev) => !prev), []),
     onToggleDarkMode: handleToggleDarkMode,
   });
 
   const ActiveComponent = activeView.component;
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 text-slate-900 transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100">
+    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground transition-colors duration-200">
       {/* Containers 1 & 2: Top-left heading & Aside Sidebar (w-72) */}
       <Sidebar
         isOpen={sidebarOpen}
@@ -92,7 +83,7 @@ function AppLayout() {
         />
 
         {/* Container 4: Main Body View Section */}
-        <main className="flex-1 overflow-y-auto p-6 text-slate-800 dark:text-slate-200">
+        <main className="flex-1 overflow-y-auto p-3 text-foreground">
           <ActiveComponent />
         </main>
       </div>
@@ -108,10 +99,7 @@ function AppLayout() {
       />
 
       {/* Global Keyboard Shortcuts Cheatsheet Modal */}
-      <ShortcutsModal
-        isOpen={shortcutsModalOpen}
-        onClose={handleCloseShortcuts}
-      />
+      <ShortcutsModal isOpen={shortcutsModalOpen} onClose={handleCloseShortcuts} />
 
       {/* Floating Accessible Toast Notifications */}
       <ToastContainer />
@@ -122,20 +110,20 @@ function AppLayout() {
 // Top-level root application provider container
 export function App() {
   return (
-    <AuthProvider>
+    <ThemeProvider>
       <AccentProvider>
         <ToastProvider>
           <RealtimeProvider>
             <SecurityIncidentProvider>
               <HeaderSlotProvider>
-                <AppLayout />
+                <TooltipProvider delayDuration={150}>
+                  <AppLayout />
+                </TooltipProvider>
               </HeaderSlotProvider>
             </SecurityIncidentProvider>
           </RealtimeProvider>
         </ToastProvider>
       </AccentProvider>
-    </AuthProvider>
+    </ThemeProvider>
   );
 }
-
-export default App;

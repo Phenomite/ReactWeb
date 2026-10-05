@@ -1,6 +1,6 @@
-import { DatabaseSync } from 'node:sqlite';
-import { readFileSync, existsSync, mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -13,7 +13,9 @@ if (!existsSync(DB_DIR)) {
 }
 const DB_PATH = process.env.DATABASE_URL || join(DB_DIR, 'reactweb.db');
 
-export const db = new DatabaseSync(DB_PATH);
+const TABLE_IDENTIFIER_REGEX = /^[a-zA-Z0-9_]+$/;
+
+const db = new DatabaseSync(DB_PATH);
 
 // Configure SQLite for high concurrency and zero-loss durability
 db.exec(`
@@ -71,9 +73,12 @@ db.exec(`
 
 // Migration safety: Ensure version and lastUpdatedBy columns exist on pre-existing tables
 try {
-  const columns = db.prepare('PRAGMA table_info(tenants)').all().map((c) => c.name);
+  const columns = db
+    .prepare('PRAGMA table_info(tenants)')
+    .all()
+    .map((c) => c.name);
   if (!columns.includes('version')) {
-    db.exec("ALTER TABLE tenants ADD COLUMN version INTEGER NOT NULL DEFAULT 1");
+    db.exec('ALTER TABLE tenants ADD COLUMN version INTEGER NOT NULL DEFAULT 1');
   }
   if (!columns.includes('lastUpdatedBy')) {
     db.exec("ALTER TABLE tenants ADD COLUMN lastUpdatedBy TEXT NOT NULL DEFAULT 'system'");
@@ -193,11 +198,10 @@ export function seedDatabaseIfEmpty() {
           t.rank,
           1,
           'system_seed',
-          now
+          now,
         );
       }
       db.exec('COMMIT;');
-      console.log(`[Database] Seeded ${rawData.length} tenant records into SQLite.`);
     }
   }
 
@@ -206,14 +210,14 @@ export function seedDatabaseIfEmpty() {
     const initialIncidents = [
       {
         id: 'inc-101',
-        title: 'Suspicious Credential Velocity on Client Login',
+        title: 'Anomalous API Rate Threshold Exceeded',
         severity: 'high',
         status: 'active',
-        category: 'Identity & Access',
-        source: 'Auth PBKDF2 Engine',
+        category: 'Traffic Anomaly',
+        source: 'Rate Limiter Service',
         timestamp: Date.now() - 1000 * 60 * 18,
-        description: 'Multiple rapid cryptographic derivation attempts detected without matching registered salt parameters.',
-        recommendation: 'Enforce exponential derivation delay and inspect origin IP reputation.',
+        description: 'Multiple rapid mutation requests detected from external IP violating rate limit threshold.',
+        recommendation: 'Inspect source IP address and verify rate-limiting rules.',
       },
       {
         id: 'inc-102',
@@ -223,19 +227,20 @@ export function seedDatabaseIfEmpty() {
         category: 'Data Integrity',
         source: 'Storage Management API',
         timestamp: Date.now() - 1000 * 60 * 65,
-        description: 'Complete cache flush invoked via client administration trigger outside of scheduled maintenance windows.',
-        recommendation: 'Verify authenticated administrator audit trail and validate session token signature.',
+        description:
+          'Complete cache flush invoked via client administration trigger outside of scheduled maintenance windows.',
+        recommendation: 'Verify administrator audit trail and inspect state persistence.',
       },
       {
         id: 'inc-103',
-        title: 'Unauthorized Protected Anchor Navigation Trapped',
+        title: 'Ingress TLS Certificate Renewal Scheduled',
         severity: 'low',
         status: 'resolved',
-        category: 'Route Authorization Guard',
-        source: 'Client Hash Router',
+        category: 'Transport Security',
+        source: 'Certificate Manager',
         timestamp: Date.now() - 1000 * 60 * 180,
-        description: 'Unauthenticated browser navigation to #debug route intercepted and redirected to guest access notice.',
-        recommendation: 'Route guard functioning normally; no further administrative action required.',
+        description: 'Edge TLS certificate renewal automatically negotiated via ACME challenge before 30-day window.',
+        recommendation: 'Certificate successfully renewed; no further administrative action required.',
       },
     ];
 
@@ -250,11 +255,10 @@ export function seedDatabaseIfEmpty() {
         inc.source,
         inc.timestamp,
         inc.description,
-        inc.recommendation
+        inc.recommendation,
       );
     }
     db.exec('COMMIT;');
-    console.log(`[Database] Seeded ${initialIncidents.length} security incident records into SQLite.`);
   }
 }
 
@@ -270,7 +274,7 @@ export function getTenantById(id) {
 }
 
 // Multi-admin safe tenant update with optimistic concurrency control
-export function publishTenantUpdate(id, updates = {}, expectedVersion = null, updatedBy = 'admin') {
+function publishTenantUpdate(id, updates = {}, expectedVersion = null, updatedBy = 'admin') {
   db.exec('BEGIN IMMEDIATE;');
   try {
     const existing = stmtSelectTenantById.get(id);
@@ -296,23 +300,9 @@ export function publishTenantUpdate(id, updates = {}, expectedVersion = null, up
     const nextSeatCount = typeof updates.seatCount === 'number' ? updates.seatCount : existing.seatCount;
 
     const nextSentinel =
-      updates.statusBubbles?.sentinel !== undefined
-        ? updates.statusBubbles.sentinel
-          ? 1
-          : 0
-        : existing.sentinel;
-    const nextMde =
-      updates.statusBubbles?.mde !== undefined
-        ? updates.statusBubbles.mde
-          ? 1
-          : 0
-        : existing.mde;
-    const nextMdi =
-      updates.statusBubbles?.mdi !== undefined
-        ? updates.statusBubbles.mdi
-          ? 1
-          : 0
-        : existing.mdi;
+      updates.statusBubbles?.sentinel !== undefined ? (updates.statusBubbles.sentinel ? 1 : 0) : existing.sentinel;
+    const nextMde = updates.statusBubbles?.mde !== undefined ? (updates.statusBubbles.mde ? 1 : 0) : existing.mde;
+    const nextMdi = updates.statusBubbles?.mdi !== undefined ? (updates.statusBubbles.mdi ? 1 : 0) : existing.mdi;
     const nextLog =
       updates.statusBubbles?.logAnalytics !== undefined
         ? updates.statusBubbles.logAnalytics
@@ -355,7 +345,7 @@ export function publishTenantUpdate(id, updates = {}, expectedVersion = null, up
       nextVersion,
       updatedBy,
       now,
-      id
+      id,
     );
 
     stmtRecalculateRanks.run();
@@ -415,7 +405,8 @@ export function batchUpdateTenants(updates = null, updatedBy = 'k8s-telemetry-ge
         const sent = u.statusBubbles?.sentinel !== undefined ? (u.statusBubbles.sentinel ? 1 : 0) : existing.sentinel;
         const mde = u.statusBubbles?.mde !== undefined ? (u.statusBubbles.mde ? 1 : 0) : existing.mde;
         const mdi = u.statusBubbles?.mdi !== undefined ? (u.statusBubbles.mdi ? 1 : 0) : existing.mdi;
-        const log = u.statusBubbles?.logAnalytics !== undefined ? (u.statusBubbles.logAnalytics ? 1 : 0) : existing.logAnalytics;
+        const log =
+          u.statusBubbles?.logAnalytics !== undefined ? (u.statusBubbles.logAnalytics ? 1 : 0) : existing.logAnalytics;
 
         stmtUpdate.run(score, dev, iden, app, dat, sent, mde, mdi, log, updatedBy, now, u.id);
         updatedCount += 1;
@@ -475,7 +466,7 @@ export function addIncident(incident) {
     incident.source || 'Sentinel Engine',
     timestamp,
     incident.description || '',
-    incident.recommendation || ''
+    incident.recommendation || '',
   );
   return {
     id,
@@ -498,7 +489,7 @@ export function updateIncidentStatus(id, status) {
 // Data-agnostic record updater scaling across any database table in SQLite
 export function updateGenericRecord(tableName, id, updates = {}, expectedVersion = null, updatedBy = 'admin') {
   // Validate table name to prevent SQL injection
-  if (!/^[a-zA-Z0-9_]+$/.test(tableName)) {
+  if (!TABLE_IDENTIFIER_REGEX.test(tableName)) {
     throw new Error('Invalid table identifier');
   }
 

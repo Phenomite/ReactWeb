@@ -1,19 +1,12 @@
 const COMMON = {
   APP_TITLE: 'Boilerplate App',
-  BTN_LOGIN_TEXT: 'Sign In',
-  BTN_LOGIN_ARIA_LABEL: 'Navigate to login page',
-  BTN_LOGOUT_TEXT: 'Sign Out',
-  BTN_LOGOUT_ARIA_LABEL: 'Sign out of application',
   BTN_CLOSE: 'Close',
   BTN_CLOSE_ARIA_LABEL: 'Close dialog or modal',
   BTN_DISMISS_ARIA_LABEL: 'Dismiss notification',
   LABEL_DARK_MODE: 'Dark Mode',
   SWITCH_THEME_ARIA_LABEL: 'Toggle dark mode',
-  BADGE_DEFAULT_USER: 'User',
-  LABEL_STATUS_AUTH: 'Authentication Status',
-  TXT_STATUS_AUTHENTICATED: 'Authenticated',
-  TXT_STATUS_NOT_AUTHENTICATED: 'Not Authenticated',
   TXT_NONE: 'None',
+  LABEL_PENDING: 'Pending',
 } as const;
 
 const SIDEBAR = {
@@ -21,7 +14,6 @@ const SIDEBAR = {
   HEADING_TITLE: COMMON.APP_TITLE,
   NAV_MAIN_ARIA_LABEL: 'Main navigation',
   BTN_CLOSE_ARIA_LABEL: 'Close sidebar',
-  BADGE_ADMIN: 'ADMIN',
 } as const;
 
 const HEADER = {
@@ -43,8 +35,10 @@ const COMMAND_PALETTE = {
   TXT_CATEGORY_APPEARANCE: 'Theme & Appearance',
   TXT_FOOTER_HINT: 'Use arrows to navigate, Enter to select, Esc to close',
   BTN_CLOSE_ARIA_LABEL: 'Close command palette',
+  TXT_ACTIVE_SUFFIX: ' (Active)',
   CMD_THEME_LIGHT: 'Switch to Light Mode',
   CMD_THEME_DARK: 'Switch to Dark Mode',
+  CMD_THEME_OCEAN: 'Switch to Ocean Theme',
   CMD_SET_ACCENT_PREFIX: 'Set Accent: ',
   CMD_COPY_URL: 'Copy Current Page URL',
   CMD_EXPORT_SENTINEL: 'Export Microsoft Sentinel Security Log',
@@ -63,8 +57,7 @@ const SHORTCUTS = {
   LABEL_SHORTCUT_GO_HOME: 'Jump to Homepage',
   LABEL_SHORTCUT_GO_SETTINGS: 'Jump to Settings',
   LABEL_SHORTCUT_GO_MICROSOFT: 'Jump to Microsoft Security',
-  LABEL_SHORTCUT_GO_DEBUG: 'Jump to Debug (Admin)',
-  LABEL_SHORTCUT_GO_LOGIN: 'Jump to Login',
+  LABEL_SHORTCUT_GO_DEBUG: 'Jump to Debug',
   LABEL_SHORTCUT_CLOSE: COMMON.BTN_CLOSE_ARIA_LABEL,
   TXT_FOOTER_NOTE: 'Productivity Hotkeys',
   BTN_CLOSE: 'Got It',
@@ -76,11 +69,10 @@ const TOAST = {
   CONTAINER_ARIA_LABEL: 'Notifications',
   TXT_THEME_DARK: 'Switched to Dark Mode',
   TXT_THEME_LIGHT: 'Switched to Light Mode',
+  TXT_THEME_OCEAN: 'Switched to Ocean Theme',
   TXT_ACCENT_CHANGED: 'Accent palette updated to',
   TXT_URL_COPIED: 'Page link copied to clipboard',
   TXT_STORAGE_CLEARED: 'Local storage cache cleared',
-  TXT_LOGGED_IN: 'Authenticated successfully',
-  TXT_LOGGED_OUT: 'Signed out successfully',
 } as const;
 
 const HOMEPAGE = {
@@ -94,9 +86,7 @@ const HOMEPAGE = {
   GREETING_EVENING: 'Good evening',
   HEADING_QUICK_ACTIONS: 'Quick Actions',
   HEADING_SYSTEM_PULSE: 'System Pulse',
-  LABEL_STATUS_AUTH: COMMON.LABEL_STATUS_AUTH,
-  TXT_STATUS_AUTHENTICATED: COMMON.TXT_STATUS_AUTHENTICATED,
-  TXT_STATUS_NOT_AUTHENTICATED: COMMON.TXT_STATUS_NOT_AUTHENTICATED,
+  LABEL_MANAGED_TENANTS: 'Fleet Tenants',
   LABEL_STATUS_THEME: 'Theme Mode',
   LABEL_STATUS_ACCENT: 'Accent Palette',
   BTN_QUICK_SETTINGS: 'Settings',
@@ -113,6 +103,8 @@ const SETTINGS = {
   NAV_HASH: '#settings',
   HEADING_PAGE: 'Settings',
   TXT_DESCRIPTION: 'Configure and customize your application settings and preferences.',
+  HEADING_THEME: 'Theme Mode',
+  TXT_THEME_DESC: 'Switch between Light, Dark, and Ocean semantic palettes with real-time token adaptation.',
   HEADING_APPEARANCE: 'Appearance & Accent Palette',
   TXT_APPEARANCE_DESC: 'Select your preferred accent theme color across all buttons, tabs, and focus rings.',
   LABEL_ACCENT_PICKER: 'Accent Theme',
@@ -121,7 +113,8 @@ const SETTINGS = {
   BTN_TEST_TOAST: 'Trigger Toast',
   TXT_TEST_TOAST_MESSAGE: 'Here is a toast notification with tactile feedback!',
   TXT_TEST_TOAST_DESC: 'Tactile micro-animations and WCAG-compliant status notifications.',
-  TXT_FEEDBACK_NOTE: 'Notifications provide instant visual confirmation for authentication, settings changes, and productivity timers.',
+  TXT_FEEDBACK_NOTE:
+    'Notifications provide instant visual confirmation for settings changes, telemetry updates, and productivity timers.',
   HEADING_KEYBOARD_CARD: 'Shortcuts Quick-Reference',
   TXT_KEYBOARD_DESC: 'Press the question mark key anytime to inspect all available hotkeys.',
   BTN_VIEW_SHORTCUTS: 'Open Shortcuts Modal',
@@ -131,56 +124,29 @@ const SETTINGS = {
   KBD_HELP: '?',
 } as const;
 
-const LOGIN = {
-  NAV_ID: 'login',
-  NAV_TITLE: 'Login',
-  NAV_HASH: '#login',
-  HEADING_PAGE: 'User Authentication',
-  TXT_DESCRIPTION: 'Enter your credentials to access protected diagnostic views.',
-  LABEL_USERNAME: 'Username',
-  LABEL_PASSWORD: 'Password',
-  INPUT_PLACEHOLDER_USERNAME: 'Enter username',
-  INPUT_PLACEHOLDER_PASSWORD: 'Enter password',
-  BTN_SUBMIT: COMMON.BTN_LOGIN_TEXT,
-  BTN_SUBMIT_LOADING: 'Deriving Cryptographic Credentials...',
-  BTN_LOGOUT: COMMON.BTN_LOGOUT_TEXT,
-  BTN_GO_TO_DEBUG: 'Open Debug View',
-  TXT_AUTH_NOTICE: 'Please provide your authorized credentials to proceed.',
-  TXT_INVALID_CREDENTIALS: 'Invalid username or password. Please try again.',
-  TXT_LOGGED_IN_GREETING: 'You are authenticated as',
-  TXT_DEBUG_UNLOCKED: 'Diagnostic console unmasked in tactical navigation.',
-  BTN_CLEAR_STORAGE: 'Clear Local Storage',
-  BTN_CLEAR_STORAGE_ARIA_LABEL: 'Clear stored session and preferences from local storage',
-} as const;
-
 const DEBUG = {
   NAV_ID: 'debug',
   NAV_TITLE: 'Debug',
   NAV_HASH: '#debug',
   HEADING_PAGE: 'Debug & Runtime Diagnostics',
-  TXT_DESCRIPTION: 'Protected view for inspecting runtime state, environment variables, and system metrics.',
-  HEADING_UNAUTHORIZED: 'Authentication Required',
-  TXT_UNAUTHORIZED_MESSAGE: 'You must be authenticated to access the diagnostics dashboard.',
-  BTN_LOGIN_PROMPT: 'Go to Login',
+  TXT_DESCRIPTION: 'View for inspecting runtime state, environment variables, and system metrics.',
   HEADING_SYSTEM_INFO: 'System & Framework',
   HEADING_ACTIVE_STATE: 'Application State',
   LABEL_ACTIVE_ANCHOR: 'Active URL Anchor',
-  LABEL_AUTH_STATE: COMMON.LABEL_STATUS_AUTH,
-  LABEL_AUTH_ACTIVE: 'Active (True)',
   LABEL_REGISTERED_VIEWS: 'Registered Views Count',
-  TXT_AUTH_USER_PREFIX: 'Authenticated: ',
+  LABEL_GATEWAY: 'Mesh Gateway',
+  VAL_GATEWAY: 'Istio Ambient',
   LABEL_FRAMEWORK: 'Framework',
   VAL_FRAMEWORK: 'React 19.x',
   LABEL_BUILD_TOOL: 'Build Tool',
   VAL_BUILD_TOOL: 'Vite 8.x',
+  LABEL_RUNTIME: 'Runtime Engine',
+  VAL_RUNTIME: 'Bun (Bun.serve)',
   LABEL_CSS_ENGINE: 'CSS Engine',
   VAL_CSS_ENGINE: 'Tailwind CSS v4',
   LABEL_ROUTING_MODE: 'Routing Mode',
   VAL_ROUTING_MODE: 'Anchor Hash',
-  LABEL_SESSION_DURATION: 'Session Duration',
-  VAL_SESSION_DURATION: '7 Days',
   HEADING_DEBUG_ACTIONS: 'Tactical Diagnostics & Overrides',
-  BTN_LOGOUT_LOCK: 'Terminate Session & Lock Diagnostic Console',
 } as const;
 
 const MICROSOFT = {
@@ -199,23 +165,29 @@ const MICROSOFT = {
   LABEL_BUBBLE_MDI: 'MDI',
   LABEL_BUBBLE_LOG: 'Audit Logging',
 
-  CAT_DEVICE: 'Device',                       // Device (Defender XDR)
+  CAT_DEVICE: 'Device', // Device (Defender XDR)
   CAT_DEVICE_DESC: 'Defender XDR',
-  CAT_IDENTITIES: 'Identities',               // Identities (Entra)
+  CAT_IDENTITIES: 'Identities', // Identities (Entra)
   CAT_IDENTITIES_DESC: 'Entra',
-  CAT_APPS: 'Apps',                           // Apps (Defender for Cloud Apps)
+  CAT_APPS: 'Apps', // Apps (Defender for Cloud Apps)
   CAT_APPS_DESC: 'Defender for Cloud Apps',
-  CAT_DATA: 'Data',                           // Data (Purview)
+  CAT_DATA: 'Data', // Data (Purview)
   CAT_DATA_DESC: 'Purview',
 
   HEADING_RECOMMENDED_ACTIONS: 'Recommended Actions to Boost Score',
   LABEL_REC_MDE_CATEGORY: 'Device (Defender XDR)',
-  TXT_REC_MDE_SERVERS: 'Deploy Defender for Servers under the Device (Defender XDR) category to protect hybrid server infrastructure and unmanaged VMs (+16.5% device score).',
-  TXT_REC_MDE_SERVERS_EXPAND: 'Expand Defender for Servers Plan 2 coverage under the Device (Defender XDR) category for active server vulnerability assessment (+7.5% device score).',
-  TXT_REC_MDI: 'Deploy Microsoft Defender for Identity (MDI) sensors under the Identities (Entra) category (+14.2% identities score).',
-  TXT_REC_SENTINEL: 'Connect Microsoft Sentinel workspace for automated threat triage and incident synchronization (+11.8% overall score).',
-  TXT_REC_AUDIT: 'Enable Azure Log Analytics Audit Logging under the Data (Purview) category for complete audit trail retention (+9.5% data score).',
-  TXT_REC_FULL_STACK: 'Full telemetry stack enabled! Focus on automated Conditional Access policy enforcement and continuous server posture management.',
+  TXT_REC_MDE_SERVERS:
+    'Deploy Defender for Servers under the Device (Defender XDR) category to protect hybrid server infrastructure and unmanaged VMs (+16.5% device score).',
+  TXT_REC_MDE_SERVERS_EXPAND:
+    'Expand Defender for Servers Plan 2 coverage under the Device (Defender XDR) category for active server vulnerability assessment (+7.5% device score).',
+  TXT_REC_MDI:
+    'Deploy Microsoft Defender for Identity (MDI) sensors under the Identities (Entra) category (+14.2% identities score).',
+  TXT_REC_SENTINEL:
+    'Connect Microsoft Sentinel workspace for automated threat triage and incident synchronization (+11.8% overall score).',
+  TXT_REC_AUDIT:
+    'Enable Azure Log Analytics Audit Logging under the Data (Purview) category for complete audit trail retention (+9.5% data score).',
+  TXT_REC_FULL_STACK:
+    'Full telemetry stack enabled! Focus on automated Conditional Access policy enforcement and continuous server posture management.',
 
   HEADING_OVERVIEW_POSTURE: 'Posture Overview & Metrics',
   HEADING_TOP_THREE_LEADERBOARD: 'Leaderboard Top 3',
@@ -356,7 +328,8 @@ const REALTIME = {
   LABEL_DISCONNECTED: 'Reconnecting...',
   LABEL_OFFLINE: 'Offline / Local Cache',
   LABEL_DB_ENGINE: 'Database Engine',
-  VALUE_DB_ENGINE: 'Node.js + SQLite WAL',
+  VALUE_DB_ENGINE: 'Bun + SQLite WAL',
+  LABEL_PENDING: COMMON.LABEL_PENDING,
   LABEL_ACTIVE_VISITORS: 'Active Visitors',
   LABEL_LAST_SYNC: 'Last Synced',
   LABEL_SYNC_INTERVAL: 'Keepalive Pulse',
@@ -367,7 +340,7 @@ const REALTIME = {
   BTN_PUBLISH_ARIA_LABEL: 'Publish tenant modifications to database server',
   LABEL_VERSION: 'Record Version',
   LABEL_LAST_UPDATED_BY: 'Last Updated By',
-  LABEL_EDIT_MODE: 'Admin Quick Editor',
+  LABEL_EDIT_MODE: 'Tenant Quick Editor',
   TXT_PULSE_SUCCESS: 'Enterprise telemetry pulse dispatched successfully',
   TXT_SCORE_UPDATED: 'Tenant score synchronized via real-time stream',
   TXT_PUBLISH_SUCCESS: 'Tenant update saved',
@@ -380,7 +353,7 @@ const REALTIME = {
   TXT_SERVER_ONLINE: 'Server is online',
   TXT_SERVER_OFFLINE: 'Server is offline',
   MODAL_HEADING_REALTIME: 'ReactWeb Status',
-  MODAL_TXT_DESCRIPTION: 'You\'ll receive automatic updates.',
+  MODAL_TXT_DESCRIPTION: "You'll receive automatic updates.",
 } as const;
 
 export const APP_STRINGS = {
@@ -397,7 +370,6 @@ export const APP_STRINGS = {
   VIEWS: {
     HOMEPAGE,
     SETTINGS,
-    LOGIN,
     DEBUG,
     MICROSOFT,
     SIDEBAR,

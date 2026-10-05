@@ -1,37 +1,112 @@
+#!/usr/bin/env bun
 import fs from 'node:fs';
 import path from 'node:path';
 
 // Seed enterprise names and prefixes/suffixes to create 200 distinct enterprise tenants
 const COMPANY_BASES = [
-  'Contoso', 'Fabrikam', 'Woodgrove', 'Northwind', 'Tailspin', 'Adatum', 'Litware',
-  'AdventureWorks', 'Trey Research', 'Lucerne', 'Coho', 'Alpine', 'VanArsdel',
-  'Wide World Importers', 'Southridge', 'Consolidated Messenger', 'Graphic Design Institute',
-  'Humongous Insurance', 'Datum Cyber', 'Blue Yonder', 'Lamna Healthcare', 'Relecloud',
-  'Kudo Global', 'Fourth Coffee', 'Nod Publishers', 'Wingtip Toys', 'Margie\'s Travel',
-  'Munson\'s Pickles', 'Proseware', 'City Power & Light', 'Parnell Aerospace', 'Terra Flora',
-  'Bellows College', 'Baldwin Museum', 'Tosh Mondo', 'Finman Global', 'Skyline Networks',
-  'Vanguard Medical', 'Apex Capital', 'Solstice Energy', 'Helios Robotics', 'Pinnacle Systems',
-  'Aegis Logistics', 'Meridian Bio', 'Titan Industrial', 'Starlight Media', 'Echo Dynamics',
-  'OmniCorp Global', 'Crestview Health', 'Falcon Defense', 'Ironclad Cloud', 'Horizon Financial'
+  'Contoso',
+  'Fabrikam',
+  'Woodgrove',
+  'Northwind',
+  'Tailspin',
+  'Adatum',
+  'Litware',
+  'AdventureWorks',
+  'Trey Research',
+  'Lucerne',
+  'Coho',
+  'Alpine',
+  'VanArsdel',
+  'Wide World Importers',
+  'Southridge',
+  'Consolidated Messenger',
+  'Graphic Design Institute',
+  'Humongous Insurance',
+  'Datum Cyber',
+  'Blue Yonder',
+  'Lamna Healthcare',
+  'Relecloud',
+  'Kudo Global',
+  'Fourth Coffee',
+  'Nod Publishers',
+  'Wingtip Toys',
+  "Margie's Travel",
+  "Munson's Pickles",
+  'Proseware',
+  'City Power & Light',
+  'Parnell Aerospace',
+  'Terra Flora',
+  'Bellows College',
+  'Baldwin Museum',
+  'Tosh Mondo',
+  'Finman Global',
+  'Skyline Networks',
+  'Vanguard Medical',
+  'Apex Capital',
+  'Solstice Energy',
+  'Helios Robotics',
+  'Pinnacle Systems',
+  'Aegis Logistics',
+  'Meridian Bio',
+  'Titan Industrial',
+  'Starlight Media',
+  'Echo Dynamics',
+  'OmniCorp Global',
+  'Crestview Health',
+  'Falcon Defense',
+  'Ironclad Cloud',
+  'Horizon Financial',
 ];
 
 const MODIFIERS = [
-  'Global', 'Enterprises', 'Technologies', 'Systems', 'Holdings', 'Digital',
-  'Cloud Services', 'Capital', 'Health', 'Aerospace', 'Security', 'Networks',
-  'Consulting', 'International', 'Laboratories', 'Solutions', 'Logistics', 'Robotics'
+  'Global',
+  'Enterprises',
+  'Technologies',
+  'Systems',
+  'Holdings',
+  'Digital',
+  'Cloud Services',
+  'Capital',
+  'Health',
+  'Aerospace',
+  'Security',
+  'Networks',
+  'Consulting',
+  'International',
+  'Laboratories',
+  'Solutions',
+  'Logistics',
+  'Robotics',
 ];
 
 const INDUSTRIES = [
-  'Financial Services', 'Healthcare & Life Sciences', 'Manufacturing & Robotics',
-  'Retail & E-Commerce', 'Technology & SaaS', 'Aerospace & Defense',
-  'Energy & Utilities', 'Telecommunications', 'Higher Education',
-  'Media & Entertainment', 'Logistics & Supply Chain', 'Government & Public Sector'
+  'Financial Services',
+  'Healthcare & Life Sciences',
+  'Manufacturing & Robotics',
+  'Retail & E-Commerce',
+  'Technology & SaaS',
+  'Aerospace & Defense',
+  'Energy & Utilities',
+  'Telecommunications',
+  'Higher Education',
+  'Media & Entertainment',
+  'Logistics & Supply Chain',
+  'Government & Public Sector',
 ];
 
 const REGIONS = [
-  'East US', 'West US 2', 'Central US', 'North Europe', 'West Europe',
-  'UK South', 'Southeast Asia', 'Australia East', 'Japan East',
-  'Canada Central', 'Sweden Central', 'Switzerland North'
+  'East US',
+  'West US 2',
+  'Central US',
+  'North Europe',
+  'West Europe',
+  'UK South',
+  'Southeast Asia',
+  'Australia East',
+  'Japan East',
+  'Canada Central',
+  'Sweden Central',
+  'Switzerland North',
 ];
 
 // Pseudo-random deterministic generator using linear congruential generator
@@ -89,16 +164,20 @@ const rawTenants = tenantNames.map((name, index) => {
   const seatCount = randInt(1200, 95000);
 
   // Distribution tier factor (0 = lowest security posture, 1 = elite tier)
-  const tierFactor = index < 30 ? randFloat(0.82, 0.98)
-    : index < 90 ? randFloat(0.68, 0.86)
-    : index < 150 ? randFloat(0.48, 0.72)
-    : randFloat(0.24, 0.52);
+  const tierFactor =
+    index < 30
+      ? randFloat(0.82, 0.98)
+      : index < 90
+        ? randFloat(0.68, 0.86)
+        : index < 150
+          ? randFloat(0.48, 0.72)
+          : randFloat(0.24, 0.52);
 
   // Status bubbles: Sentinel, MDE, MDI, Log Analytics
-  const hasSentinel = rand() < (tierFactor * 0.9 + 0.05);
-  const hasMDE = rand() < (tierFactor * 0.95 + 0.1);
-  const hasMDI = rand() < (tierFactor * 0.88 + 0.05);
-  const hasAuditLogging = rand() < (tierFactor * 0.92 + 0.12);
+  const hasSentinel = rand() < tierFactor * 0.9 + 0.05;
+  const hasMDE = rand() < tierFactor * 0.95 + 0.1;
+  const hasMDI = rand() < tierFactor * 0.88 + 0.05;
+  const hasAuditLogging = rand() < tierFactor * 0.92 + 0.12;
 
   // Category scores (0 - 100)
   // Device score strongly driven by Defender XDR (MDE)
@@ -110,7 +189,7 @@ const rawTenants = tenantNames.map((name, index) => {
   const identities = Number(Math.min(99, Math.max(18, baseIdentities * (0.85 + tierFactor * 0.15))).toFixed(1));
 
   // Apps score driven by Defender for Cloud Apps
-  const baseApps = (hasSentinel && hasMDE) ? randFloat(70, 96) : randFloat(32, 72);
+  const baseApps = hasSentinel && hasMDE ? randFloat(70, 96) : randFloat(32, 72);
   const apps = Number(Math.min(98, Math.max(12, baseApps * (0.88 + tierFactor * 0.12))).toFixed(1));
 
   // Data score driven by Purview & Audit Logging
@@ -158,8 +237,3 @@ if (!fs.existsSync(outDir)) {
 
 const outPath = path.join(outDir, 'tenants.json');
 fs.writeFileSync(outPath, JSON.stringify(rawTenants, null, 2), 'utf-8');
-
-console.log(`Generated ${rawTenants.length} tenants successfully at ${outPath}`);
-console.log(`Top Tenant: #${rawTenants[0].rank} ${rawTenants[0].name} (${rawTenants[0].overallScore}%)`);
-console.log(`Lowest Tenant: #${rawTenants[199].rank} ${rawTenants[199].name} (${rawTenants[199].overallScore}%)`);
-

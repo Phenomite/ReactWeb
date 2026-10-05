@@ -28,10 +28,7 @@ export function useKeyboardShortcuts({
       // If user is actively typing in a form input, skip single-key shortcuts
       const target = e.target as HTMLElement | null;
       const isInput =
-        target &&
-        (target.tagName === 'INPUT' ||
-          target.tagName === 'TEXTAREA' ||
-          target.isContentEditable);
+        target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
 
       if (isInput) return;
 
@@ -80,9 +77,6 @@ export function useKeyboardShortcuts({
         } else if (nextKey === 'd') {
           e.preventDefault();
           window.location.hash = APP_STRINGS.VIEWS.DEBUG.NAV_HASH;
-        } else if (nextKey === 'l') {
-          e.preventDefault();
-          window.location.hash = APP_STRINGS.VIEWS.LOGIN.NAV_HASH;
         }
       }
     };
@@ -96,4 +90,3 @@ export function useKeyboardShortcuts({
     };
   }, [onToggleCommandPalette, onToggleShortcutsModal, onToggleDarkMode]);
 }
-

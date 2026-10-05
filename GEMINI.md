@@ -3,12 +3,24 @@
 This repository contains a modern React web application scaffolded with Vite 8, React 19,
 Tailwind CSS v4, Lucide React icons, and TypeScript.
 
+## Rules
+
+- Read package.json, use those scripts.
+- Never use pnpm dlx or npx for dependencies that exist in package.json.
+- Always use local binaries via `pnpm <command>` (e.g., `pnpm biome`) or execute the predefined scripts in package.json
+  (e.g., pnpm run check). Assume node_modules is always up to date.
+- Never add exclusions to fix errors in linting/formatting/checks, always fix the root cause.
+- Run format, check, and lint to assess code after completing work, repair the findings.
+- Never add new packages without explicit permission granted.
+- Never commit or push without explicit permission granted.
+
 ---
 
 ## Tech Stack
 
+- **Runtime & Backend**: [Bun](https://bun.sh/) (`bun`) native runtime and toolkit (`Bun.serve`, `bun:sqlite`)
 - **Framework**: [React 19](https://react.dev/) (`react`, `react-dom`)
-- **Bundler & Build Tool**: [Vite 8](https://vite.dev/) (`vite`, `@vitejs/plugin-react`)
+- **Bundler & Dev Server**: [Vite 8](https://vite.dev/) (`vite`, `@vitejs/plugin-react`)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) via `@tailwindcss/vite`
 - **Icon Suite**: [Lucide React](https://lucide.dev/) (`lucide-react`)
 - **Language**: TypeScript (`strict` & `noUncheckedIndexedAccess` enabled, `@/*` path mapping)
@@ -17,53 +29,16 @@ Tailwind CSS v4, Lucide React icons, and TypeScript.
 
 ---
 
-## Project Structure
+## Tooling & Package Management Policy
 
-```text
-ReactWeb/
-├── public/
-│   └── vite.svg               # Application favicon
-├── scripts/
-│   └── generate-user-hash.js  # CLI utility to generate random salts and PBKDF2 hashes
-├── src/
-│   ├── components/            # Reusable UI components
-│   │   ├── Button.tsx         # Accessible interactive button with variant & tactile feedback
-│   │   ├── Card.tsx           # Standard surface card container with heading & icon badge
-│   │   ├── Header.tsx         # Main header with matching height, view title & theme mode toggle
-│   │   ├── InputField.tsx     # Accessible form input with icon prefix & dark focus styles
-│   │   ├── ThemeSwitch.tsx    # Accessible dark mode toggle switch control
-│   │   └── UserBadge.tsx      # Authenticated user identity badge with shield icon & role pill
-│   ├── context/               # React Context providers & hooks
-│   │   └── AuthContext.tsx    # AuthProvider & useAuth hook implementation
-│   ├── hooks/                 # Reusable custom React hooks
-│   │   ├── useTheme.ts        # Theme detection, media query & storage sync
-│   │   └── useHashRouting.ts  # URL hash routing & navigation synchronization
-│   ├── lib/                   # Libraries & helper utilities
-│   │   ├── crypto.ts          # Pure PBKDF2-HMAC-SHA256 & constant-time crypto
-│   │   └── utils.ts           # Class merge utility (cn helper with clsx & twMerge)
-│   ├── views/                 # View components & layout views
-│   │   ├── HomepageView.tsx   # Default landing view (#homepage) & view metadata
-│   │   ├── SettingsView.tsx   # Settings view (#settings) & view metadata
-│   │   ├── DebugView.tsx      # Protected diagnostics view (#debug) & view metadata
-│   │   ├── LoginView.tsx      # Authentication view (#login) & view metadata
-│   │   ├── Sidebar.tsx        # Aside sidebar view (w-72), Cuboid heading & navigation
-│   │   └── views.ts           # Aggregated view registry & navigation lookup helpers
-│   ├── vite-env.d.ts          # Vite client type definitions
-│   ├── App.tsx                # 4-container layout, custom hooks integration
-│   ├── constants.ts           # Centralized system constants & user registry
-│   ├── strings.ts             # Centralized application site string constants
-│   ├── index.css              # Tailwind CSS v4 import & root styles
-│   ├── main.tsx               # React root DOM mount
-│   └── types.ts               # Shared TypeScript interfaces & types
-├── .editorconfig              # Editor configuration
-├── .markdownlint.yaml         # Markdownlint configuration (120 char max line length)
-├── GEMINI.md                  # Project instructions & guidelines
-├── index.html                 # HTML entry point
-├── package.json               # Package dependencies & scripts
-├── README.md                  # Project setup and quickstart guide
-├── tsconfig.json              # Consolidated TypeScript configuration with @/* paths
-└── vite.config.ts             # Vite 8 configuration with React + Tailwind plugins
-```
+- **Package Operations**: Always use `pnpm` for package installation, management, and script execution.
+- **Tool Acquisition & Security**: Never use `iex`, piped remote shell scripts (`irm ... | iex`), or insecure
+  download-and-execute commands to install tools. Always use secure package managers like `winget`
+  (e.g. `winget install Oven-sh.Bun`) or direct verified system packages.
+- **Runtime Execution**: Use Bun (`bun`) to run server entrypoints, database migrations, background tasks,
+  and CLI utilities.
+- **Frontend Tooling**: Use Vite (`vite`) for the client development server (`pnpm dev`) and production
+  compilation (`pnpm build`).
 
 ---
 
@@ -73,14 +48,21 @@ Use `pnpm` to run scripts:
 
 | Command | Action |
 | :--- | :--- |
-| `pnpm install` | Install all project dependencies |
-| `pnpm dev` | Launch the local Vite 8 development server with instant HMR |
-| `pnpm run lint` | Type-check and lint whole TypeScript codebase with `tsc --noEmit` |
-| `pnpm build` | Run TypeScript lint check and build production assets into `dist/` |
-| `pnpm preview` | Locally preview the production build output |
-| `pnpm run auth:hash` | Generate random salt and PBKDF2 hash for a password |
-| `pnpm run dev:modify` | Modify live database records with developer attribution |
-| `pnpm run md:lint` | Lint all markdown files with `markdownlint-cli2` |
+| `pnpm install` | Install all project dependencies deterministically |
+| `pnpm dev` | Launch the local Vite 8 development server with instant HMR and API proxy |
+| `pnpm run server` | Launch the native Bun HTTP backend server (`Bun.serve`) on port 3001 |
+| `pnpm run server:dev` | Launch the Bun backend server with active file watch mode (`bun --watch`) |
+| `pnpm run format` | Auto-format all code with Biome |
+| `pnpm run check` | Run and write Biome formatting and linting checks across whole codebase |
+| `pnpm run lint` | Type-check and lint whole TypeScript codebase with `tsc --noEmit` and `biome lint` |
+| `pnpm build` | Run TypeScript lint check and build production assets into `dist/` with Vite |
+| `pnpm preview` | Locally preview the production build output with Vite |
+| `pnpm run telemetry:cron` | Run real-time background cluster telemetry generator with Bun |
+| `pnpm run telemetry:cron:once` | Execute a single batch telemetry perturbation update with Bun |
+| `pnpm run dev:modify` | Modify live database records with developer attribution using Bun |
+| `pnpm run tenants:generate` | Generate 200 distinct enterprise tenants dataset with Bun |
+| `pnpm run test:e2e` | Run Playwright end-to-end tests across all views and interactive primitives |
+| `pnpm run lint:md` | Lint all markdown files with markdownlint-cli2 |
 
 ---
 
@@ -95,7 +77,7 @@ Use `pnpm` to run scripts:
 
 3. **Direct Imports & No Barrel Indirection**:
    - Avoid `index.ts` barrel files and compatibility re-exports.
-   - All modules import directly via `@/*` aliases (e.g. `@/context/AuthContext`, `@/constants`, `@/strings`).
+   - All modules import directly via `@/*` aliases (e.g. `@/context/RealtimeContext`, `@/constants`, `@/strings`).
 
 ---
 
@@ -108,39 +90,30 @@ Use `pnpm` to run scripts:
 2. **Aside Sidebar (Container 2)**:
    - Fixed width of `w-72` on desktop viewports and a collapsible drawer overlay on mobile.
    - Houses the view navigation buttons without extra section headings.
-   - Dynamically exposes `#debug` when authenticated.
-   - Pinned at the bottom are the user badge (with role pill), full-width Sign In/Out button, and dark mode switch.
+   - Exposes `#homepage`, `#microsoft`, `#settings`, and `#debug` views directly.
+   - Pinned at the bottom is the dark mode switch.
 
 3. **Main Header (Container 3)**:
    - Top section of the main container matching the sidebar header height (`h-16`).
    - Displays the active view title, mobile sidebar toggle button, and theme mode toggle button.
 
 4. **Main Body Section (Container 4)**:
-   - Primary content area (`flex-1 overflow-y-auto p-6`) rendering the active view component.
+   - Primary content area (`flex-1 overflow-y-auto p-3`) rendering the active view component.
 
 ---
 
 ## Views & Anchor Routing Paradigm
 
 1. **Colocated Views**:
-   - Create a view component in `src/views/` (e.g. `MyView.tsx`) exporting both the component and its `ViewDefinition` object.
+   - Create a view component in `src/views/` (e.g. `MyView.tsx`) colocated with its exported `ViewDefinition` object.
    - Register the view definition in `src/views/views.ts` within the `APP_VIEWS` array.
-   - For protected views, set `requiresAuth: true`.
-   - For guest-only views, set `hideWhenAuth: true`.
-   - To hide standalone views (such as Login) from the sidebar list, set `hideInSidebar: true`.
-   - Registered views route via their anchor hash (e.g. `#homepage`, `#login`, `#debug`).
+   - To hide standalone views from the sidebar list, set `hideInSidebar: true`.
+   - Registered views route via their anchor hash (e.g. `#homepage`, `#microsoft`, `#settings`, `#debug`).
 
-2. **Anchor Routing & Authentication**:
+2. **Anchor Routing Paradigm**:
    - The active view is synchronized with the browser's URL hash (e.g. `#homepage`).
    - The default landing route is `#homepage`.
-   - Client-side cryptographic verification uses PBKDF2-HMAC-SHA256 (100,000 iterations) via Web Crypto API.
-   - Credential verification uses constant-time byte comparisons and dummy key derivation to mitigate timing attacks.
-   - Supports an extensible array-based user registry (`AUTH_USER_REGISTRY` of `UserCredentialRecord[]`).
-   - Lookups use `findUserByUsername` supporting case-insensitive matching, numbers, and symbols.
-   - Signing in via `#login` unlocks and exposes the `#debug` view in the sidebar.
-   - Sessions are signed with cryptographic SHA-256 signatures over 5 identity/temporal parameters,
-     preventing users from forging boolean flags or modifying identities in storage.
-   - Sessions are valid for 7 days (`AUTH_SESSION_DURATION_MS = 604,800,000 ms`).
+   - All registered views route directly via their anchor hash (e.g. `#homepage`, `#microsoft`, `#settings`, `#debug`).
 
 ---
 
@@ -171,7 +144,7 @@ Use `pnpm` to run scripts:
 2. **React Optimizations**:
    - Wrap view components and layout containers in `React.memo`.
    - Wrap event handlers and navigation callbacks in `useCallback`.
-   - Memoize context value objects in `src/context/AuthContext.tsx` with `useMemo`.
+   - Memoize context value objects in context providers with `useMemo`.
 
 3. **Bundle Optimization**:
    - Configured `manualChunks` in `vite.config.ts` isolating `vendor-react` and `vendor-icons`.
@@ -182,18 +155,16 @@ Use `pnpm` to run scripts:
 
 5. **Strings & Component-First Naming Taxonomy**:
    - Application site UI strings reside in `src/strings.ts`.
-   - System configuration and auth registries reside in `src/constants.ts`.
+   - System configuration and constants reside in `src/constants.ts`.
    - All string keys use uppercase format (`APP_STRINGS.SECTION.KEY`).
    - Strings follow component-first prefixes:
-     - `BTN_*`: Buttons and action triggers (`BTN_SUBMIT`, `BTN_LOGOUT`, `BTN_CLEAR_STORAGE`).
-     - `LABEL_*`: Input and status labels (`LABEL_USERNAME`, `LABEL_DARK_MODE`, `LABEL_AUTH_ACTIVE`).
-     - `INPUT_*`: Placeholders and field configurations (`INPUT_PLACEHOLDER_USERNAME`).
-     - `HEADING_*`: View headings and card titles (`HEADING_PAGE`, `HEADING_UNAUTHORIZED`).
-     - `TXT_*`: Instructional text, messages, and greetings (`TXT_DESCRIPTION`, `TXT_AUTH_NOTICE`).
+     - `BTN_*`: Buttons and action triggers (`BTN_SUBMIT`, `BTN_CLEAR_STORAGE`).
+     - `LABEL_*`: Input and status labels (`LABEL_DARK_MODE`, `LABEL_DB_ENGINE`).
+     - `INPUT_*`: Placeholders and field configurations (`INPUT_SEARCH_PLACEHOLDER`).
+     - `HEADING_*`: View headings and card titles (`HEADING_PAGE`, `HEADING_SYSTEM_PULSE`).
+     - `TXT_*`: Instructional text, messages, and greetings (`TXT_DESCRIPTION`, `TXT_PULSE_SUCCESS`).
      - `NAV_*`: Navigation IDs, titles, and hash routes (`NAV_ID`, `NAV_TITLE`, `NAV_HASH`).
-     - `BADGE_*`: Default user badges (`BADGE_DEFAULT_USER`).
-     - `STORAGE_KEY_*`: Local storage keys (`STORAGE_KEY_SESSION`).
-   - Zero hardcoded usernames in generic UI strings; identities are dynamically resolved via `useAuth()`.
+     - `STORAGE_KEY_*`: Local storage keys (`STORAGE_KEY_THEME`, `STORAGE_KEY_ACCENT`).
 
 ---
 
@@ -202,7 +173,7 @@ Use `pnpm` to run scripts:
 1. **Tailwind CSS v4**:
    - Tailwind is integrated directly via the `@tailwindcss/vite` plugin in `vite.config.ts`.
    - Global stylesheet imports `@import "tailwindcss";` in `src/index.css`.
-   - Class-based dark mode uses `@variant dark (&:where(.dark, .dark *));`.
+   - Class-based dark mode uses `@custom-variant dark (&:where(.dark, .dark *));`.
 
 2. **Dark Mode & Theme Detection**:
    - Default theme is light mode unless the browser/OS prefers dark mode via `prefers-color-scheme`.
@@ -217,10 +188,10 @@ Use `pnpm` to run scripts:
    - Prefer icons from `lucide-react`. Import individual icons to support optimal tree-shaking:
 
      ```tsx
-     import { Bug, Cuboid, Home, LogIn, LogOut, Moon, Settings, Sun } from 'lucide-react';
+     import { Bug, Cuboid, Home, Moon, Settings, Sun } from 'lucide-react';
      ```
 
 5. **Component Guidelines**:
    - Place reusable components in `src/components/` and page-level views in `src/views/`.
-   - Use named exports for view components and define explicit TypeScript interfaces for props.
+   - Use named exports for reusable components and view definitions with explicit TypeScript interfaces for props.
    - Keep state colocated with components or lift up when shared.

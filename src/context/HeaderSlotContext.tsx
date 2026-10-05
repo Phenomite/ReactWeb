@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo, type ReactNode } from 'react';
+import { createContext, type ReactNode, useContext, useMemo, useState } from 'react';
 
 interface HeaderSlotContextType {
   customTitle: ReactNode | null;
@@ -18,7 +18,7 @@ export function HeaderSlotProvider({ children }: { children: ReactNode }) {
       customActions: slot?.actions ?? null,
       setHeaderSlot: setSlot,
     }),
-    [slot]
+    [slot],
   );
 
   return <HeaderSlotContext.Provider value={contextValue}>{children}</HeaderSlotContext.Provider>;
@@ -32,4 +32,3 @@ export function useHeaderSlot(): HeaderSlotContextType {
   }
   return context;
 }
-

@@ -1,16 +1,16 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
-import { ALL_TENANTS, INITIAL_SECURITY_INCIDENTS, AUTH_CONFIG } from '@/constants';
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { ALL_TENANTS, INITIAL_SECURITY_INCIDENTS } from '@/constants';
 import { useToast } from '@/context/ToastContext';
 import { APP_STRINGS } from '@/strings';
 import type {
-  TenantRecord,
-  TenantScoreCategories,
-  SecurityIncident,
+  DataUpdateOptions,
+  DataUpdateResult,
   IncidentStatus,
   RealtimeConnectionStatus,
   RealtimeContextType,
-  DataUpdateOptions,
-  DataUpdateResult,
+  SecurityIncident,
+  TenantRecord,
+  TenantScoreCategories,
 } from '@/types';
 
 const RealtimeContext = createContext<RealtimeContextType | undefined>(undefined);
@@ -121,7 +121,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
               id: string;
               data: Record<string, unknown>;
             };
-            if (payload && payload.resource && payload.id && payload.data) {
+            if (payload?.resource && payload?.id && payload?.data) {
               applyEntityUpdate(payload.resource, payload.id, payload.data);
               setLastSyncTime(Date.now());
             }
@@ -135,7 +135,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
           if (!isMounted) return;
           try {
             const updated = JSON.parse(e.data) as TenantRecord;
-            if (updated && updated.id) {
+            if (updated?.id) {
               applyEntityUpdate('tenants', updated.id, updated as unknown as Record<string, unknown>);
               setLastSyncTime(Date.now());
             }
@@ -171,7 +171,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
           if (!isMounted) return;
           try {
             const newIncident = JSON.parse(e.data) as SecurityIncident;
-            if (newIncident && newIncident.id) {
+            if (newIncident?.id) {
               setIncidents((prev) => [newIncident, ...prev.filter((i) => i.id !== newIncident.id)]);
               setLastSyncTime(Date.now());
               showToast(APP_STRINGS.REALTIME.TXT_THREAT_BROADCAST, {
@@ -193,9 +193,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
               if ('title' in payload) {
                 applyEntityUpdate('incidents', payload.id, payload as unknown as Record<string, unknown>);
               } else if ('status' in payload) {
-                setIncidents((prev) =>
-                  prev.map((i) => (i.id === payload.id ? { ...i, status: payload.status } : i))
-                );
+                setIncidents((prev) => prev.map((i) => (i.id === payload.id ? { ...i, status: payload.status } : i)));
               }
               setLastSyncTime(Date.now());
             }
@@ -250,34 +248,24 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       resource: string,
       id: string,
       updates: Partial<T> | Record<string, unknown>,
-      options?: DataUpdateOptions<T>
+      options?: DataUpdateOptions<T>,
     ): Promise<DataUpdateResult<T>> => {
       // 1. Optional optimistic local execution
-      if (options?.optimisticUpdate) {
+      const optimisticUpdate = options?.optimisticUpdate;
+      if (optimisticUpdate) {
         if (resource === 'tenants') {
-          setTenants((prev) => options.optimisticUpdate!(prev as unknown as T[]) as unknown as TenantRecord[]);
+          setTenants((prev) => optimisticUpdate(prev as unknown as T[]) as unknown as TenantRecord[]);
         } else if (resource === 'incidents') {
-          setIncidents((prev) => options.optimisticUpdate!(prev as unknown as T[]) as unknown as SecurityIncident[]);
+          setIncidents((prev) => optimisticUpdate(prev as unknown as T[]) as unknown as SecurityIncident[]);
         }
       }
 
-      // Check active admin session token before dispatching
-      let activeSessionJson: string | null = null;
-      if (typeof window !== 'undefined') {
-        activeSessionJson = localStorage.getItem(AUTH_CONFIG.STORAGE_KEY_SESSION);
-      }
-
-      const targetEndpoint =
-        options?.endpoint || `/api/${encodeURIComponent(resource)}/${encodeURIComponent(id)}`;
+      const targetEndpoint = options?.endpoint || `/api/${encodeURIComponent(resource)}/${encodeURIComponent(id)}`;
       const httpMethod = options?.method || 'PATCH';
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
 
-      if (activeSessionJson) {
-        headers['Authorization'] = `Bearer ${activeSessionJson}`;
-        headers['X-Auth-Session'] = activeSessionJson;
-      }
       if (options?.updatedBy) {
         headers['X-Admin-User'] = options.updatedBy;
       }
@@ -291,19 +279,6 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
             expectedVersion: options?.expectedVersion,
           }),
         });
-
-        // 2. Handle Unauthorized / Forbidden (Active admin role in namespace required)
-        if (res.status === 401 || res.status === 403) {
-          const errPayload = (await res.json().catch(() => ({}))) as { message?: string; error?: string };
-          const errorMsg =
-            errPayload.message ||
-            'Forbidden: Modifying the database requires an active administrator role in the namespace.';
-          showToast(errorMsg, { type: 'error' });
-          return {
-            success: false,
-            error: errorMsg,
-          };
-        }
 
         // 2. Handle Optimistic Concurrency Conflict (HTTP 409)
         if (res.status === 409) {
@@ -370,7 +345,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
         };
       }
     },
-    [applyEntityUpdate, showToast]
+    [applyEntityUpdate, showToast],
   );
 
   // Retrieve all records for any resource collection dynamically
@@ -381,7 +356,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       const collection = entities[resource];
       return collection ? (Object.values(collection) as T[]) : [];
     },
-    [tenants, incidents, entities]
+    [tenants, incidents, entities],
   );
 
   // Retrieve a single record from any resource collection dynamically
@@ -391,7 +366,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       if (resource === 'incidents') return incidents.find((i) => i.id === id) as unknown as T;
       return entities[resource]?.[id] as T | undefined;
     },
-    [tenants, incidents, entities]
+    [tenants, incidents, entities],
   );
 
   // Backward-compatible tenant update wrapper delegating to data-agnostic updateData
@@ -399,7 +374,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
     async (
       id: string,
       updates: Partial<TenantRecord>,
-      expectedVersion?: number | undefined
+      expectedVersion?: number | undefined,
     ): Promise<{ success: boolean; conflict?: boolean | undefined; current?: TenantRecord | undefined }> => {
       const res = await updateData<TenantRecord>('tenants', id, updates, {
         expectedVersion,
@@ -411,7 +386,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
         current: res.current,
       };
     },
-    [updateData]
+    [updateData],
   );
 
   // Backward-compatible score update wrapper delegating to data-agnostic updateData
@@ -424,11 +399,11 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
         {
           endpoint: `/api/tenants/${encodeURIComponent(id)}/score`,
           successMessage: APP_STRINGS.REALTIME.TXT_SCORE_UPDATED,
-        }
+        },
       );
       return res.success;
     },
-    [updateData]
+    [updateData],
   );
 
   // Backward-compatible incident status update delegating to data-agnostic updateData
@@ -441,11 +416,11 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
         {
           endpoint: `/api/incidents/${encodeURIComponent(id)}/status`,
           successMessage: false,
-        }
+        },
       );
       return res.success;
     },
-    [updateData]
+    [updateData],
   );
 
   // Simulate threat signal via backend database with live broadcast
@@ -517,7 +492,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       simulateThreatSignal,
       updateIncidentStatus,
       triggerTelemetryPulse,
-    ]
+    ],
   );
 
   return <RealtimeContext.Provider value={contextValue}>{children}</RealtimeContext.Provider>;

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { ACCENT_CONFIG, ACCENT_OPTIONS } from '@/constants';
 import type { AccentColor, AccentOption } from '@/types';
 
@@ -44,7 +44,7 @@ export function AccentProvider({ children }: { children: ReactNode }) {
 
   const contextValue = useMemo<AccentContextType>(
     () => ({ accent, setAccent, activeOption, options: ACCENT_OPTIONS }),
-    [accent, setAccent, activeOption]
+    [accent, setAccent, activeOption],
   );
 
   return <AccentContext.Provider value={contextValue}>{children}</AccentContext.Provider>;
@@ -57,4 +57,3 @@ export function useAccent(): AccentContextType {
   }
   return context;
 }
-
