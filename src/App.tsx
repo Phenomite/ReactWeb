@@ -122,5 +122,3 @@ export function App() {
     </AccentProvider>
   );
 }
-
-export default App;

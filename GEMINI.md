@@ -59,6 +59,7 @@ Use `pnpm` to run scripts:
 | `pnpm run telemetry:cron` | Run real-time background cluster telemetry generator with Bun |
 | `pnpm run telemetry:cron:once` | Execute a single batch telemetry perturbation update with Bun |
 | `pnpm run dev:modify` | Modify live database records with developer attribution using Bun |
+| `pnpm run tenants:generate` | Generate 200 distinct enterprise tenants dataset with Bun |
 | `pnpm run lint:md` | Lint all markdown files with markdownlint-cli2 |
 
 ---
@@ -102,7 +103,7 @@ Use `pnpm` to run scripts:
 ## Views & Anchor Routing Paradigm
 
 1. **Colocated Views**:
-   - Create a view component in `src/views/` (e.g. `MyView.tsx`) exporting both the component and its `ViewDefinition` object.
+   - Create a view component in `src/views/` (e.g. `MyView.tsx`) colocated with its exported `ViewDefinition` object.
    - Register the view definition in `src/views/views.ts` within the `APP_VIEWS` array.
    - To hide standalone views from the sidebar list, set `hideInSidebar: true`.
    - Registered views route via their anchor hash (e.g. `#homepage`, `#microsoft`, `#settings`, `#debug`).
@@ -190,5 +191,5 @@ Use `pnpm` to run scripts:
 
 5. **Component Guidelines**:
    - Place reusable components in `src/components/` and page-level views in `src/views/`.
-   - Use named exports for view components and define explicit TypeScript interfaces for props.
+   - Use named exports for reusable components and view definitions with explicit TypeScript interfaces for props.
    - Keep state colocated with components or lift up when shared.

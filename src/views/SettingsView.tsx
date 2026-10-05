@@ -41,7 +41,7 @@ const AccentButton = memo(({ opt, isSelected, onSelect }: AccentButtonProps) => 
 AccentButton.displayName = 'AccentButton';
 
 // Renders the settings preferences and personalization view
-export const SettingsView = memo(() => {
+const SettingsView = memo(() => {
   const { accent, setAccent, options } = useAccent();
   const { showToast } = useToast();
 

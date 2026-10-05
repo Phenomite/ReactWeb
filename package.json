@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "pnpm run lint && vite build",
-    "check": "biome check --write .",
+    "check": "biome check --write . && pnpm knip",
     "dev:modify": "bun scripts/dev-modify-db.js",
     "dev": "vite",
     "format": "biome format --write .",
@@ -15,7 +15,8 @@
     "server:dev": "bun --watch server/index.js",
     "server": "bun server/index.js",
     "telemetry:cron:once": "bun scripts/k8s-telemetry-generator.js --once",
-    "telemetry:cron": "bun scripts/k8s-telemetry-generator.js"
+    "telemetry:cron": "bun scripts/k8s-telemetry-generator.js",
+    "tenants:generate": "bun scripts/generate-tenants.js"
   },
   "dependencies": {
     "clsx": "~2.1.1",
@@ -31,6 +32,7 @@
     "@types/react": "~19.3.0",
     "@types/react-dom": "~19.3.0",
     "@vitejs/plugin-react": "~6.1.1",
+    "knip": "6.39.0",
     "markdownlint-cli2": "0.23.3",
     "tailwindcss": "~4.3.3",
     "typescript": "~7.0.2",

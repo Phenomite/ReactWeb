@@ -19,7 +19,7 @@ function getGreeting(): string {
 }
 
 // Renders the Living Dashboard landing view
-export const HomepageView = memo(() => {
+const HomepageView = memo(() => {
   const { activeOption } = useAccent();
   const { isLive, activeVisitors } = useRealtime();
   const { showToast } = useToast();

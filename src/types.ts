@@ -49,7 +49,7 @@ export interface CommandItem {
 }
 
 // Security incident severity levels and lifecycle status
-export type IncidentSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info';
+type IncidentSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info';
 export type IncidentStatus = 'active' | 'investigating' | 'resolved';
 
 // Client-side security incident telemetry record
@@ -63,20 +63,6 @@ export interface SecurityIncident {
   timestamp: number;
   description: string;
   recommendation: string;
-}
-
-// MSRC Vulnerability and CVE advisory record
-export interface MsrcAdvisory {
-  cveId: string;
-  title: string;
-  severity: 'Critical' | 'High' | 'Medium';
-  cvssScore: number;
-  affectedProduct: string;
-  publishedDate: string;
-  description: string;
-  mitigation: string;
-  kbArticle: string;
-  isZeroDay: boolean;
 }
 
 // Security incident context state and methods

@@ -222,7 +222,7 @@ const TenantTableRow = memo(({ tenant, onInspect, m }: TenantTableRowProps) => {
 TenantTableRow.displayName = 'TenantTableRow';
 
 // Renders the gamified Microsoft Secure Score multi-tenant leaderboard
-export const MicrosoftView = memo(() => {
+const MicrosoftView = memo(() => {
   const { showToast } = useToast();
   const { setHeaderSlot } = useHeaderSlot();
   const { tenants } = useRealtime();

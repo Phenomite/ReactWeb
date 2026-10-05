@@ -13,7 +13,7 @@ if (!existsSync(DB_DIR)) {
 }
 const DB_PATH = process.env.DATABASE_URL || join(DB_DIR, 'reactweb.db');
 
-export const db = new DatabaseSync(DB_PATH);
+const db = new DatabaseSync(DB_PATH);
 
 // Configure SQLite for high concurrency and zero-loss durability
 db.exec(`
@@ -274,7 +274,7 @@ export function getTenantById(id) {
 }
 
 // Multi-admin safe tenant update with optimistic concurrency control
-export function publishTenantUpdate(id, updates = {}, expectedVersion = null, updatedBy = 'admin') {
+function publishTenantUpdate(id, updates = {}, expectedVersion = null, updatedBy = 'admin') {
   db.exec('BEGIN IMMEDIATE;');
   try {
     const existing = stmtSelectTenantById.get(id);

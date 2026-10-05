@@ -27,7 +27,7 @@ const MetricRow = ({
 );
 
 // Diagnostics view displaying runtime environment diagnostics and application state
-export const DebugView = memo(() => {
+const DebugView = memo(() => {
   const { showToast } = useToast();
   const d = APP_STRINGS.VIEWS.DEBUG;
 
