@@ -8,7 +8,6 @@
 		"dev:modify": "bun scripts/dev-modify-db.js",
 		"dev": "vite",
 		"lint": "tsc --noEmit && biome lint --write .",
-		"md:lint": "markdownlint-cli2 \"*.md\"",
 		"preview": "vite preview",
 		"server:dev": "bun --watch server/index.js",
 		"server": "bun server/index.js",

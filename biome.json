@@ -33,5 +33,13 @@
 		"formatter": {
 			"quoteStyle": "single"
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.md", "*.md"],
+			"formatter": {
+				"lineWidth": 120
+			}
+		}
+	]
 }

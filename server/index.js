@@ -50,8 +50,7 @@ const SECURITY_HEADERS = {
 	'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 	'Access-Control-Allow-Origin': CORS_ORIGIN,
 	'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
-	'Access-Control-Allow-Headers':
-		'Content-Type, Authorization, X-Auth-Session, X-Namespace-Secret, X-Updater-Source, X-Admin-User, X-Admin-Password',
+	'Access-Control-Allow-Headers': 'Content-Type, X-Namespace-Secret, X-Updater-Source, X-Admin-User',
 };
 
 function jsonResponse(data, status = 200, extraHeaders = {}) {
@@ -88,20 +87,20 @@ const SIMULATED_ALERTS = [
 		recommendation: 'Verify targetOrigin validation on window.addEventListener handlers.',
 	},
 	{
-		title: 'Repeated PBKDF2 Web Crypto Salt Mismatch Ingestion',
+		title: 'Anomalous API Rate Threshold Exceeded',
 		severity: 'critical',
-		category: 'Credential Defense',
-		source: 'Client Auth Engine',
-		description: 'Automated rapid-fire hash verification attempts flagged with randomized salt parameters.',
-		recommendation: 'Apply IP rate-limiting and enforce multi-factor authentication policies.',
+		category: 'Traffic Anomaly',
+		source: 'Rate Limiter Service',
+		description: 'Automated rapid mutation requests flagged from external IP violating rate limit window.',
+		recommendation: 'Inspect source IP address and verify edge rate-limiting rules.',
 	},
 	{
 		title: 'Local Storage State Manipulation Flagged',
 		severity: 'medium',
 		category: 'Data Integrity',
 		source: 'Storage Event Listener',
-		description: 'Direct console manipulation of session storage token detected outside normal application hooks.',
-		recommendation: 'Audit client-side state transitions and rotate signed session key.',
+		description: 'Direct console modification of local storage keys detected outside normal application hooks.',
+		recommendation: 'Audit client-side state transitions and verify stored preference schema.',
 	},
 	{
 		title: 'Sentinel Threat Intelligence Feeds Sync Completed',

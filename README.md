@@ -35,66 +35,9 @@ Used to test agentic harnesses and models understanding of intent, behaviour, an
 | `pnpm build` | Run type-check and build production assets to `dist/` |
 | `pnpm preview` | Locally preview the production build output |
 | `pnpm run dev:modify` | Modify live database records from terminal with developer attribution |
-| `pnpm run md:lint` | Lint all markdown files with markdownlint-cli2 |
+## Anchor Hash Routing
 
-## Service Mesh & Istio Waypoint Authorization Architecture
-
-In-app authentication and client-side cryptographic credential validation have been removed from the application
-codebase. Access control and Layer 7 policy enforcement are delegated upstream to Istio Waypoint proxies within the
-Istio Ambient Service Mesh.
-
-### Mesh Authorization Flow
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Operator as Operator / Client Browser
-    participant Gateway as Istio Ingress Gateway
-    participant Waypoint as Istio Waypoint Proxy (Envoy)
-    participant Backend as ReactWeb Backend (Bun)
-    participant SQLite as SQLite WAL Database
-
-    Operator->>Gateway: HTTPS Request (e.g. PATCH /api/tenants/:id)
-    Gateway->>Waypoint: Forward to Namespace Waypoint (HBONE / mTLS)
-    Note over Waypoint: Evaluate L7 AuthorizationPolicy & RBAC
-    alt Unauthorized / Forbidden
-        Waypoint-->>Gateway: HTTP 403 Forbidden
-        Gateway-->>Operator: 403 Forbidden (Blocked at Mesh Layer)
-    else Policy Allowed
-        Waypoint->>Backend: Forward Request (X-Admin-User: alice)
-        Backend->>SQLite: ACID Transaction & Optimistic Concurrency Check
-        SQLite-->>Backend: Updated Record Version
-        Backend-->>Waypoint: HTTP 200 OK
-        Waypoint-->>Gateway: HTTP 200 OK
-        Gateway-->>Operator: HTTP 200 OK (Live SSE Broadcast)
-    end
-```
-
-### Architectural Principles
-
-#### 1. Zero-Trust Layer 7 Enforcement
-
-- **Istio Ambient Waypoint**: Layer 7 traffic inspection, mutual TLS (mTLS), and role-based access control (RBAC) are
-  enforced by dedicated Waypoint Envoy proxies in the cluster namespace before packets reach the application.
-- **Declarative Authorization Policies**: Mesh administrators manage security posture declaratively via standard
-  Kubernetes custom resources (`AuthorizationPolicy` and `RequestAuthentication`).
-- **Zero In-App Auth Fragility**: Removing passwords, PBKDF2 derivation, and session tokens from the frontend bundle
-  eliminates client-side credential exposure and prevents cryptographic key derivation overhead on client devices.
-
-#### 2. Stateless Backend & Identity Attribution
-
-- **Identity Propagation**: When requests pass the Waypoint proxy, authenticated caller identities are propagated
-  via standard HTTP headers (`X-Admin-User`). The backend server attributes database modifications directly to the
-  calling operator or automation service (`lastUpdatedBy`).
-- **Optimistic Concurrency Control (OCC)**: Concurrency conflicts are handled through monotonically incrementing
-  record versions and SQLite WAL transactions, ensuring safe multi-operator collaboration without in-app locks.
-
-#### 3. Direct Anchor Hash Routing
-
-- **Seamless Navigation**: All application views (`#homepage`, `#microsoft`, `#settings`, `#debug`) route via anchor
-  hashes and are directly accessible in the UI.
-- **Decoupled Diagnostics**: The `#debug` diagnostics view displays active application state, build versions, and mesh
-  gateway status (`Istio Ambient`) without requiring client-side session elevation.
+All application views (`#homepage`, `#microsoft`, `#settings`, `#debug`) route directly via browser URL hashes and are immediately accessible in the UI.
 
 ---
 
@@ -276,17 +219,14 @@ runs directly inside the cluster namespace:
   pnpm run telemetry:cron
   ```
 
-### 3. Multi-Developer Namespace Authorization & Database Mutations
+### 3. Multi-Developer Attribution & Database Mutations
 
-The application delegates Layer 7 authorization to the upstream Istio Waypoint proxy while preserving developer
-attribution across all database mutations:
+The database layer coordinates multi-developer updates while preserving operator attribution across all mutations:
 
 - **Multi-Developer Access**: Multiple operators (`admin`, `alice`, `bob`, `charlie`) collaborate and publish live
   database updates.
-- **Mesh-Enforced Authorization**: Ingress and Waypoint proxies enforce L7 access policies before requests reach the
-  backend. Mutations are attributed to the identity in `X-Admin-User` (falling back to `operator` or `system`).
 - **Developer Attribution**: Every mutation records `lastUpdatedBy` in SQLite WAL, displaying the modifying operator
-  in the UI badge pill (e.g. `by alice`).
+  in the UI badge pill (e.g. `by alice`), attributed from the `X-Admin-User` header or `--as` flag.
 - **Live SSE Push to All Visitors**: All mutations immediately broadcast `data_updated` and `tenant_updated` events
   over Server-Sent Events, instantly reflecting updates across all connected visitor browsers.
 - **Web UI & CLI Mutation**:

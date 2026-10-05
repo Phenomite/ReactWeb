@@ -125,7 +125,7 @@ const DEBUG = {
 	NAV_TITLE: 'Debug',
 	NAV_HASH: '#debug',
 	HEADING_PAGE: 'Debug & Runtime Diagnostics',
-	TXT_DESCRIPTION: 'Protected view for inspecting runtime state, environment variables, and system metrics.',
+	TXT_DESCRIPTION: 'View for inspecting runtime state, environment variables, and system metrics.',
 	HEADING_SYSTEM_INFO: 'System & Framework',
 	HEADING_ACTIVE_STATE: 'Application State',
 	LABEL_ACTIVE_ANCHOR: 'Active URL Anchor',

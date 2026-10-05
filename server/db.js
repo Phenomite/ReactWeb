@@ -209,15 +209,14 @@ export function seedDatabaseIfEmpty() {
 		const initialIncidents = [
 			{
 				id: 'inc-101',
-				title: 'Suspicious Credential Velocity on Client Login',
+				title: 'Anomalous API Rate Threshold Exceeded',
 				severity: 'high',
 				status: 'active',
-				category: 'Identity & Access',
-				source: 'Auth PBKDF2 Engine',
+				category: 'Traffic Anomaly',
+				source: 'Rate Limiter Service',
 				timestamp: Date.now() - 1000 * 60 * 18,
-				description:
-					'Multiple rapid cryptographic derivation attempts detected without matching registered salt parameters.',
-				recommendation: 'Enforce exponential derivation delay and inspect origin IP reputation.',
+				description: 'Multiple rapid mutation requests detected from external IP violating rate limit threshold.',
+				recommendation: 'Inspect source IP address and verify rate-limiting rules.',
 			},
 			{
 				id: 'inc-102',
@@ -229,19 +228,18 @@ export function seedDatabaseIfEmpty() {
 				timestamp: Date.now() - 1000 * 60 * 65,
 				description:
 					'Complete cache flush invoked via client administration trigger outside of scheduled maintenance windows.',
-				recommendation: 'Verify authenticated administrator audit trail and validate session token signature.',
+				recommendation: 'Verify administrator audit trail and inspect state persistence.',
 			},
 			{
 				id: 'inc-103',
-				title: 'Unauthorized Protected Anchor Navigation Trapped',
+				title: 'Ingress TLS Certificate Renewal Scheduled',
 				severity: 'low',
 				status: 'resolved',
-				category: 'Route Authorization Guard',
-				source: 'Client Hash Router',
+				category: 'Transport Security',
+				source: 'Certificate Manager',
 				timestamp: Date.now() - 1000 * 60 * 180,
-				description:
-					'Unauthenticated browser navigation to #debug route intercepted and redirected to guest access notice.',
-				recommendation: 'Route guard functioning normally; no further administrative action required.',
+				description: 'Edge TLS certificate renewal automatically negotiated via ACME challenge before 30-day window.',
+				recommendation: 'Certificate successfully renewed; no further administrative action required.',
 			},
 		];
 

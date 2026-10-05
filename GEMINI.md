@@ -59,7 +59,6 @@ Use `pnpm` to run scripts:
 | `pnpm run telemetry:cron` | Run real-time background cluster telemetry generator with Bun |
 | `pnpm run telemetry:cron:once` | Execute a single batch telemetry perturbation update with Bun |
 | `pnpm run dev:modify` | Modify live database records with developer attribution using Bun |
-| `pnpm run md:lint` | Lint all markdown files with `markdownlint-cli2` |
 
 ---
 
@@ -74,7 +73,7 @@ Use `pnpm` to run scripts:
 
 3. **Direct Imports & No Barrel Indirection**:
    - Avoid `index.ts` barrel files and compatibility re-exports.
-   - All modules import directly via `@/*` aliases (e.g. `@/context/AuthContext`, `@/constants`, `@/strings`).
+   - All modules import directly via `@/*` aliases (e.g. `@/context/RealtimeContext`, `@/constants`, `@/strings`).
 
 ---
 
@@ -107,14 +106,10 @@ Use `pnpm` to run scripts:
    - To hide standalone views from the sidebar list, set `hideInSidebar: true`.
    - Registered views route via their anchor hash (e.g. `#homepage`, `#microsoft`, `#settings`, `#debug`).
 
-2. **Anchor Routing & Istio Waypoint Authorization**:
+2. **Anchor Routing Paradigm**:
    - The active view is synchronized with the browser's URL hash (e.g. `#homepage`).
    - The default landing route is `#homepage`.
-   - Authorization and Layer 7 access controls are offloaded from client application logic and enforced
-     upstream by server-side Istio Waypoint proxies (Istio Ambient Mesh) via `AuthorizationPolicy`.
-   - The backend service runs stateless and zero-trust, accepting operator and internal service calls
-     attributed via HTTP headers (`X-Admin-User`), with mutual TLS (mTLS) and ingress policy enforcement
-     handled at the mesh waypoint layer.
+   - All registered views route directly via their anchor hash (e.g. `#homepage`, `#microsoft`, `#settings`, `#debug`).
 
 ---
 

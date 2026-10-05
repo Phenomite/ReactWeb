@@ -2,7 +2,7 @@
 /**
  * Developer In-Namespace Database Mutation CLI
  *
- * Enables authorized developers within the cluster namespace (or local dev environment)
+ * Enables developers within the cluster namespace (or local dev environment)
  * to modify records in the live running server database, with immediate real-time SSE
  * propagation across all connected visitors.
  *
@@ -92,7 +92,7 @@ async function main() {
 
 		if (res.status === 403 || res.status === 401) {
 			const err = await res.json().catch(() => ({}));
-			console.error(`[ACCESS DENIED] HTTP ${res.status}: ${err.message || 'Active admin role in namespace required.'}`);
+			console.error(`[ACCESS DENIED] HTTP ${res.status}: ${err.message || 'Access denied.'}`);
 			process.exit(1);
 		}
 
