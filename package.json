@@ -1,37 +1,38 @@
 {
-  "name": "react-web-app",
-  "private": true,
-  "version": "0.1.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "server": "node server/index.js",
-    "server:dev": "node --watch server/index.js",
-    "telemetry:cron": "node scripts/k8s-telemetry-generator.js",
-    "telemetry:cron:once": "node scripts/k8s-telemetry-generator.js --once",
-    "lint": "tsc --noEmit",
-    "build": "pnpm run lint && vite build",
-    "preview": "vite preview",
-    "auth:hash": "node scripts/generate-user-hash.js",
-    "dev:modify": "node scripts/dev-modify-db.js",
-    "md:lint": "markdownlint-cli2 \"*.md\""
-  },
-  "dependencies": {
-    "clsx": "^2.1.1",
-    "lucide-react": "^1.37.0",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "tailwind-merge": "^3.6.0"
-  },
-  "devDependencies": {
-    "@tailwindcss/vite": "^4.3.3",
-    "@types/node": "^26.4.0",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.5",
-    "@vitejs/plugin-react": "^6.1.1",
-    "markdownlint-cli2": "^0.23.2",
-    "tailwindcss": "^4.3.3",
-    "typescript": "~7.0.2",
-    "vite": "^8.2.2"
-  }
+	"name": "reactweb",
+	"private": true,
+	"version": "0.2.0",
+	"type": "module",
+	"scripts": {
+		"build": "pnpm run lint && vite build",
+		"dev:modify": "bun scripts/dev-modify-db.js",
+		"dev": "vite",
+		"lint": "tsc --noEmit && biome lint --write .",
+		"md:lint": "markdownlint-cli2 \"*.md\"",
+		"preview": "vite preview",
+		"server:dev": "bun --watch server/index.js",
+		"server": "bun server/index.js",
+		"telemetry:cron:once": "bun scripts/k8s-telemetry-generator.js --once",
+		"telemetry:cron": "bun scripts/k8s-telemetry-generator.js",
+		"format": "biome format --write .",
+		"check": "biome check --write ."
+	},
+	"dependencies": {
+		"clsx": "~2.1.1",
+		"lucide-react": "~1.51.0",
+		"react": "~19.3.0",
+		"react-dom": "~19.3.0",
+		"tailwind-merge": "~3.7.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "~2.5.15",
+		"@tailwindcss/vite": "~4.3.3",
+		"@types/bun": "~1.4.2",
+		"@types/react": "~19.3.0",
+		"@types/react-dom": "~19.3.0",
+		"@vitejs/plugin-react": "~6.1.1",
+		"tailwindcss": "~4.3.3",
+		"typescript": "~7.0.2",
+		"vite": "~8.3.2"
+	}
 }

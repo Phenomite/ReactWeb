@@ -1,2 +1,21 @@
 {
+	"editor.defaultFormatter": "biomejs.biome",
+	"editor.formatOnSave": true,
+
+	// safe lint fixes and organize imports on save
+	"editor.codeActionsOnSave": {
+		"source.fixAll.biome": "explicit",
+		"source.organizeImports.biome": "explicit"
+	},
+
+	// TS and TSX explicitly use Biome
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	}
 }

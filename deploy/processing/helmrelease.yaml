@@ -34,7 +34,7 @@ spec:
               repository: ghcr.io/phenomite/reactweb-backend
               tag: latest
             command:
-              - node
+              - bun
               - scripts/k8s-telemetry-generator.js
             env:
               NODE_ENV: production

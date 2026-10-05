@@ -1,18 +1,15 @@
-import { createServer } from 'node:http';
 import {
-  seedDatabaseIfEmpty,
-  getAllTenants,
-  getTenantById,
-  updateTenantScore,
-  publishTenantUpdate,
-  batchUpdateTenants,
-  getAllIncidents,
-  addIncident,
-  updateIncidentStatus,
-  updateGenericRecord,
-  getDatabaseStats,
+	addIncident,
+	batchUpdateTenants,
+	getAllIncidents,
+	getAllTenants,
+	getDatabaseStats,
+	getTenantById,
+	seedDatabaseIfEmpty,
+	updateGenericRecord,
+	updateIncidentStatus,
+	updateTenantScore,
 } from './db.js';
-import { authenticateAdminRequest } from './auth.js';
 
 // Configuration
 const PORT = Number.parseInt(process.env.PORT || '3001', 10);
@@ -23,530 +20,461 @@ const ENABLE_SIMULATOR = process.env.ENABLE_SIMULATOR !== 'false';
 // Seed database on startup
 seedDatabaseIfEmpty();
 
-// Active SSE client subscriptions
+// Active SSE client subscriptions (ReadableStreamDefaultController set)
 const activeClients = new Set();
+const textEncoder = new TextEncoder();
 
-// Rate limiter storage: IP -> { tokens: number, lastRefill: number }
+// Rate limiter storage: IP -> { count: number, resetAt: number }
 const rateLimitMap = new Map();
 const RATE_LIMIT_MAX = 100;
 const RATE_LIMIT_WINDOW_MS = 60000;
 
 function checkRateLimit(ip) {
-  const now = Date.now();
-  const record = rateLimitMap.get(ip) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
-  if (now > record.resetAt) {
-    record.count = 0;
-    record.resetAt = now + RATE_LIMIT_WINDOW_MS;
-  }
-  record.count += 1;
-  rateLimitMap.set(ip, record);
-  return record.count <= RATE_LIMIT_MAX;
+	const now = Date.now();
+	const record = rateLimitMap.get(ip) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
+	if (now > record.resetAt) {
+		record.count = 0;
+		record.resetAt = now + RATE_LIMIT_WINDOW_MS;
+	}
+	record.count += 1;
+	rateLimitMap.set(ip, record);
+	return record.count <= RATE_LIMIT_MAX;
 }
 
 // DevSecOps Security Headers
-function setSecurityHeaders(res) {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  res.setHeader('Access-Control-Allow-Origin', CORS_ORIGIN);
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+const SECURITY_HEADERS = {
+	'X-Content-Type-Options': 'nosniff',
+	'X-Frame-Options': 'DENY',
+	'X-XSS-Protection': '1; mode=block',
+	'Referrer-Policy': 'strict-origin-when-cross-origin',
+	'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+	'Access-Control-Allow-Origin': CORS_ORIGIN,
+	'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
+	'Access-Control-Allow-Headers':
+		'Content-Type, Authorization, X-Auth-Session, X-Namespace-Secret, X-Updater-Source, X-Admin-User, X-Admin-Password',
+};
+
+function jsonResponse(data, status = 200, extraHeaders = {}) {
+	return Response.json(data, {
+		status,
+		headers: {
+			...SECURITY_HEADERS,
+			...extraHeaders,
+		},
+	});
 }
 
 // Broadcast real-time SSE event to all connected browser visitors
 export function broadcastEvent(event, data) {
-  const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
-  for (const client of activeClients) {
-    try {
-      client.write(payload);
-    } catch {
-      activeClients.delete(client);
-    }
-  }
+	const payload = textEncoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+	for (const client of activeClients) {
+		try {
+			client.enqueue(payload);
+		} catch {
+			activeClients.delete(client);
+		}
+	}
 }
 
 // Simulated enterprise threat signals
 const SIMULATED_ALERTS = [
-  {
-    title: 'Anomalous Cross-Origin PostMessage Telemetry Probe',
-    severity: 'high',
-    category: 'Cross-Context Isolation',
-    source: 'Browser Window Messaging Guard',
-    description: 'An untrusted origin attempted to post structured messages without meeting COOP same-origin constraints.',
-    recommendation: 'Verify targetOrigin validation on window.addEventListener handlers.',
-  },
-  {
-    title: 'Repeated PBKDF2 Web Crypto Salt Mismatch Ingestion',
-    severity: 'critical',
-    category: 'Credential Defense',
-    source: 'Client Auth Engine',
-    description: 'Automated rapid-fire hash verification attempts flagged with randomized salt parameters.',
-    recommendation: 'Apply IP rate-limiting and enforce multi-factor authentication policies.',
-  },
-  {
-    title: 'Local Storage State Manipulation Flagged',
-    severity: 'medium',
-    category: 'Data Integrity',
-    source: 'Storage Event Listener',
-    description: 'Direct console manipulation of session storage token detected outside normal application hooks.',
-    recommendation: 'Audit client-side state transitions and rotate signed session key.',
-  },
-  {
-    title: 'Sentinel Threat Intelligence Feeds Sync Completed',
-    severity: 'info',
-    category: 'Threat Intelligence',
-    source: 'Azure Sentinel Connector',
-    description: 'Successfully ingested 42 new IOC signatures from Microsoft Threat Intelligence.',
-    recommendation: 'No action required; signatures active in tenant firewall rules.',
-  },
+	{
+		title: 'Anomalous Cross-Origin PostMessage Telemetry Probe',
+		severity: 'high',
+		category: 'Cross-Context Isolation',
+		source: 'Browser Window Messaging Guard',
+		description:
+			'An untrusted origin attempted to post structured messages without meeting COOP same-origin constraints.',
+		recommendation: 'Verify targetOrigin validation on window.addEventListener handlers.',
+	},
+	{
+		title: 'Repeated PBKDF2 Web Crypto Salt Mismatch Ingestion',
+		severity: 'critical',
+		category: 'Credential Defense',
+		source: 'Client Auth Engine',
+		description: 'Automated rapid-fire hash verification attempts flagged with randomized salt parameters.',
+		recommendation: 'Apply IP rate-limiting and enforce multi-factor authentication policies.',
+	},
+	{
+		title: 'Local Storage State Manipulation Flagged',
+		severity: 'medium',
+		category: 'Data Integrity',
+		source: 'Storage Event Listener',
+		description: 'Direct console manipulation of session storage token detected outside normal application hooks.',
+		recommendation: 'Audit client-side state transitions and rotate signed session key.',
+	},
+	{
+		title: 'Sentinel Threat Intelligence Feeds Sync Completed',
+		severity: 'info',
+		category: 'Threat Intelligence',
+		source: 'Azure Sentinel Connector',
+		description: 'Successfully ingested 42 new IOC signatures from Microsoft Threat Intelligence.',
+		recommendation: 'No action required; signatures active in tenant firewall rules.',
+	},
 ];
 
-// Helper to parse JSON body with strict length limit (64KB)
-function parseJsonBody(req, maxLength = 65536) {
-  return new Promise((resolve, reject) => {
-    let raw = '';
-    req.on('data', (chunk) => {
-      raw += chunk;
-      if (raw.length > maxLength) {
-        reject(new Error('Payload Too Large'));
-      }
-    });
-    req.on('end', () => {
-      try {
-        resolve(raw ? JSON.parse(raw) : {});
-      } catch (err) {
-        reject(err);
-      }
-    });
-    req.on('error', reject);
-  });
+// Helper to safely parse JSON body from standard Request
+async function parseJsonBody(req) {
+	try {
+		return await req.json();
+	} catch {
+		return {};
+	}
 }
 
-// Create native HTTP server
-export const server = createServer(async (req, res) => {
-  setSecurityHeaders(res);
+// Start native Bun HTTP server
+export const server = Bun.serve({
+	port: PORT,
+	hostname: HOST,
+	idleTimeout: 0,
 
-  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
-  const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
-  const pathname = url.pathname;
-  const method = req.method || 'GET';
+	async fetch(req, serverInstance) {
+		const ip = req.headers.get('x-forwarded-for') || serverInstance.requestIP(req)?.address || '127.0.0.1';
+		const url = new URL(req.url);
+		const pathname = url.pathname;
+		const method = req.method;
 
-  // Handle CORS preflight
-  if (method === 'OPTIONS') {
-    res.writeHead(204);
-    res.end();
-    return;
-  }
+		// Handle CORS preflight
+		if (method === 'OPTIONS') {
+			return new Response(null, {
+				status: 204,
+				headers: SECURITY_HEADERS,
+			});
+		}
 
-  // Rate limit protection on mutating requests
-  if (method === 'POST' || method === 'PATCH') {
-    if (!checkRateLimit(ip)) {
-      res.writeHead(429, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Too Many Requests', retryAfter: 60 }));
-      return;
-    }
-  }
+		// Rate limit protection on mutating requests
+		if (method === 'POST' || method === 'PATCH') {
+			if (!checkRateLimit(ip)) {
+				return jsonResponse({ error: 'Too Many Requests', retryAfter: 60 }, 429);
+			}
+		}
 
-  try {
-    // Kubernetes Liveness Probe
-    if (pathname === '/healthz' && method === 'GET') {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ status: 'ok', uptime: process.uptime() }));
-      return;
-    }
+		try {
+			// Kubernetes Liveness Probe
+			if (pathname === '/healthz' && method === 'GET') {
+				return jsonResponse({ status: 'ok', uptime: process.uptime() });
+			}
 
-    // Kubernetes Readiness Probe
-    if (pathname === '/readyz' && method === 'GET') {
-      try {
-        getDatabaseStats();
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: 'ready', clientsConnected: activeClients.size }));
-      } catch {
-        res.writeHead(503, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: 'unavailable' }));
-      }
-      return;
-    }
+			// Kubernetes Readiness Probe
+			if (pathname === '/readyz' && method === 'GET') {
+				try {
+					getDatabaseStats();
+					return jsonResponse({ status: 'ready', clientsConnected: activeClients.size });
+				} catch {
+					return jsonResponse({ status: 'unavailable' }, 503);
+				}
+			}
 
-    // Real-Time SSE Stream Endpoint
-    if (pathname === '/api/events' && method === 'GET') {
-      res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache, no-transform',
-        'Connection': 'keep-alive',
-        'X-Accel-Buffering': 'no',
-      });
+			// Real-Time SSE Stream Endpoint
+			if (pathname === '/api/events' && method === 'GET') {
+				let clientController = null;
+				const stream = new ReadableStream({
+					start(controller) {
+						clientController = controller;
+						activeClients.add(controller);
 
-      // Send initial keep-alive comment
-      res.write(': connected\n\n');
+						// Send initial keep-alive comment
+						controller.enqueue(textEncoder.encode(': connected\n\n'));
 
-      // Register client
-      activeClients.add(res);
+						// Send initial data snapshot
+						const initialPayload = {
+							tenants: getAllTenants(),
+							incidents: getAllIncidents(),
+							stats: getDatabaseStats(),
+							activeVisitors: activeClients.size,
+							serverTime: Date.now(),
+						};
+						controller.enqueue(textEncoder.encode(`event: init\ndata: ${JSON.stringify(initialPayload)}\n\n`));
 
-      // Send initial data snapshot
-      const initialPayload = {
-        tenants: getAllTenants(),
-        incidents: getAllIncidents(),
-        stats: getDatabaseStats(),
-        activeVisitors: activeClients.size,
-        serverTime: Date.now(),
-      };
-      res.write(`event: init\ndata: ${JSON.stringify(initialPayload)}\n\n`);
+						// Broadcast updated visitor count to all visitors
+						broadcastEvent('visitors', {
+							activeVisitors: activeClients.size,
+							timestamp: Date.now(),
+						});
+					},
+					cancel() {
+						if (clientController) {
+							activeClients.delete(clientController);
+							broadcastEvent('visitors', {
+								activeVisitors: activeClients.size,
+								timestamp: Date.now(),
+							});
+						}
+					},
+				});
 
-      // Broadcast updated visitor count to all visitors
-      broadcastEvent('visitors', {
-        activeVisitors: activeClients.size,
-        timestamp: Date.now(),
-      });
+				return new Response(stream, {
+					headers: {
+						...SECURITY_HEADERS,
+						'Content-Type': 'text/event-stream',
+						'Cache-Control': 'no-cache, no-transform',
+						Connection: 'keep-alive',
+						'X-Accel-Buffering': 'no',
+					},
+				});
+			}
 
-      // Cleanup on disconnect
-      req.on('close', () => {
-        activeClients.delete(res);
-        broadcastEvent('visitors', {
-          activeVisitors: activeClients.size,
-          timestamp: Date.now(),
-        });
-      });
-      return;
-    }
+			// API Status Endpoint
+			if (pathname === '/api/status' && method === 'GET') {
+				const stats = getDatabaseStats();
+				return jsonResponse({
+					status: 'online',
+					engine: `Bun ${Bun.version} + SQLite WAL`,
+					uptime: process.uptime(),
+					activeVisitors: activeClients.size,
+					database: stats,
+					timestamp: Date.now(),
+				});
+			}
 
-    // API Status Endpoint
-    if (pathname === '/api/status' && method === 'GET') {
-      const stats = getDatabaseStats();
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(
-        JSON.stringify({
-          status: 'online',
-          engine: 'Node.js + SQLite WAL',
-          uptime: process.uptime(),
-          activeVisitors: activeClients.size,
-          database: stats,
-          timestamp: Date.now(),
-        })
-      );
-      return;
-    }
+			// Tenants Collection
+			if (pathname === '/api/tenants' && method === 'GET') {
+				const tenants = getAllTenants();
+				return jsonResponse(tenants);
+			}
 
-    // Tenants Collection
-    if (pathname === '/api/tenants' && method === 'GET') {
-      const tenants = getAllTenants();
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(tenants));
-      return;
-    }
+			// Single Tenant
+			const tenantMatch = pathname.match(/^\/api\/tenants\/([^/]+)$/);
+			if (tenantMatch && method === 'GET') {
+				const tenantId = tenantMatch[1];
+				const tenant = getTenantById(tenantId);
+				if (!tenant) {
+					return jsonResponse({ error: 'Tenant Not Found' }, 404);
+				}
+				return jsonResponse(tenant);
+			}
 
-    // Single Tenant
-    const tenantMatch = pathname.match(/^\/api\/tenants\/([^/]+)$/);
-    if (tenantMatch && method === 'GET') {
-      const tenantId = tenantMatch[1];
-      const tenant = getTenantById(tenantId);
-      if (!tenant) {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Tenant Not Found' }));
-        return;
-      }
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(tenant));
-      return;
-    }
+			// Data-Agnostic Entity Update (with Optimistic Concurrency Control & Real-Time Broadcast)
+			const genericPatchMatch = pathname.match(/^\/api\/([a-zA-Z0-9_]+)\/([^/]+)$/);
+			if (
+				genericPatchMatch &&
+				method === 'PATCH' &&
+				genericPatchMatch[2] !== 'pulse' &&
+				genericPatchMatch[2] !== 'simulate'
+			) {
+				const resource = genericPatchMatch[1];
+				const entityId = genericPatchMatch[2];
+				const body = await parseJsonBody(req);
+				const adminUser =
+					(typeof req.headers?.get === 'function' ? req.headers.get('x-admin-user') : req.headers?.['x-admin-user']) ||
+					'system';
+				const expectedVersion = typeof body.expectedVersion === 'number' ? body.expectedVersion : null;
 
-    // Data-Agnostic Entity Update (with Optimistic Concurrency Control & Real-Time Broadcast)
-    const genericPatchMatch = pathname.match(/^\/api\/([a-zA-Z0-9_]+)\/([^/]+)$/);
-    if (genericPatchMatch && method === 'PATCH' && genericPatchMatch[2] !== 'pulse' && genericPatchMatch[2] !== 'simulate') {
-      const auth = authenticateAdminRequest(req);
-      if (!auth.authorized) {
-        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
-        return;
-      }
+				const result = updateGenericRecord(resource, entityId, body, expectedVersion, adminUser);
 
-      const resource = genericPatchMatch[1];
-      const entityId = genericPatchMatch[2];
-      const body = await parseJsonBody(req);
-      const adminUser = auth.user;
-      const expectedVersion = typeof body.expectedVersion === 'number' ? body.expectedVersion : null;
+				if (result.notFound) {
+					return jsonResponse({ error: `${resource} item not found` }, 404);
+				}
 
-      const result = updateGenericRecord(resource, entityId, body, expectedVersion, adminUser);
+				if (result.conflict) {
+					return jsonResponse(
+						{
+							error: 'Conflict',
+							message: `${resource} item was concurrently modified by another administrator`,
+							current: result.current,
+							currentTenant: result.current,
+						},
+						409,
+					);
+				}
 
-      if (result.notFound) {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: `${resource} item not found` }));
-        return;
-      }
+				const updatedRecord = result.record || result.tenant;
 
-      if (result.conflict) {
-        res.writeHead(409, { 'Content-Type': 'application/json' });
-        res.end(
-          JSON.stringify({
-            error: 'Conflict',
-            message: `${resource} item was concurrently modified by another administrator`,
-            current: result.current,
-            currentTenant: result.current,
-          })
-        );
-        return;
-      }
+				// Broadcast generic event over SSE so all open browser tabs update dynamically
+				broadcastEvent('data_updated', {
+					resource,
+					id: entityId,
+					data: updatedRecord,
+					timestamp: Date.now(),
+				});
 
-      const updatedRecord = result.record || result.tenant;
+				// Backward-compatible entity-specific broadcasts
+				if (resource === 'tenants') {
+					broadcastEvent('tenant_updated', updatedRecord);
+				} else if (resource === 'incidents') {
+					broadcastEvent('incident_status_updated', updatedRecord);
+				}
 
-      // Broadcast generic event over SSE so all open browser tabs update dynamically
-      broadcastEvent('data_updated', {
-        resource,
-        id: entityId,
-        data: updatedRecord,
-        timestamp: Date.now(),
-      });
+				return jsonResponse({ success: true, resource, data: updatedRecord, tenant: updatedRecord });
+			}
 
-      // Backward-compatible entity-specific broadcasts
-      if (resource === 'tenants') {
-        broadcastEvent('tenant_updated', updatedRecord);
-      } else if (resource === 'incidents') {
-        broadcastEvent('incident_status_updated', updatedRecord);
-      }
+			// High-Throughput Batch Update for In-Cluster Scripts & CronJobs
+			if (pathname === '/api/internal/batch-update-tenants' && method === 'POST') {
+				const body = await parseJsonBody(req);
+				const updatedBy =
+					body.updatedBy ||
+					(typeof req.headers?.get === 'function' ? req.headers.get('x-admin-user') : req.headers?.['x-admin-user']) ||
+					'k8s-telemetry-generator';
+				const result = batchUpdateTenants(body.updates, updatedBy);
 
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, resource, data: updatedRecord, tenant: updatedRecord }));
-      return;
-    }
+				// Broadcast batch event over SSE so all open browser tabs update instantly
+				broadcastEvent('tenants_batch_updated', {
+					updatedCount: result.updatedCount,
+					timestamp: result.timestamp,
+					updatedBy,
+					tenants: result.tenants,
+				});
 
-    // High-Throughput Batch Update for In-Cluster Scripts & CronJobs
-    if (pathname === '/api/internal/batch-update-tenants' && method === 'POST') {
-      const auth = authenticateAdminRequest(req);
-      if (!auth.authorized) {
-        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
-        return;
-      }
+				return jsonResponse({
+					status: 'success',
+					updatedCount: result.updatedCount,
+					timestamp: result.timestamp,
+				});
+			}
 
-      const body = await parseJsonBody(req);
-      const updatedBy = auth.user || 'k8s-telemetry-generator';
-      const result = batchUpdateTenants(body.updates, updatedBy);
+			// Legacy Update Tenant Score (with Real-Time Broadcast)
+			const scoreMatch = pathname.match(/^\/api\/tenants\/([^/]+)\/score$/);
+			if (scoreMatch && method === 'PATCH') {
+				const tenantId = scoreMatch[1];
+				const body = await parseJsonBody(req);
+				const overallScore = Number.parseFloat(body.overallScore);
+				if (Number.isNaN(overallScore) || overallScore < 0 || overallScore > 100) {
+					return jsonResponse({ error: 'overallScore must be a number between 0 and 100' }, 400);
+				}
 
-      // Broadcast batch event over SSE so all open browser tabs update instantly
-      broadcastEvent('tenants_batch_updated', {
-        updatedCount: result.updatedCount,
-        timestamp: result.timestamp,
-        updatedBy,
-        tenants: result.tenants,
-      });
+				const adminUser =
+					(typeof req.headers?.get === 'function' ? req.headers.get('x-admin-user') : req.headers?.['x-admin-user']) ||
+					'system';
+				const updated = updateTenantScore(tenantId, overallScore, body.categories || {}, adminUser);
+				if (!updated) {
+					return jsonResponse({ error: 'Tenant Not Found' }, 404);
+				}
 
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(
-        JSON.stringify({
-          status: 'success',
-          updatedCount: result.updatedCount,
-          timestamp: result.timestamp,
-        })
-      );
-      return;
-    }
+				// Broadcast update to all connected browsers
+				broadcastEvent('tenant_updated', updated);
 
-    // Legacy Update Tenant Score (with Real-Time Broadcast)
-    const scoreMatch = pathname.match(/^\/api\/tenants\/([^/]+)\/score$/);
-    if (scoreMatch && method === 'PATCH') {
-      const auth = authenticateAdminRequest(req);
-      if (!auth.authorized) {
-        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
-        return;
-      }
+				return jsonResponse(updated);
+			}
 
-      const tenantId = scoreMatch[1];
-      const body = await parseJsonBody(req);
-      const overallScore = Number.parseFloat(body.overallScore);
-      if (Number.isNaN(overallScore) || overallScore < 0 || overallScore > 100) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'overallScore must be a number between 0 and 100' }));
-        return;
-      }
+			// Incidents Collection
+			if (pathname === '/api/incidents' && method === 'GET') {
+				const incidents = getAllIncidents();
+				return jsonResponse(incidents);
+			}
 
-      const updated = updateTenantScore(tenantId, overallScore, body.categories || {}, auth.user);
-      if (!updated) {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Tenant Not Found' }));
-        return;
-      }
+			// Create Incident (with Real-Time Broadcast)
+			if (pathname === '/api/incidents' && method === 'POST') {
+				const body = await parseJsonBody(req);
+				if (!body.title) {
+					return jsonResponse({ error: 'title is required' }, 400);
+				}
+				const created = addIncident(body);
 
-      // Broadcast update to all connected browsers
-      broadcastEvent('tenant_updated', updated);
+				// Broadcast real-time incident event to all connected visitors
+				broadcastEvent('incident_created', created);
 
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(updated));
-      return;
-    }
+				return jsonResponse(created, 201);
+			}
 
-    // Incidents Collection
-    if (pathname === '/api/incidents' && method === 'GET') {
-      const incidents = getAllIncidents();
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(incidents));
-      return;
-    }
+			// Simulate Incident (with Real-Time Broadcast)
+			if (pathname === '/api/incidents/simulate' && method === 'POST') {
+				const template = SIMULATED_ALERTS[Math.floor(Math.random() * SIMULATED_ALERTS.length)];
+				const incident = {
+					...template,
+					timestamp: Date.now(),
+				};
+				const created = addIncident(incident);
 
-    // Create Incident (with Real-Time Broadcast)
-    if (pathname === '/api/incidents' && method === 'POST') {
-      const auth = authenticateAdminRequest(req);
-      if (!auth.authorized) {
-        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
-        return;
-      }
+				// Broadcast to all connected visitors
+				broadcastEvent('incident_created', created);
 
-      const body = await parseJsonBody(req);
-      if (!body.title) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'title is required' }));
-        return;
-      }
-      const created = addIncident(body);
+				return jsonResponse(created, 201);
+			}
 
-      // Broadcast real-time incident event to all connected visitors
-      broadcastEvent('incident_created', created);
+			// Update Incident Status (with Real-Time Broadcast)
+			const incidentStatusMatch = pathname.match(/^\/api\/incidents\/([^/]+)\/status$/);
+			if (incidentStatusMatch && method === 'PATCH') {
+				const incidentId = incidentStatusMatch[1];
+				const body = await parseJsonBody(req);
+				if (!['active', 'investigating', 'resolved'].includes(body.status)) {
+					return jsonResponse({ error: 'Invalid status' }, 400);
+				}
+				const updated = updateIncidentStatus(incidentId, body.status);
 
-      res.writeHead(201, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(created));
-      return;
-    }
+				// Broadcast to all connected visitors
+				broadcastEvent('incident_status_updated', updated);
 
-    // Simulate Incident (with Real-Time Broadcast)
-    if (pathname === '/api/incidents/simulate' && method === 'POST') {
-      const auth = authenticateAdminRequest(req);
-      if (!auth.authorized) {
-        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
-        return;
-      }
+				return jsonResponse(updated);
+			}
 
-      const template = SIMULATED_ALERTS[Math.floor(Math.random() * SIMULATED_ALERTS.length)];
-      const incident = {
-        ...template,
-        timestamp: Date.now(),
-      };
-      const created = addIncident(incident);
+			// Manual Telemetry Pulse Trigger
+			if (pathname === '/api/telemetry/pulse' && method === 'POST') {
+				const tenants = getAllTenants();
+				if (tenants.length > 0) {
+					// Randomly select one tenant and gently nudge score (+/- 1-2 points)
+					const randomTenant = tenants[Math.floor(Math.random() * tenants.length)];
+					const delta = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 2) + 1);
+					const newScore = Math.min(100, Math.max(20, Math.round((randomTenant.overallScore + delta) * 10) / 10));
+					const adminUser =
+						(typeof req.headers?.get === 'function'
+							? req.headers.get('x-admin-user')
+							: req.headers?.['x-admin-user']) || 'system';
+					const updated = updateTenantScore(randomTenant.id, newScore, {}, adminUser);
+					if (updated) {
+						broadcastEvent('tenant_updated', updated);
+					}
+				}
+				return jsonResponse({ status: 'pulse_dispatched', activeVisitors: activeClients.size });
+			}
 
-      // Broadcast to all connected visitors
-      broadcastEvent('incident_created', created);
-
-      res.writeHead(201, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(created));
-      return;
-    }
-
-    // Update Incident Status (with Real-Time Broadcast)
-    const incidentStatusMatch = pathname.match(/^\/api\/incidents\/([^/]+)\/status$/);
-    if (incidentStatusMatch && method === 'PATCH') {
-      const auth = authenticateAdminRequest(req);
-      if (!auth.authorized) {
-        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
-        return;
-      }
-
-      const incidentId = incidentStatusMatch[1];
-      const body = await parseJsonBody(req);
-      if (!['active', 'investigating', 'resolved'].includes(body.status)) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Invalid status' }));
-        return;
-      }
-      const updated = updateIncidentStatus(incidentId, body.status);
-
-      // Broadcast to all connected visitors
-      broadcastEvent('incident_status_updated', updated);
-
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(updated));
-      return;
-    }
-
-    // Manual Telemetry Pulse Trigger
-    if (pathname === '/api/telemetry/pulse' && method === 'POST') {
-      const auth = authenticateAdminRequest(req);
-      if (!auth.authorized) {
-        res.writeHead(auth.status || 403, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: auth.error || 'Forbidden', message: auth.message }));
-        return;
-      }
-
-      const tenants = getAllTenants();
-      if (tenants.length > 0) {
-        // Randomly select one tenant and gently nudge score (+/- 1-2 points)
-        const randomTenant = tenants[Math.floor(Math.random() * tenants.length)];
-        const delta = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 2) + 1);
-        const newScore = Math.min(100, Math.max(20, Math.round((randomTenant.overallScore + delta) * 10) / 10));
-        const updated = updateTenantScore(randomTenant.id, newScore, {}, auth.user);
-        if (updated) {
-          broadcastEvent('tenant_updated', updated);
-        }
-      }
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ status: 'pulse_dispatched', activeVisitors: activeClients.size }));
-      return;
-    }
-
-    // Default Not Found
-    res.writeHead(404, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Endpoint Not Found' }));
-  } catch (err) {
-    console.error('[API Error]', err);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Internal Server Error' }));
-  }
+			// Default Not Found
+			return jsonResponse({ error: 'Endpoint Not Found' }, 404);
+		} catch (err) {
+			console.error('[API Error]', err);
+			return jsonResponse({ error: 'Internal Server Error' }, 500);
+		}
+	},
 });
 
 // Periodic heartbeat keepalive (every 15s) to sustain SSE connections through firewalls
 const heartbeatTimer = setInterval(() => {
-  for (const client of activeClients) {
-    try {
-      client.write(': heartbeat\n\n');
-    } catch {
-      activeClients.delete(client);
-    }
-  }
+	const payload = textEncoder.encode(': heartbeat\n\n');
+	for (const client of activeClients) {
+		try {
+			client.enqueue(payload);
+		} catch {
+			activeClients.delete(client);
+		}
+	}
 }, 15000);
 
 // Gentle background telemetry simulator: keeps the leaderboard dynamic and alive for visitors
 let simulatorTimer = null;
 if (ENABLE_SIMULATOR) {
-  simulatorTimer = setInterval(() => {
-    if (activeClients.size > 0) {
-      const tenants = getAllTenants();
-      if (tenants.length > 0) {
-        const randomTenant = tenants[Math.floor(Math.random() * tenants.length)];
-        const delta = (Math.random() > 0.45 ? 0.5 : -0.5);
-        const newScore = Math.min(100, Math.max(20, Math.round((randomTenant.overallScore + delta) * 10) / 10));
-        const updated = updateTenantScore(randomTenant.id, newScore);
-        if (updated) {
-          broadcastEvent('tenant_updated', updated);
-        }
-      }
-    }
-  }, 25000);
+	simulatorTimer = setInterval(() => {
+		if (activeClients.size > 0) {
+			const tenants = getAllTenants();
+			if (tenants.length > 0) {
+				const randomTenant = tenants[Math.floor(Math.random() * tenants.length)];
+				const delta = Math.random() > 0.45 ? 0.5 : -0.5;
+				const newScore = Math.min(100, Math.max(20, Math.round((randomTenant.overallScore + delta) * 10) / 10));
+				const updated = updateTenantScore(randomTenant.id, newScore);
+				if (updated) {
+					broadcastEvent('tenant_updated', updated);
+				}
+			}
+		}
+	}, 25000);
 }
 
 // Graceful shutdown handling
 function handleShutdown() {
-  console.log('[Server] Shutting down gracefully...');
-  clearInterval(heartbeatTimer);
-  if (simulatorTimer) clearInterval(simulatorTimer);
-  for (const client of activeClients) {
-    try {
-      client.end();
-    } catch {}
-  }
-  activeClients.clear();
-  server.close(() => {
-    console.log('[Server] Closed all connections.');
-    process.exit(0);
-  });
+	console.log('[Server] Shutting down gracefully...');
+	clearInterval(heartbeatTimer);
+	if (simulatorTimer) clearInterval(simulatorTimer);
+	for (const client of activeClients) {
+		try {
+			client.close();
+		} catch {}
+	}
+	activeClients.clear();
+	server.stop(true);
+	console.log('[Server] Closed all connections.');
+	process.exit(0);
 }
 
 process.on('SIGTERM', handleShutdown);
 process.on('SIGINT', handleShutdown);
 
-server.listen(PORT, HOST, () => {
-  console.log(`[Server] Secure Real-Time Backend running on http://${HOST}:${PORT}`);
-  console.log(`[Server] Real-time SSE event stream available at /api/events`);
-});
+console.log(`[Server] Secure Real-Time Backend running on http://${HOST}:${PORT} (Bun ${Bun.version})`);
+console.log(`[Server] Real-time SSE event stream available at /api/events`);
