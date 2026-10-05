@@ -1,14 +1,118 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/geist";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (
+  &:where([data-theme="dark"], [data-theme="dark"] *, [data-theme="ocean"], [data-theme="ocean"] *, .dark, .dark *)
+);
+
+@theme {
+  --font-sans: "Geist Variable", sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-input: var(--input);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ring: var(--accent-ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
 
 @layer base {
-  :root {
-    color-scheme: light dark;
+  :root,
+  [data-theme="light"] {
+    color-scheme: light;
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --border: #e2e8f0;
+    --ring: var(--accent, #2563eb);
+    --primary: var(--accent, #2563eb);
+    --primary-foreground: #ffffff;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f172a;
+    --destructive: #e11d48;
+    --input: #e2e8f0;
+    --radius: 0.625rem;
+
     --accent: #2563eb;
     --accent-hover: #1d4ed8;
     --accent-soft: rgba(37, 99, 235, 0.1);
     --accent-ring: rgba(37, 99, 235, 0.4);
+  }
+
+  [data-theme="dark"],
+  .dark {
+    color-scheme: dark;
+    --background: #020617;
+    --foreground: #f8fafc;
+    --card: #0f172a;
+    --card-foreground: #f8fafc;
+    --popover: #0f172a;
+    --popover-foreground: #f8fafc;
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
+    --border: #1e293b;
+    --ring: var(--accent, #3b82f6);
+    --primary: var(--accent, #3b82f6);
+    --primary-foreground: #ffffff;
+    --secondary: #1e293b;
+    --secondary-foreground: #f8fafc;
+    --destructive: #f43f5e;
+    --input: #1e293b;
+    --radius: 0.625rem;
+
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --accent-soft: rgba(59, 130, 246, 0.15);
+    --accent-ring: rgba(59, 130, 246, 0.4);
+  }
+
+  [data-theme="ocean"] {
+    color-scheme: dark;
+    --background: #0b132b;
+    --foreground: #e0f2fe;
+    --card: #1c2541;
+    --card-foreground: #f0f9ff;
+    --popover: #1c2541;
+    --popover-foreground: #f0f9ff;
+    --muted: #243256;
+    --muted-foreground: #7dd3fc;
+    --border: #2e3f68;
+    --ring: #38bdf8;
+    --primary: #0284c7;
+    --primary-foreground: #ffffff;
+    --secondary: #243256;
+    --secondary-foreground: #e0f2fe;
+    --destructive: #f43f5e;
+    --input: #2e3f68;
+    --radius: 0.625rem;
+
+    --accent: #0284c7;
+    --accent-hover: #0369a1;
+    --accent-soft: rgba(2, 132, 199, 0.18);
+    --accent-ring: rgba(56, 189, 248, 0.4);
   }
 
   [data-accent="blue"] {
@@ -45,24 +149,34 @@
     --accent-soft: rgba(217, 119, 6, 0.12);
     --accent-ring: rgba(217, 119, 6, 0.4);
   }
+
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
 }
 
-.bg-accent {
-  background-color: var(--accent);
-}
+@layer utilities {
+  .bg-accent {
+    background-color: var(--accent);
+  }
 
-.hover\:bg-accent-hover:hover {
-  background-color: var(--accent-hover);
-}
+  .hover\:bg-accent-hover:hover {
+    background-color: var(--accent-hover);
+  }
 
-.text-accent {
-  color: var(--accent);
-}
+  .text-accent {
+    color: var(--accent);
+  }
 
-.border-accent {
-  border-color: var(--accent);
-}
+  .border-accent {
+    border-color: var(--accent);
+  }
 
-.bg-accent-soft {
-  background-color: var(--accent-soft);
+  .bg-accent-soft {
+    background-color: var(--accent-soft);
+  }
 }

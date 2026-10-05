@@ -62,8 +62,8 @@ const ToastItem = memo(({ toast, onDismiss }: { toast: ToastMessage; onDismiss: 
     return () => clearInterval(interval);
   }, [totalMs, isHovered, onDismiss, toast.id]);
 
-  const handleMouseEnter = useCallback(() => setIsHovered(true), []);
-  const handleMouseLeave = useCallback(() => {
+  const handlePointerEnter = useCallback(() => setIsHovered(true), []);
+  const handlePointerLeave = useCallback(() => {
     lastTickRef.current = Date.now();
     setIsHovered(false);
   }, []);
@@ -80,28 +80,28 @@ const ToastItem = memo(({ toast, onDismiss }: { toast: ToastMessage; onDismiss: 
     <div
       role="status"
       aria-live="polite"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
       className={cn(
-        'pointer-events-auto relative flex flex-col overflow-hidden rounded-xl border shadow-lg backdrop-blur-md transition-all duration-200 animate-in fade-in slide-from-bottom-3',
-        'bg-white/95 dark:bg-slate-900/95 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100',
+        'fade-in slide-from-bottom-3 pointer-events-auto relative flex animate-in flex-col overflow-hidden rounded-xl border shadow-lg backdrop-blur-md transition-all duration-200',
+        'border-border bg-popover/95 text-popover-foreground',
       )}
     >
       <div className="flex items-start gap-3 p-3.5 pb-3">
         <div className="shrink-0 pt-0.5">
           <IconComponent className={cn('h-4 w-4', config.iconClass)} aria-hidden="true" />
         </div>
-        <div className="flex-1 min-w-0 pr-1">
-          <p className="text-xs font-semibold leading-tight text-slate-900 dark:text-white">{toast.title}</p>
+        <div className="min-w-0 flex-1 pr-1">
+          <p className="font-semibold text-foreground text-xs leading-tight">{toast.title}</p>
           {toast.description && (
-            <p className="mt-1 text-[11px] leading-normal text-slate-600 dark:text-slate-400">{toast.description}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground leading-normal">{toast.description}</p>
           )}
         </div>
         <button
           type="button"
           onClick={handleDismiss}
           aria-label={APP_STRINGS.TOAST.BTN_DISMISS_ARIA_LABEL}
-          className="flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 active:scale-95 focus-visible:outline-2 focus-visible:outline-blue-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+          className="flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring active:scale-95"
         >
           <X className="h-3.5 w-3.5" aria-hidden="true" />
         </button>
@@ -109,7 +109,7 @@ const ToastItem = memo(({ toast, onDismiss }: { toast: ToastMessage; onDismiss: 
 
       {/* Visual countdown progress bar with pause indicator */}
       {totalMs > 0 && (
-        <div className="h-1 w-full bg-slate-100 dark:bg-slate-800">
+        <div className="h-1 w-full bg-muted">
           <div
             className={cn('h-full transition-all duration-75 ease-linear', config.barClass)}
             style={{ width: `${progressRatio}%` }}
@@ -131,7 +131,7 @@ export const ToastContainer = memo(() => {
   return (
     <section
       aria-label={APP_STRINGS.TOAST.CONTAINER_ARIA_LABEL}
-      className="pointer-events-none fixed bottom-5 right-5 z-50 flex max-w-sm w-full flex-col gap-2.5 p-2 sm:p-0"
+      className="pointer-events-none fixed right-5 bottom-5 z-50 flex w-full max-w-sm flex-col gap-2.5 p-2 sm:p-0"
     >
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onDismiss={dismissToast} />

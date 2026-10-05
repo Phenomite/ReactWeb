@@ -15,11 +15,18 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { type ChangeEvent, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { type ChangeEvent, memo, useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { Button } from '@/components/Button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { TOTAL_TELEMETRY_SIGNALS } from '@/constants';
 import { useRealtime } from '@/context/RealtimeContext';
-import { useEscapeKey } from '@/hooks/useEscapeKey';
 import { cn, getActiveSignalCount } from '@/lib/utils';
 import { APP_STRINGS } from '@/strings';
 import type { TenantRecord } from '@/types';
@@ -31,6 +38,8 @@ interface TenantDetailModalProps {
 }
 
 export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose }: TenantDetailModalProps) => {
+  const overallScoreInputId = useId();
+  const seatCountInputId = useId();
   const m = APP_STRINGS.VIEWS.MICROSOFT;
   const r = APP_STRINGS.REALTIME;
   const { tenants, updateData } = useRealtime();
@@ -78,7 +87,14 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
     }
   }, [isOpen]);
 
-  useEscapeKey(isOpen, onClose);
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        onClose();
+      }
+    },
+    [onClose],
+  );
 
   const handlePublish = useCallback(async () => {
     if (!tenant) return;
@@ -163,7 +179,7 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
     setLogActive((prev) => !prev);
   }, []);
 
-  if (!isOpen || !tenant) return null;
+  if (!tenant) return null;
 
   const activeSignalsCount = getActiveSignalCount(tenant.statusBubbles);
 
@@ -204,7 +220,7 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
       color: 'bg-blue-500',
       iconColor: 'text-blue-500',
       extra: (
-        <div className="flex items-center justify-between pt-0.5 text-[10px] text-slate-500 dark:text-slate-400">
+        <div className="flex items-center justify-between pt-0.5 text-muted-foreground text-xs">
           <span>
             {m.LABEL_MDE_SENSOR}: {tenant.statusBubbles.mde ? m.STATUS_ACTIVE : m.STATUS_MISSING}
           </span>
@@ -244,23 +260,20 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
   ];
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="tenant-modal-title"
-      className="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6 flex justify-center animate-in fade-in"
-    >
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent
+        showCloseButton={false}
+        className="flex max-h-[calc(100vh-2rem)] max-w-2xl flex-col overflow-hidden p-6 sm:max-h-[calc(100vh-3rem)] sm:max-w-2xl"
+      >
+        <DialogHeader className="sr-only">
+          <DialogTitle>{tenant.name}</DialogTitle>
+          <DialogDescription>
+            {tenant.domain} - {tenant.industry}
+          </DialogDescription>
+        </DialogHeader>
 
-      {/* Modal Card */}
-      <div className="relative z-10 my-auto flex max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] w-full max-w-2xl flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl transition-all dark:border-slate-800 dark:bg-slate-900">
-        {/* Header */}
-        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-100 pb-4 dark:border-slate-800">
+        {/* Visible Header */}
+        <div className="flex shrink-0 items-start justify-between gap-4 border-border border-b pb-4">
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <span
@@ -273,28 +286,26 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
                         ? m.TOOLTIP_RANK_3
                         : undefined
                 }
-                className="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-black text-amber-700 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
+                className="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-2 py-0.5 font-black text-amber-700 text-xs dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
               >
                 <Trophy className="h-3 w-3" aria-hidden="true" />
                 Rank #{tenant.rank}
               </span>
-              <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+              <span className="rounded-md bg-muted px-2 py-0.5 font-semibold text-muted-foreground text-xs">
                 {tenant.industry}
               </span>
-              <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-mono text-slate-500 dark:border-slate-800 dark:bg-slate-800/60 dark:text-slate-400">
+              <span className="rounded-md border border-border bg-muted/60 px-2 py-0.5 font-mono text-muted-foreground text-xs">
                 rev v{tenant.version ?? 1}
               </span>
               {tenant.lastUpdatedBy && (
-                <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
+                <span className="rounded-md bg-blue-50 px-2 py-0.5 font-medium text-blue-700 text-xs dark:bg-blue-950/60 dark:text-blue-300">
                   by {tenant.lastUpdatedBy}
                 </span>
               )}
             </div>
-            <h2 id="tenant-modal-title" className="text-lg font-bold text-slate-900 dark:text-white">
-              {tenant.name}
-            </h2>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
-              <span className="flex items-center gap-1 font-mono text-[11px]">
+            <h2 className="font-bold text-foreground text-lg">{tenant.name}</h2>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground text-xs">
+              <span className="flex items-center gap-1 font-mono text-xs">
                 <Globe className="h-3.5 w-3.5" aria-hidden="true" />
                 {tenant.domain}
               </span>
@@ -314,10 +325,10 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
               type="button"
               onClick={handleToggleEditing}
               className={cn(
-                'flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-all active:scale-95 focus-visible:outline-2 focus-visible:outline-blue-600',
+                'flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-2.5 font-semibold text-xs transition-all focus-visible:outline-2 focus-visible:outline-ring active:scale-95',
                 isEditing
                   ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
               )}
               aria-label="Toggle edit mode"
             >
@@ -325,83 +336,77 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
               <span>{isEditing ? 'Cancel Edit' : 'Edit'}</span>
             </button>
 
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label={m.BTN_CLOSE_MODAL}
-              className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 active:scale-95 focus-visible:outline-2 focus-visible:outline-blue-600 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-            >
-              <X className="h-5 w-5" aria-hidden="true" />
-            </button>
+            <DialogClose asChild>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label={m.BTN_CLOSE_MODAL}
+                className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring active:scale-95"
+              >
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </DialogClose>
           </div>
         </div>
 
         {/* Modal Body */}
-        <div className="mt-5 flex-1 min-h-0 space-y-6 overflow-y-auto pr-1">
+        <div className="mt-5 min-h-0 flex-1 space-y-6 overflow-y-auto pr-1">
           {/* Edit Mode Panel */}
           {isEditing && (
-            <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4 space-y-4 dark:border-amber-900/60 dark:bg-amber-950/30">
-              <div className="flex items-center justify-between border-b border-amber-200 pb-2.5 dark:border-amber-900/60">
-                <div className="flex items-center gap-2 text-xs font-bold text-amber-900 dark:text-amber-200">
+            <div className="space-y-4 rounded-xl border border-amber-200 bg-amber-50/70 p-4 dark:border-amber-900/60 dark:bg-amber-950/30">
+              <div className="flex items-center justify-between border-amber-200 border-b pb-2.5 dark:border-amber-900/60">
+                <div className="flex items-center gap-2 font-bold text-amber-900 text-xs dark:text-amber-200">
                   <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-400" aria-hidden="true" />
                   <span>{r.LABEL_EDIT_MODE} (Multi-Operator Safe)</span>
                 </div>
-                <span className="text-[11px] font-mono text-amber-700 dark:text-amber-400">
+                <span className="font-mono text-amber-700 text-xs dark:text-amber-400">
                   Lock Base: v{tenant.version ?? 1}
                 </span>
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <label
-                    htmlFor="tenant-overall-score"
-                    className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
-                  >
+                  <label htmlFor={overallScoreInputId} className="font-semibold text-foreground text-xs">
                     Overall Secure Score (%):
                   </label>
                   <input
-                    id="tenant-overall-score"
+                    id={overallScoreInputId}
                     type="number"
                     min="0"
                     max="100"
                     step="0.1"
                     value={score}
                     onChange={handleScoreChange}
-                    className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono dark:border-slate-700 dark:bg-slate-900"
+                    className="mt-1 w-full rounded-lg border border-border bg-card px-3 py-2 font-mono text-foreground text-sm"
                   />
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="tenant-seat-count"
-                    className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
-                  >
+                  <label htmlFor={seatCountInputId} className="font-semibold text-foreground text-xs">
                     Seat Count:
                   </label>
                   <input
-                    id="tenant-seat-count"
+                    id={seatCountInputId}
                     type="number"
                     min="1"
                     value={seatCount}
                     onChange={handleSeatCountChange}
-                    className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono dark:border-slate-700 dark:bg-slate-900"
+                    className="mt-1 w-full rounded-lg border border-border bg-card px-3 py-2 font-mono text-foreground text-sm"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <span className="block text-[11px] font-medium text-slate-700 dark:text-slate-300">
-                  Telemetry Defense Signals:
-                </span>
+                <span className="block font-semibold text-foreground text-xs">Telemetry Defense Signals:</span>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   <button
                     type="button"
                     onClick={handleToggleSentinel}
                     className={cn(
-                      'rounded-md px-2 py-1 text-xs font-semibold border transition-all',
+                      'cursor-pointer rounded-md border px-2.5 py-1.5 font-semibold text-xs transition-all',
                       sentinelActive
                         ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                        : 'border-slate-200 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-900',
+                        : 'border-border bg-muted/50 text-muted-foreground',
                     )}
                   >
                     Sentinel: {sentinelActive ? 'ON' : 'OFF'}
@@ -411,10 +416,10 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
                     type="button"
                     onClick={handleToggleMde}
                     className={cn(
-                      'rounded-md px-2 py-1 text-xs font-semibold border transition-all',
+                      'cursor-pointer rounded-md border px-2.5 py-1.5 font-semibold text-xs transition-all',
                       mdeActive
                         ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                        : 'border-slate-200 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-900',
+                        : 'border-border bg-muted/50 text-muted-foreground',
                     )}
                   >
                     MDE: {mdeActive ? 'ON' : 'OFF'}
@@ -424,10 +429,10 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
                     type="button"
                     onClick={handleToggleMdi}
                     className={cn(
-                      'rounded-md px-2 py-1 text-xs font-semibold border transition-all',
+                      'cursor-pointer rounded-md border px-2.5 py-1.5 font-semibold text-xs transition-all',
                       mdiActive
                         ? 'border-violet-500 bg-violet-50 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300'
-                        : 'border-slate-200 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-900',
+                        : 'border-border bg-muted/50 text-muted-foreground',
                     )}
                   >
                     MDI: {mdiActive ? 'ON' : 'OFF'}
@@ -437,10 +442,10 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
                     type="button"
                     onClick={handleToggleLog}
                     className={cn(
-                      'rounded-md px-2 py-1 text-xs font-semibold border transition-all',
+                      'cursor-pointer rounded-md border px-2.5 py-1.5 font-semibold text-xs transition-all',
                       logActive
                         ? 'border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
-                        : 'border-slate-200 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-900',
+                        : 'border-border bg-muted/50 text-muted-foreground',
                     )}
                   >
                     Log Analytics: {logActive ? 'ON' : 'OFF'}
@@ -448,7 +453,7 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-amber-200 dark:border-amber-900/60">
+              <div className="flex justify-end gap-2 border-amber-200 border-t pt-2 dark:border-amber-900/60">
                 <Button variant="secondary" onClick={handleCancelEditing} disabled={isPublishing}>
                   Cancel
                 </Button>
@@ -467,16 +472,14 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
           )}
 
           {/* Overall Score Highlight */}
-          <div className="flex items-center justify-between rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
+          <div className="flex items-center justify-between rounded-xl bg-muted/50 p-4">
             <div>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              <span className="font-bold text-muted-foreground text-xs uppercase tracking-wider">
                 {m.HEADING_COMPOSITE_SCORE}
               </span>
               <div className="mt-1 flex items-baseline gap-2">
-                <span className="font-mono text-3xl font-black text-slate-900 dark:text-white">
-                  {tenant.overallScore}%
-                </span>
-                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <span className="font-black font-mono text-3xl text-foreground">{tenant.overallScore}%</span>
+                <span className="font-semibold text-emerald-600 text-sm dark:text-emerald-400">
                   {tenant.overallScore >= 80
                     ? m.TXT_POSTURE_SUPERIOR
                     : tenant.overallScore >= 60
@@ -486,9 +489,11 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
               </div>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-right shadow-2xs dark:border-slate-700 dark:bg-slate-900">
-              <span className="text-[10px] font-semibold uppercase text-slate-400">{m.LABEL_ACTIVE_TELEMETRY}</span>
-              <p className="font-mono text-base font-black text-accent">
+            <div className="rounded-xl border border-border bg-card px-3 py-2 text-right shadow-2xs">
+              <span className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
+                {m.LABEL_ACTIVE_TELEMETRY}
+              </span>
+              <p className="font-black font-mono text-accent text-lg">
                 {activeSignalsCount} / {TOTAL_TELEMETRY_SIGNALS}
               </p>
             </div>
@@ -496,7 +501,7 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
 
           {/* Telemetry Status Bubbles Inspection */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <h4 className="font-bold text-muted-foreground text-xs uppercase tracking-wider">
               {m.LABEL_BUBBLES_SECTION}
             </h4>
             <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
@@ -507,11 +512,11 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
                     'rounded-xl border p-3 text-center',
                     b.active
                       ? 'border-emerald-200 bg-emerald-50/70 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/50 dark:text-emerald-300'
-                      : 'border-slate-200 bg-slate-50 text-slate-400 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-500',
+                      : 'border-border bg-muted/40 text-muted-foreground',
                   )}
                 >
-                  <p className="text-xs font-bold">{b.name}</p>
-                  <p className="mt-1 text-[10px] font-medium">{b.active ? b.onText : b.offText}</p>
+                  <p className="font-bold text-sm">{b.name}</p>
+                  <p className="mt-1 font-medium text-xs">{b.active ? b.onText : b.offText}</p>
                 </div>
               ))}
             </div>
@@ -519,30 +524,27 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
 
           {/* Category Score Breakdowns */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <h4 className="font-bold text-muted-foreground text-xs uppercase tracking-wider">
               {m.HEADING_CATEGORY_BREAKDOWN}
             </h4>
             <div className="mt-3 space-y-3">
               {categoryConfigs.map((cat) => {
                 const Icon = cat.icon;
                 return (
-                  <div
-                    key={cat.key}
-                    className="rounded-lg border border-slate-100 bg-slate-50/50 p-3 dark:border-slate-800 dark:bg-slate-800/40"
-                  >
-                    <div className="flex items-center justify-between text-xs">
+                  <div key={cat.key} className="rounded-lg border border-border bg-muted/30 p-3">
+                    <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
                         <Icon className={cn('h-4 w-4', cat.iconColor)} aria-hidden="true" />
                         <div>
-                          <span className="font-semibold text-slate-900 dark:text-white">{cat.label}</span>
-                          <span className="ml-2 text-[10px] text-slate-400">{cat.desc}</span>
+                          <span className="font-semibold text-foreground text-sm">{cat.label}</span>
+                          <span className="ml-2 text-muted-foreground text-xs">{cat.desc}</span>
                         </div>
                       </div>
-                      <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{cat.score}%</span>
+                      <span className="font-bold font-mono text-foreground text-sm">{cat.score}%</span>
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                       <div
                         className={cn('h-full transition-all duration-300', cat.color)}
                         style={{ width: `${cat.score}%` }}
@@ -559,21 +561,21 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
 
           {/* Gamified Action Recommendations */}
           <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 dark:border-blue-900/60 dark:bg-blue-950/30">
-            <div className="flex items-center gap-2 text-xs font-bold text-blue-900 dark:text-blue-300">
+            <div className="flex items-center gap-2 font-bold text-blue-900 text-sm dark:text-blue-300">
               <ListChecks className="h-4 w-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
               <span>{m.HEADING_RECOMMENDED_ACTIONS}</span>
             </div>
-            <ul className="mt-2.5 space-y-2 text-xs text-blue-800 dark:text-blue-200">
+            <ul className="mt-2.5 space-y-2 text-blue-800 text-xs dark:text-blue-200">
               {!tenant.statusBubbles.mde ? (
                 <li className="flex items-start gap-1.5">
-                  <ArrowUpRight className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-500" aria-hidden="true" />
+                  <ArrowUpRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-500" aria-hidden="true" />
                   <span>
                     <strong>{m.LABEL_REC_MDE_CATEGORY}:</strong> {m.TXT_REC_MDE_SERVERS}
                   </span>
                 </li>
               ) : tenant.categories.device < 92 ? (
                 <li className="flex items-start gap-1.5">
-                  <ArrowUpRight className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-500" aria-hidden="true" />
+                  <ArrowUpRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-500" aria-hidden="true" />
                   <span>
                     <strong>{m.LABEL_REC_MDE_CATEGORY}:</strong> {m.TXT_REC_MDE_SERVERS_EXPAND}
                   </span>
@@ -582,7 +584,7 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
 
               {!tenant.statusBubbles.mdi && (
                 <li className="flex items-start gap-1.5">
-                  <ArrowUpRight className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-500" aria-hidden="true" />
+                  <ArrowUpRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-500" aria-hidden="true" />
                   <span>
                     <strong>{m.LABEL_REC_IDENTITIES_CATEGORY}:</strong> {m.TXT_REC_MDI}
                   </span>
@@ -591,7 +593,7 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
 
               {!tenant.statusBubbles.sentinel && (
                 <li className="flex items-start gap-1.5">
-                  <ArrowUpRight className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-500" aria-hidden="true" />
+                  <ArrowUpRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-500" aria-hidden="true" />
                   <span>
                     <strong>{m.LABEL_REC_SIEM_CATEGORY}:</strong> {m.TXT_REC_SENTINEL}
                   </span>
@@ -600,7 +602,7 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
 
               {!tenant.statusBubbles.logAnalytics && (
                 <li className="flex items-start gap-1.5">
-                  <ArrowUpRight className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-500" aria-hidden="true" />
+                  <ArrowUpRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-500" aria-hidden="true" />
                   <span>
                     <strong>{m.LABEL_REC_AUDIT_CATEGORY}:</strong> {m.TXT_REC_AUDIT}
                   </span>
@@ -618,13 +620,15 @@ export const TenantDetailModal = memo(({ tenant: initialTenant, isOpen, onClose 
         </div>
 
         {/* Footer */}
-        <div className="mt-6 flex shrink-0 justify-end border-t border-slate-100 pt-4 dark:border-slate-800">
-          <Button onClick={onClose} variant="secondary">
-            {m.BTN_CLOSE_MODAL}
-          </Button>
+        <div className="mt-6 flex shrink-0 justify-end border-border border-t pt-4">
+          <DialogClose asChild>
+            <Button onClick={onClose} variant="secondary">
+              {m.BTN_CLOSE_MODAL}
+            </Button>
+          </DialogClose>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 });
 

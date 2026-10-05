@@ -28,6 +28,14 @@ export interface ToastContextType {
   dismissToast: (id: string) => void;
 }
 
+// Supported application theme mode options
+export type ThemeMode = 'light' | 'dark' | 'ocean';
+
+export interface ThemeOption {
+  id: ThemeMode;
+  label: string;
+}
+
 // Curated accent color identifiers
 export type AccentColor = 'blue' | 'violet' | 'emerald' | 'rose' | 'amber';
 

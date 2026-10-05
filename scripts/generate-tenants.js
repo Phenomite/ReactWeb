@@ -237,7 +237,3 @@ if (!fs.existsSync(outDir)) {
 
 const outPath = path.join(outDir, 'tenants.json');
 fs.writeFileSync(outPath, JSON.stringify(rawTenants, null, 2), 'utf-8');
-
-console.log(`Generated ${rawTenants.length} tenants successfully at ${outPath}`);
-console.log(`Top Tenant: #${rawTenants[0].rank} ${rawTenants[0].name} (${rawTenants[0].overallScore}%)`);
-console.log(`Lowest Tenant: #${rawTenants[199].rank} ${rawTenants[199].name} (${rawTenants[199].overallScore}%)`);

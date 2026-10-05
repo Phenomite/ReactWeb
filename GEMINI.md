@@ -12,6 +12,7 @@ Tailwind CSS v4, Lucide React icons, and TypeScript.
 - Never add exclusions to fix errors in linting/formatting/checks, always fix the root cause.
 - Run format, check, and lint to assess code after completing work, repair the findings.
 - Never add new packages without explicit permission granted.
+- Never commit or push without explicit permission granted.
 
 ---
 
@@ -60,6 +61,7 @@ Use `pnpm` to run scripts:
 | `pnpm run telemetry:cron:once` | Execute a single batch telemetry perturbation update with Bun |
 | `pnpm run dev:modify` | Modify live database records with developer attribution using Bun |
 | `pnpm run tenants:generate` | Generate 200 distinct enterprise tenants dataset with Bun |
+| `pnpm run test:e2e` | Run Playwright end-to-end tests across all views and interactive primitives |
 | `pnpm run lint:md` | Lint all markdown files with markdownlint-cli2 |
 
 ---
@@ -96,7 +98,7 @@ Use `pnpm` to run scripts:
    - Displays the active view title, mobile sidebar toggle button, and theme mode toggle button.
 
 4. **Main Body Section (Container 4)**:
-   - Primary content area (`flex-1 overflow-y-auto p-6`) rendering the active view component.
+   - Primary content area (`flex-1 overflow-y-auto p-3`) rendering the active view component.
 
 ---
 

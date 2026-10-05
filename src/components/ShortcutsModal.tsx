@@ -1,7 +1,14 @@
 import { Command, Keyboard, X } from 'lucide-react';
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { Button } from '@/components/Button';
-import { useEscapeKey } from '@/hooks/useEscapeKey';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { APP_STRINGS } from '@/strings';
 
 interface ShortcutsModalProps {
@@ -27,58 +34,52 @@ const SHORTCUT_LIST: ShortcutEntry[] = [
 
 // Modal cheatsheet dialog detailing all global keyboard hotkeys
 export const ShortcutsModal = memo(({ isOpen, onClose }: ShortcutsModalProps) => {
-  useEscapeKey(isOpen, onClose);
-
-  if (!isOpen) return null;
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) onClose();
+    },
+    [onClose],
+  );
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={APP_STRINGS.SHORTCUTS.HEADING_TITLE}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-    >
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Modal Card */}
-      <div className="relative z-10 w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl transition-all dark:border-slate-800 dark:bg-slate-900">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent showCloseButton={false} className="w-full max-w-md p-6">
+        <DialogHeader className="flex flex-row items-center justify-between border-border border-b pb-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
               <Keyboard className="h-5 w-5" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900 dark:text-white">
+              <DialogTitle className="font-bold text-base text-foreground">
                 {APP_STRINGS.SHORTCUTS.HEADING_TITLE}
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">{APP_STRINGS.SHORTCUTS.TXT_DESCRIPTION}</p>
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground text-xs">
+                {APP_STRINGS.SHORTCUTS.TXT_DESCRIPTION}
+              </DialogDescription>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={APP_STRINGS.SHORTCUTS.BTN_CLOSE_ARIA_LABEL}
-            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-300"
-          >
-            <X className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </div>
+          <DialogClose asChild>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={APP_STRINGS.SHORTCUTS.BTN_CLOSE_ARIA_LABEL}
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </DialogClose>
+        </DialogHeader>
 
         {/* Shortcuts Table */}
-        <div className="mt-4 space-y-2">
+        <div className="space-y-2">
           {SHORTCUT_LIST.map((entry) => (
             <div key={entry.label} className="flex items-center justify-between py-1.5 text-xs">
-              <span className="text-slate-600 dark:text-slate-300">{entry.label}</span>
+              <span className="text-foreground">{entry.label}</span>
               <div className="flex items-center gap-1">
                 {entry.keys.map((k) => (
                   <kbd
                     key={k}
-                    className="min-w-6 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-center font-mono text-[11px] font-semibold text-slate-700 shadow-2xs dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200"
+                    className="min-w-6 rounded-md border border-border bg-muted px-2 py-1 text-center font-mono font-semibold text-[11px] text-foreground shadow-2xs"
                   >
                     {k}
                   </kbd>
@@ -89,16 +90,20 @@ export const ShortcutsModal = memo(({ isOpen, onClose }: ShortcutsModalProps) =>
         </div>
 
         {/* Footer */}
-        <div className="mt-6 flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-1.5 text-[11px] text-slate-400 dark:text-slate-500">
-            <Command className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" aria-hidden="true" />
+        <div className="flex items-center justify-between border-border border-t pt-4">
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <Command className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
             <span>{APP_STRINGS.SHORTCUTS.TXT_FOOTER_NOTE}</span>
           </div>
-          <Button onClick={onClose} variant="secondary">
-            {APP_STRINGS.SHORTCUTS.BTN_CLOSE}
-          </Button>
+          <DialogClose asChild>
+            <Button onClick={onClose} variant="secondary">
+              {APP_STRINGS.SHORTCUTS.BTN_CLOSE}
+            </Button>
+          </DialogClose>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 });
+
+ShortcutsModal.displayName = 'ShortcutsModal';

@@ -14,14 +14,52 @@
     "enabled": true,
     "rules": {
       "preset": "recommended",
+      "a11y": {
+        "noNoninteractiveElementInteractions": "warn"
+      },
+      "complexity": {
+        "noForEach": "warn"
+      },
       "suspicious": {
-        "noExplicitAny": "error"
+        "noExplicitAny": "error",
+        "noConsole": {
+          "level": "warn",
+          "options": { "allow": ["warn", "error"] }
+        },
+        "noConstantBinaryExpressions": "error",
+        "noShadow": "warn"
       },
       "correctness": {
-        "useExhaustiveDependencies": "error"
+        "useExhaustiveDependencies": "error",
+        "noNestedComponentDefinitions": "error",
+        "noNodejsModules": "error",
+        "useUniqueElementIds": "warn"
+      },
+      "security": {
+        "noSecrets": "warn"
+      },
+      "style": {
+        "noProcessEnv": "error",
+        "useSelfClosingElements": "warn"
       },
       "performance": {
-        "noJsxPropsBind": "warn"
+        "noJsxPropsBind": "warn",
+        "noDelete": "error",
+        "useTopLevelRegex": "warn",
+        "noBarrelFile": "warn",
+        "noReExportAll": "error",
+        "noNamespaceImport": "warn",
+        "noDynamicNamespaceImportAccess": "error",
+        "noAwaitInLoops": "warn"
+      },
+      "nursery": {
+        "useSortedClasses": {
+          "level": "warn",
+          "options": {
+            "attributes": ["classList", "className"],
+            "functions": ["cn", "clsx", "twMerge"]
+          }
+        }
       }
     }
   },
@@ -37,6 +75,19 @@
     }
   },
   "overrides": [
+    {
+      "includes": ["scripts/**", "server/**", "e2e/**", "playwright.config.ts"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noNodejsModules": "off"
+          },
+          "style": {
+            "noProcessEnv": "off"
+          }
+        }
+      }
+    },
     {
       "includes": ["**/*.md", "*.md"],
       "formatter": {

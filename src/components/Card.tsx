@@ -16,24 +16,21 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 export const Card = memo(
   ({ heading, description, icon: Icon, iconClassName, headerRight, children, className, ...rest }: CardProps) => (
     <div
-      className={cn(
-        'rounded-xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900',
-        className,
-      )}
+      className={cn('rounded-xl border border-border bg-card p-6 text-card-foreground shadow-xs', className)}
       {...rest}
     >
       {(heading || description || Icon) && (
         <div
           className={cn(
-            'flex flex-col sm:flex-row sm:items-center justify-between gap-4',
-            children && 'border-b border-slate-200 pb-4 dark:border-slate-800',
+            'flex flex-col justify-between gap-4 sm:flex-row sm:items-center',
+            children && 'border-border border-b pb-4',
           )}
         >
           <div className="flex items-center gap-3">
             {Icon && (
               <div
                 className={cn(
-                  'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400',
+                  'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent',
                   iconClassName,
                 )}
               >
@@ -41,10 +38,8 @@ export const Card = memo(
               </div>
             )}
             <div>
-              {heading && (
-                <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">{heading}</h2>
-              )}
-              {description && <p className="text-xs text-slate-600 dark:text-slate-400">{description}</p>}
+              {heading && <h2 className="font-bold text-foreground text-xl tracking-tight">{heading}</h2>}
+              {description && <p className="text-muted-foreground text-xs">{description}</p>}
             </div>
           </div>
           {headerRight}

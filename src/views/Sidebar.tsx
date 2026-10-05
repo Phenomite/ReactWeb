@@ -1,6 +1,7 @@
 import { Cuboid, X } from 'lucide-react';
 import { memo, useCallback } from 'react';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { ALL_TENANTS } from '@/constants';
 import { cn } from '@/lib/utils';
 import { APP_STRINGS } from '@/strings';
@@ -17,22 +18,25 @@ interface SidebarProps {
 }
 
 // Sidebar top-left brand header with Cuboid icon and mobile close button
-const SidebarHeader = memo(({ onClose }: { onClose: () => void }) => (
-  <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 px-6 dark:border-slate-800">
-    <div className="flex select-none items-center gap-2.5 font-bold text-slate-900 dark:text-white">
+const SidebarBrandHeader = memo(({ onClose }: { onClose?: (() => void) | undefined }) => (
+  <div className="flex h-16 shrink-0 items-center justify-between border-border border-b px-6">
+    <div className="flex select-none items-center gap-2.5 font-bold text-foreground">
       <Cuboid className="h-5 w-5 text-accent" aria-hidden="true" />
       <span className="text-lg tracking-tight">{APP_STRINGS.SIDEBAR.HEADING_TITLE}</span>
     </div>
-    <button
-      type="button"
-      onClick={onClose}
-      aria-label={APP_STRINGS.SIDEBAR.BTN_CLOSE_ARIA_LABEL}
-      className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 md:hidden dark:text-slate-400 dark:hover:bg-slate-800"
-    >
-      <X className="h-5 w-5" aria-hidden="true" />
-    </button>
+    {onClose && (
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label={APP_STRINGS.SIDEBAR.BTN_CLOSE_ARIA_LABEL}
+        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-muted-foreground hover:bg-muted md:hidden"
+      >
+        <X className="h-5 w-5" aria-hidden="true" />
+      </button>
+    )}
   </div>
 ));
+SidebarBrandHeader.displayName = 'SidebarBrandHeader';
 
 // Sidebar navigation button item with active state and badge
 const SidebarNavItem = memo(
@@ -57,21 +61,21 @@ const SidebarNavItem = memo(
         aria-label={view.title}
         aria-current={isActive ? 'page' : undefined}
         className={cn(
-          'flex w-full cursor-pointer select-none items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-all active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-blue-600',
+          'flex w-full cursor-pointer select-none items-center justify-between rounded-lg px-3 py-2.5 font-medium text-sm transition-all focus-visible:outline-2 focus-visible:outline-ring active:scale-[0.98]',
           isActive
-            ? 'bg-accent-soft text-accent font-semibold'
-            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-slate-100',
+            ? 'bg-accent-soft font-semibold text-accent'
+            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
         )}
       >
         <div className="flex items-center gap-3">
           <Icon
-            className={cn('h-4 w-4 shrink-0', isActive ? 'text-accent' : 'text-slate-500 dark:text-slate-400')}
+            className={cn('h-4 w-4 shrink-0', isActive ? 'text-accent' : 'text-muted-foreground')}
             aria-hidden="true"
           />
           <span>{view.title}</span>
         </div>
         {view.id === 'microsoft' && (
-          <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
+          <span className="rounded-full bg-blue-100 px-2 py-0.5 font-bold text-[10px] text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
             {ALL_TENANTS.length}
           </span>
         )}
@@ -79,38 +83,84 @@ const SidebarNavItem = memo(
     );
   },
 );
+SidebarNavItem.displayName = 'SidebarNavItem';
 
-// Main sidebar container rendering header, view navigation, and theme switch
-export const Sidebar = memo(
-  ({ isOpen, onClose, darkMode, onToggleDarkMode, activeViewId, onSelectView }: SidebarProps) => {
+// Sidebar content body reused in desktop aside and mobile sheet drawer
+const SidebarNavContent = memo(
+  ({
+    onClose,
+    darkMode,
+    onToggleDarkMode,
+    activeViewId,
+    onSelectView,
+  }: {
+    onClose?: (() => void) | undefined;
+    darkMode: boolean;
+    onToggleDarkMode: () => void;
+    activeViewId: string;
+    onSelectView: (view: ViewDefinition) => void;
+  }) => {
     const visibleViews = getVisibleViews();
 
     return (
+      <div className="flex h-full w-full flex-col">
+        <SidebarBrandHeader onClose={onClose} />
+        <nav aria-label={APP_STRINGS.SIDEBAR.NAV_MAIN_ARIA_LABEL} className="flex-1 space-y-1 overflow-y-auto p-4">
+          {visibleViews.map((view) => (
+            <SidebarNavItem key={view.id} view={view} isActive={activeViewId === view.id} onSelect={onSelectView} />
+          ))}
+        </nav>
+        <div className="shrink-0 space-y-3 border-border border-t p-4">
+          <ThemeSwitch darkMode={darkMode} onToggle={onToggleDarkMode} />
+        </div>
+      </div>
+    );
+  },
+);
+SidebarNavContent.displayName = 'SidebarNavContent';
+
+// Main sidebar container rendering desktop fixed aside and mobile Sheet drawer
+export const Sidebar = memo(
+  ({ isOpen, onClose, darkMode, onToggleDarkMode, activeViewId, onSelectView }: SidebarProps) => {
+    const handleOpenChange = useCallback(
+      (open: boolean) => {
+        if (!open) onClose();
+      },
+      [onClose],
+    );
+
+    return (
       <>
-        {isOpen && (
-          <div
-            className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs md:hidden"
-            onClick={onClose}
-            aria-hidden="true"
+        {/* Desktop Fixed Aside (Container 2) */}
+        <aside className="hidden w-72 flex-col border-border border-r bg-card text-card-foreground md:flex">
+          <SidebarNavContent
+            darkMode={darkMode}
+            onToggleDarkMode={onToggleDarkMode}
+            activeViewId={activeViewId}
+            onSelectView={onSelectView}
           />
-        )}
-        <aside
-          className={cn(
-            'fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-slate-200 bg-white transition-transform duration-200 md:static md:translate-x-0 dark:border-slate-800 dark:bg-slate-900',
-            isOpen ? 'translate-x-0' : '-translate-x-full',
-          )}
-        >
-          <SidebarHeader onClose={onClose} />
-          <nav aria-label={APP_STRINGS.SIDEBAR.NAV_MAIN_ARIA_LABEL} className="flex-1 space-y-1 overflow-y-auto p-4">
-            {visibleViews.map((view) => (
-              <SidebarNavItem key={view.id} view={view} isActive={activeViewId === view.id} onSelect={onSelectView} />
-            ))}
-          </nav>
-          <div className="shrink-0 space-y-3 border-t border-slate-200 p-4 dark:border-slate-800">
-            <ThemeSwitch darkMode={darkMode} onToggle={onToggleDarkMode} />
-          </div>
         </aside>
+
+        {/* Mobile Accessible Sheet Drawer */}
+        <div className="md:hidden">
+          <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+            <SheetContent side="left" showCloseButton={false} className="w-72 p-0">
+              <SheetHeader className="sr-only">
+                <SheetTitle>{APP_STRINGS.SIDEBAR.HEADING_TITLE}</SheetTitle>
+                <SheetDescription>Application navigation sidebar</SheetDescription>
+              </SheetHeader>
+              <SidebarNavContent
+                onClose={onClose}
+                darkMode={darkMode}
+                onToggleDarkMode={onToggleDarkMode}
+                activeViewId={activeViewId}
+                onSelectView={onSelectView}
+              />
+            </SheetContent>
+          </Sheet>
+        </div>
       </>
     );
   },
 );
+Sidebar.displayName = 'Sidebar';

@@ -50,7 +50,7 @@ const HomepageView = memo(() => {
         description={APP_STRINGS.VIEWS.HOMEPAGE.TXT_DESCRIPTION}
         icon={Home}
         headerRight={
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-accent dark:bg-slate-800">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 font-semibold text-accent text-xs">
             <CogIcon className="h-3.5 w-3.5" aria-hidden="true" />
             <span>Version {APP_VERSION}</span>
           </span>
@@ -66,10 +66,10 @@ const HomepageView = memo(() => {
               <Building2 className="h-4 w-4" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+              <p className="font-medium text-[11px] text-muted-foreground">
                 {APP_STRINGS.VIEWS.HOMEPAGE.LABEL_MANAGED_TENANTS}
               </p>
-              <p className="text-xs font-bold text-slate-900 dark:text-white">
+              <p className="font-bold text-foreground text-xs">
                 {ALL_TENANTS.length} {APP_STRINGS.VIEWS.MICROSOFT.LABEL_FLEET_UNITS}
               </p>
             </div>
@@ -83,10 +83,8 @@ const HomepageView = memo(() => {
               <Database className="h-4 w-4" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                {APP_STRINGS.REALTIME.LABEL_DB_ENGINE}
-              </p>
-              <p className="text-xs font-bold text-slate-900 dark:text-white">
+              <p className="font-medium text-[11px] text-muted-foreground">{APP_STRINGS.REALTIME.LABEL_DB_ENGINE}</p>
+              <p className="font-bold text-foreground text-xs">
                 {isLive
                   ? `${APP_STRINGS.REALTIME.VALUE_DB_ENGINE} (${activeVisitors})`
                   : APP_STRINGS.REALTIME.LABEL_OFFLINE}
@@ -102,10 +100,10 @@ const HomepageView = memo(() => {
               <Palette className="h-4 w-4" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+              <p className="font-medium text-[11px] text-muted-foreground">
                 {APP_STRINGS.VIEWS.HOMEPAGE.LABEL_STATUS_ACCENT}
               </p>
-              <p className="text-xs font-bold text-slate-900 dark:text-white">{activeOption.label}</p>
+              <p className="font-bold text-foreground text-xs">{activeOption.label}</p>
             </div>
           </div>
         </Card>
@@ -117,12 +115,8 @@ const HomepageView = memo(() => {
               <Terminal className="h-4 w-4" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                {APP_STRINGS.SHORTCUTS.TXT_FOOTER_NOTE}
-              </p>
-              <p className="text-xs font-bold text-slate-900 dark:text-white">
-                {APP_STRINGS.VIEWS.HOMEPAGE.TXT_HOTKEY_PALETTE}
-              </p>
+              <p className="font-medium text-[11px] text-muted-foreground">{APP_STRINGS.SHORTCUTS.TXT_FOOTER_NOTE}</p>
+              <p className="font-bold text-foreground text-xs">{APP_STRINGS.VIEWS.HOMEPAGE.TXT_HOTKEY_PALETTE}</p>
             </div>
           </div>
         </Card>
@@ -130,13 +124,9 @@ const HomepageView = memo(() => {
 
       {/* Quick Launch Actions */}
       <Card className="p-6">
-        <div className="border-b border-slate-100 pb-4 dark:border-slate-800">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-            {APP_STRINGS.VIEWS.HOMEPAGE.HEADING_QUICK_ACTIONS}
-          </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {APP_STRINGS.VIEWS.HOMEPAGE.TXT_QUICK_ACTIONS_DESC}
-          </p>
+        <div className="border-border border-b pb-4">
+          <h3 className="font-bold text-foreground text-sm">{APP_STRINGS.VIEWS.HOMEPAGE.HEADING_QUICK_ACTIONS}</h3>
+          <p className="text-muted-foreground text-xs">{APP_STRINGS.VIEWS.HOMEPAGE.TXT_QUICK_ACTIONS_DESC}</p>
         </div>
 
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">

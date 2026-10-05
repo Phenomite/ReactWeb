@@ -1,13 +1,22 @@
 import rawTenantsData from '@/data/tenants.json';
-import type { AccentColor, AccentOption, SecurityIncident, TenantRecord, TenantScoreTier } from '@/types';
+import type { AccentColor, AccentOption, SecurityIncident, TenantRecord, TenantScoreTier, ThemeOption } from '@/types';
 
 // Theme configuration constants
 export const THEME_CONFIG = {
   STORAGE_KEY: 'theme',
   MODE_DARK: 'dark',
   MODE_LIGHT: 'light',
+  MODE_OCEAN: 'ocean',
   QUERY_PREFERS_DARK: '(prefers-color-scheme: dark)',
+  AVAILABLE_THEMES: ['light', 'dark', 'ocean'] as const,
 } as const;
+
+// Predefined semantic theme mode options
+export const THEME_OPTIONS: ThemeOption[] = [
+  { id: 'light', label: 'Light' },
+  { id: 'dark', label: 'Dark' },
+  { id: 'ocean', label: 'Ocean' },
+];
 
 // Accent palette definitions
 export const ACCENT_OPTIONS: AccentOption[] = [

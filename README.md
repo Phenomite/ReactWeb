@@ -1,8 +1,23 @@
 # Web Sloplication (ReactWeb)
 
-A modern React 19 web application built with Vite 8, Tailwind CSS v4, Lucide React icons, and TypeScript.
+This repo is intended to test agentic harnesses and models to benchmark changes against
+design, behaviour, refactoring, and understanding of intent across long-horizon web
+& cloud deploy code.
 
-Used to test agentic harnesses and models understanding of intent, behaviour, and design across multiple refactors.
+A modern ReactJS web application built with:
+
+- TypeScript
+- Tailwind CSS
+- shadcn/ui (components)
+- Lucide (icons)
+
+Via:
+
+- pnpm for package management
+- Vite for production build and development (HMR ftw)
+- Biome, Knip, and markdownlint-cli2 for Linting / Checking / Formatting
+- Playwright for testing
+- Bun (JSC) for runtime and database API
 
 ## Prerequisites
 
@@ -203,10 +218,10 @@ multiple administrators simultaneously:
 
 ### 2. In-Cluster Telemetry Generator (Processing Pod Daemon)
 
-A Kubernetes-native telemetry generator script ([`scripts/k8s-telemetry-generator.js`](file:///c:/Users/Bob/Documents/GitHub/ReactWeb/scripts/k8s-telemetry-generator.js))
+A Kubernetes-native telemetry generator script ([`scripts/k8s-telemetry-generator.js`](scripts/k8s-telemetry-generator.js))
 runs directly inside the cluster namespace:
 
-- **Schedule**: Deployed via Flux [`HelmRelease`](file:///c:/Users/Bob/Documents/GitHub/ReactWeb/deploy/processing/helmrelease.yaml)
+- **Schedule**: Deployed via Flux [`HelmRelease`](deploy/processing/helmrelease.yaml)
   running as a continuous processing daemon with periodic heartbeat health checks.
 - **Batch Processing**: Dispatches atomic mutations to `POST /api/internal/batch-update-tenants`. The server executes
   a single SQLite transaction updating all 200 rows and re-ranking the entire leaderboard in under 35ms.
@@ -226,7 +241,7 @@ runs directly inside the cluster namespace:
 
 The database layer coordinates multi-developer updates while preserving operator attribution across all mutations:
 
-- **Multi-Developer Access**: Multiple operators (`admin`, `alice`, `bob`, `charlie`) collaborate and publish live
+- **Multi-Developer Access**: Multiple operators (e.g. `admin`, `alice`, `bob`, `charlie`) can collaborate and publish live
   database updates.
 - **Developer Attribution**: Every mutation records `lastUpdatedBy` in SQLite WAL, displaying the modifying operator
   in the UI badge pill (e.g. `by alice`), attributed from the `X-Admin-User` header or `--as` flag.

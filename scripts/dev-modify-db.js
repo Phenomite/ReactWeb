@@ -61,10 +61,6 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`[Developer DB CLI] Connecting to server at ${opts.url}...`);
-  console.log(`[Developer DB CLI] Developer Identity: ${opts.user}`);
-  console.log(`[Developer DB CLI] Target Resource: ${opts.collection}/${opts.id}`);
-
   // Build updates payload
   const updates = {};
   if (opts.collection === 'tenants') {
@@ -111,20 +107,7 @@ async function main() {
     }
 
     const result = await res.json();
-    const record = result.data || result.tenant || result;
-
-    console.log('\n======================================================');
-    console.log('✓ Database Mutation Successfully Committed to SQLite');
-    console.log('======================================================');
-    console.log(`Resource:        ${opts.collection}/${opts.id}`);
-    console.log(`Modified By:     ${record.lastUpdatedBy || opts.user}`);
-    console.log(`Record Version:  v${record.version || 'N/A'}`);
-    if (record.overallScore !== undefined) console.log(`Overall Score:   ${record.overallScore}`);
-    if (record.rank !== undefined) console.log(`Leaderboard Rank: #${record.rank}`);
-    if (record.status !== undefined) console.log(`Status:          ${record.status}`);
-    console.log('------------------------------------------------------');
-    console.log('⚡ Real-time SSE event broadcast dispatched to ALL active visitor browsers.');
-    console.log('======================================================\n');
+    const _record = result.data || result.tenant || result;
   } catch (err) {
     console.error('[Connection Error]', err.message);
     process.exit(1);

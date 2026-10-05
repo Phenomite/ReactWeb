@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { type KeyboardEvent, memo, useCallback } from 'react';
 import { Card } from '@/components/Card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { TOTAL_TELEMETRY_SIGNALS } from '@/constants';
 import { cn, getActiveSignalCount, getTierForScore } from '@/lib/utils';
 import { APP_STRINGS } from '@/strings';
@@ -28,39 +29,45 @@ function renderRankBadge(rank: number) {
   const m = APP_STRINGS.VIEWS.MICROSOFT;
   if (rank === 1) {
     return (
-      <span
-        title={m.TOOLTIP_RANK_1}
-        className="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-800 shadow-2xs dark:border-amber-700 dark:bg-amber-950/80 dark:text-amber-300"
-      >
-        <Trophy className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-        <span>#1</span>
-      </span>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-100 px-2 py-0.5 font-black text-amber-800 text-xs shadow-2xs dark:border-amber-700 dark:bg-amber-950/80 dark:text-amber-300">
+            <Trophy className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+            <span>#1</span>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>{m.TOOLTIP_RANK_1}</TooltipContent>
+      </Tooltip>
     );
   }
   if (rank === 2) {
     return (
-      <span
-        title={m.TOOLTIP_RANK_2}
-        className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-slate-200 px-2 py-0.5 text-xs font-black text-slate-800 shadow-2xs dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
-      >
-        <Medal className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" aria-hidden="true" />
-        <span>#2</span>
-      </span>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-slate-200 px-2 py-0.5 font-black text-slate-800 text-xs shadow-2xs dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">
+            <Medal className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" aria-hidden="true" />
+            <span>#2</span>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>{m.TOOLTIP_RANK_2}</TooltipContent>
+      </Tooltip>
     );
   }
   if (rank === 3) {
     return (
-      <span
-        title={m.TOOLTIP_RANK_3}
-        className="inline-flex items-center gap-1 rounded-lg border border-orange-300 bg-orange-100 px-2 py-0.5 text-xs font-black text-orange-800 shadow-2xs dark:border-orange-800 dark:bg-orange-950/80 dark:text-orange-300"
-      >
-        <Award className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" aria-hidden="true" />
-        <span>#3</span>
-      </span>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="inline-flex items-center gap-1 rounded-lg border border-orange-300 bg-orange-100 px-2 py-0.5 font-black text-orange-800 text-xs shadow-2xs dark:border-orange-800 dark:bg-orange-950/80 dark:text-orange-300">
+            <Award className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" aria-hidden="true" />
+            <span>#3</span>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>{m.TOOLTIP_RANK_3}</TooltipContent>
+      </Tooltip>
     );
   }
   return (
-    <span className="inline-flex items-center rounded-lg bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+    <span className="inline-flex items-center rounded-lg bg-muted px-2 py-0.5 font-bold text-muted-foreground text-xs">
       #{rank}
     </span>
   );
@@ -74,22 +81,26 @@ interface StatusBubbleProps {
 }
 
 const StatusBubble = memo(({ label, enabled, tooltipText }: StatusBubbleProps) => (
-  <span
-    title={tooltipText}
-    className={cn(
-      'inline-flex select-none items-center gap-1 rounded-full border px-1.5 py-0.5 text-[9.5px] font-semibold transition-colors',
-      enabled
-        ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/70 dark:text-emerald-300'
-        : 'border-slate-200 bg-slate-100/70 text-slate-400 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-500',
-    )}
-  >
-    {enabled ? (
-      <CheckCircle2 className="h-2.5 w-2.5 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-    ) : (
-      <XCircle className="h-2.5 w-2.5 shrink-0 text-slate-400 dark:text-slate-500" aria-hidden="true" />
-    )}
-    <span>{label}</span>
-  </span>
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <span
+        className={cn(
+          'inline-flex cursor-default select-none items-center gap-1.5 rounded-full border px-2 py-0.5 font-semibold text-xs transition-colors focus-visible:outline-2 focus-visible:outline-ring',
+          enabled
+            ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/70 dark:text-emerald-300'
+            : 'border-border bg-muted/60 text-muted-foreground',
+        )}
+      >
+        {enabled ? (
+          <CheckCircle2 className="h-3 w-3 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+        ) : (
+          <XCircle className="h-3 w-3 shrink-0 text-muted-foreground" aria-hidden="true" />
+        )}
+        <span>{label}</span>
+      </span>
+    </TooltipTrigger>
+    <TooltipContent>{tooltipText}</TooltipContent>
+  </Tooltip>
 ));
 
 StatusBubble.displayName = 'StatusBubble';
@@ -104,14 +115,14 @@ interface CategoryBarProps {
 }
 
 const CategoryBar = memo(({ label, subtitle, score, icon: Icon, colorClass }: CategoryBarProps) => (
-  <div className="space-y-0.5">
-    <div className="flex items-center justify-between text-[10.5px]">
-      <div className="flex items-center gap-1 min-w-0">
-        <Icon className="h-3 w-3 shrink-0 text-slate-400 dark:text-slate-500" aria-hidden="true" />
-        <span className="truncate font-semibold text-slate-700 dark:text-slate-300">{label}</span>
-        <span className="truncate text-[9.5px] text-slate-400 dark:text-slate-500">({subtitle})</span>
+  <div className="space-y-1">
+    <div className="flex items-center justify-between text-xs">
+      <div className="flex min-w-0 items-center gap-1.5">
+        <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+        <span className="truncate font-semibold text-foreground">{label}</span>
+        <span className="truncate text-muted-foreground">({subtitle})</span>
       </div>
-      <span className="font-mono text-[11px] font-bold text-slate-900 dark:text-white">{score}%</span>
+      <span className="font-bold font-mono text-foreground text-xs">{score}%</span>
     </div>
     <div
       role="progressbar"
@@ -119,7 +130,7 @@ const CategoryBar = memo(({ label, subtitle, score, icon: Icon, colorClass }: Ca
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label={`${label} secure score: ${score}%`}
-      className="h-1 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+      className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
     >
       <div
         className={cn('h-full rounded-full transition-all duration-300', colorClass)}
@@ -158,41 +169,39 @@ export const TenantCard = memo(({ tenant, onInspect }: TenantCardProps) => {
       role="button"
       aria-label={`${m.BTN_INSPECT} ${tenant.name}`}
       className={cn(
-        'group relative flex cursor-pointer select-none flex-col justify-between overflow-hidden p-3.5 transition-all duration-200 hover:border-accent hover:shadow-md active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-blue-600',
+        'group relative flex cursor-pointer select-none flex-col justify-between overflow-hidden p-3.5 transition-all duration-200 hover:border-accent hover:shadow-md focus-visible:outline-2 focus-visible:outline-ring active:scale-[0.99]',
         tenant.rank <= 3 && 'ring-1 ring-amber-400/40 dark:ring-amber-500/30',
       )}
     >
       {/* Top Header: Rank, Organization Info & Overall Score */}
       <div>
         <div className="flex items-start justify-between gap-2.5">
-          <div className="space-y-1 min-w-0 flex-1">
+          <div className="min-w-0 flex-1 space-y-1">
             <div className="flex items-center gap-1.5">
               {renderRankBadge(tenant.rank)}
-              <span
-                className={cn('rounded border px-1.5 py-0.2 text-[9.5px] font-bold tracking-tight', tier.badgeClass)}
-              >
+              <span className={cn('rounded border px-2 py-0.5 font-bold text-xs tracking-tight', tier.badgeClass)}>
                 {tier.label}
               </span>
             </div>
 
             <h3
               title={tenant.name}
-              className="truncate text-sm font-bold text-slate-900 transition-colors group-hover:text-accent dark:text-white"
+              className="truncate font-bold text-base text-foreground transition-colors group-hover:text-accent"
             >
               {tenant.name}
             </h3>
 
-            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[10.5px] text-slate-500 dark:text-slate-400">
-              <span className="flex items-center gap-1 truncate font-mono text-[10px]">
-                <Globe className="h-3 w-3 shrink-0 text-slate-400" aria-hidden="true" />
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground text-xs">
+              <span className="flex items-center gap-1 truncate font-mono text-xs">
+                <Globe className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
                 {tenant.domain}
               </span>
-              <span className="flex items-center gap-1 truncate text-[10px]">
-                <Building2 className="h-3 w-3 shrink-0 text-slate-400" aria-hidden="true" />
+              <span className="flex items-center gap-1 truncate text-xs">
+                <Building2 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
                 {tenant.industry}
               </span>
-              <span className="flex items-center gap-1 truncate text-[10px]">
-                <Users className="h-3 w-3 shrink-0 text-slate-400" aria-hidden="true" />
+              <span className="flex items-center gap-1 truncate text-xs">
+                <Users className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
                 {tenant.seatCount.toLocaleString()} {m.LABEL_USERS}
               </span>
             </div>
@@ -202,26 +211,24 @@ export const TenantCard = memo(({ tenant, onInspect }: TenantCardProps) => {
           <div className="flex shrink-0 flex-col items-end">
             <div
               className={cn(
-                'flex h-11 w-11 flex-col items-center justify-center rounded-xl border font-mono font-black shadow-2xs transition-transform group-hover:scale-105',
+                'flex h-12 w-12 flex-col items-center justify-center rounded-xl border font-black font-mono shadow-2xs transition-transform group-hover:scale-105',
                 tier.badgeClass,
               )}
             >
-              <span className="text-xs leading-none">{tenant.overallScore}</span>
-              <span className="text-[8.5px] font-bold leading-tight opacity-75">%</span>
+              <span className="text-sm leading-none">{tenant.overallScore}</span>
+              <span className="font-bold text-[10px] leading-tight opacity-75">%</span>
             </div>
-            <span className="mt-1 text-[8.5px] font-medium text-slate-400 dark:text-slate-500">
-              {m.LABEL_OVERALL_SCORE}
-            </span>
+            <span className="mt-1 font-medium text-muted-foreground text-xs">{m.LABEL_OVERALL_SCORE}</span>
           </div>
         </div>
 
         {/* Status Bubbles Row: explicitly positioned ABOVE secure score categories */}
-        <div className="mt-2.5 rounded-lg border border-slate-100 bg-slate-50/70 p-2 dark:border-slate-800/80 dark:bg-slate-900/60">
-          <div className="mb-1 flex items-center justify-between">
-            <span className="text-[9.5px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+        <div className="mt-3 rounded-lg border border-border bg-muted/50 p-2.5">
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="font-bold text-muted-foreground text-xs uppercase tracking-wider">
               {m.LABEL_BUBBLES_SECTION}
             </span>
-            <span className="text-[9.5px] font-medium text-slate-500 dark:text-slate-400">
+            <span className="font-semibold text-muted-foreground text-xs">
               {getActiveSignalCount(tenant.statusBubbles)}/{TOTAL_TELEMETRY_SIGNALS} {m.STATUS_ACTIVE}
             </span>
           </div>

@@ -17,9 +17,8 @@ interface ButtonProps {
 }
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-white hover:bg-accent-hover focus-visible:outline-blue-600',
-  secondary:
-    'border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700/60 focus-visible:outline-blue-600',
+  primary: 'bg-primary text-primary-foreground hover:bg-accent-hover focus-visible:outline-ring',
+  secondary: 'border border-border bg-muted text-foreground hover:bg-muted/80 focus-visible:outline-ring',
   danger:
     'border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300 focus-visible:outline-rose-600',
   warning: 'bg-amber-600 text-white hover:bg-amber-700 focus-visible:outline-amber-600',
@@ -44,7 +43,7 @@ export const Button = memo(
       disabled={disabled}
       aria-label={ariaLabel}
       className={cn(
-        'flex h-9 cursor-pointer select-none items-center justify-center gap-2 rounded-lg px-3.5 text-xs font-semibold shadow-xs transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2',
+        'flex h-9 cursor-pointer select-none items-center justify-center gap-2 rounded-lg px-3.5 font-semibold text-xs shadow-xs transition-all duration-150 focus-visible:outline-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50',
         !children && 'w-9 px-0',
         VARIANT_CLASSES[variant],
         className,

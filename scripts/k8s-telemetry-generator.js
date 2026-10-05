@@ -17,9 +17,6 @@ const INTERVAL_MS = Number.parseInt(process.env.UPDATE_INTERVAL_MS || '60000', 1
 const RUN_ONCE = process.argv.includes('--once');
 const HEALTH_FILE = process.env.HEALTH_FILE || '/tmp/healthy';
 
-console.log('[Telemetry Generator] Target Backend URL:', BACKEND_URL);
-console.log('[Telemetry Generator] Mode:', RUN_ONCE ? 'One-Shot' : `Continuous Loop (${INTERVAL_MS / 1000}s)`);
-
 async function runBatchUpdate() {
   const startTime = Date.now();
   try {
@@ -47,9 +44,8 @@ async function runBatchUpdate() {
       throw new Error(`Batch update failed: HTTP ${batchRes.status} - ${errBody}`);
     }
 
-    const data = await batchRes.json();
-    const durationMs = Date.now() - startTime;
-    console.log(`[${new Date().toISOString()}] Successfully updated ${data.updatedCount} tenants in ${durationMs}ms.`);
+    const _data = await batchRes.json();
+    const _durationMs = Date.now() - startTime;
     try {
       fs.writeFileSync(HEALTH_FILE, Math.floor(Date.now() / 1000).toString(), 'utf8');
     } catch {
@@ -76,7 +72,6 @@ async function main() {
     }, INTERVAL_MS);
 
     function cleanup() {
-      console.log('[Telemetry Generator] Terminating generator gracefully...');
       clearInterval(timer);
       process.exit(0);
     }

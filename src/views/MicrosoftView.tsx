@@ -21,6 +21,8 @@ import { Card } from '@/components/Card';
 import { TenantCard } from '@/components/TenantCard';
 import { TenantDetailModal } from '@/components/TenantDetailModal';
 import { TenantLeaderboardChart } from '@/components/TenantLeaderboardChart';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { TOTAL_TELEMETRY_SIGNALS } from '@/constants';
 import { useHeaderSlot } from '@/context/HeaderSlotContext';
 import { useRealtime } from '@/context/RealtimeContext';
@@ -70,41 +72,47 @@ const TopLeaderCard = memo(({ tenant, idx, onInspect, m }: TopLeaderCardProps) =
       role="button"
       aria-label={`${m.BTN_INSPECT} ${tenant.name}`}
       className={cn(
-        'group relative flex h-[68px] cursor-pointer select-none items-center justify-between overflow-hidden px-3.5 py-2 transition-all duration-200 hover:shadow-md active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-blue-600',
+        'group relative flex min-h-[72px] cursor-pointer select-none items-center justify-between overflow-hidden px-4 py-2.5 transition-all duration-200 hover:shadow-md focus-visible:outline-2 focus-visible:outline-ring active:scale-[0.99]',
         isFirst
-          ? 'border-amber-300 bg-amber-50/40 hover:border-amber-400 dark:border-amber-800 dark:bg-amber-950/20 ring-1 ring-amber-400/40'
+          ? 'border-amber-300 bg-amber-50/40 ring-1 ring-amber-400/40 hover:border-amber-400 dark:border-amber-800 dark:bg-amber-950/20'
           : isSecond
-            ? 'border-slate-300 bg-slate-100/50 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900/40'
+            ? 'border-border bg-muted/50 hover:border-border/80'
             : 'border-orange-200 bg-orange-50/30 hover:border-orange-300 dark:border-orange-900/40 dark:bg-orange-950/20',
       )}
     >
-      <div className="flex min-w-0 flex-1 items-center gap-2.5">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
         {/* Rank badge */}
         <div className="shrink-0">
           {isFirst ? (
-            <span
-              title={m.TOOLTIP_RANK_1}
-              className="inline-flex items-center gap-1 rounded-md bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-800 shadow-2xs dark:bg-amber-950/80 dark:text-amber-300"
-            >
-              <Trophy className="h-3 w-3" aria-hidden="true" />
-              #1
-            </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-amber-100 px-2.5 py-1 font-black text-amber-800 text-sm shadow-2xs dark:bg-amber-950/80 dark:text-amber-300">
+                  <Trophy className="h-3.5 w-3.5" aria-hidden="true" />
+                  #1
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>{m.TOOLTIP_RANK_1}</TooltipContent>
+            </Tooltip>
           ) : isSecond ? (
-            <span
-              title={m.TOOLTIP_RANK_2}
-              className="inline-flex items-center gap-1 rounded-md bg-slate-200 px-2 py-0.5 text-xs font-black text-slate-800 shadow-2xs dark:bg-slate-800 dark:text-slate-200"
-            >
-              <Medal className="h-3 w-3" aria-hidden="true" />
-              #2
-            </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-muted px-2.5 py-1 font-black text-foreground text-sm shadow-2xs">
+                  <Medal className="h-3.5 w-3.5" aria-hidden="true" />
+                  #2
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>{m.TOOLTIP_RANK_2}</TooltipContent>
+            </Tooltip>
           ) : (
-            <span
-              title={m.TOOLTIP_RANK_3}
-              className="inline-flex items-center gap-1 rounded-md bg-orange-100 px-2 py-0.5 text-xs font-black text-orange-800 shadow-2xs dark:bg-orange-950/80 dark:text-orange-300"
-            >
-              <Award className="h-3 w-3" aria-hidden="true" />
-              #3
-            </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-orange-100 px-2.5 py-1 font-black text-orange-800 text-sm shadow-2xs dark:bg-orange-950/80 dark:text-orange-300">
+                  <Award className="h-3.5 w-3.5" aria-hidden="true" />
+                  #3
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>{m.TOOLTIP_RANK_3}</TooltipContent>
+            </Tooltip>
           )}
         </div>
 
@@ -113,27 +121,27 @@ const TopLeaderCard = memo(({ tenant, idx, onInspect, m }: TopLeaderCardProps) =
           <div className="flex min-w-0 items-center gap-2">
             <h4
               title={tenant.name}
-              className="shrink-0 max-w-[65%] truncate text-sm font-bold text-slate-900 transition-colors group-hover:text-accent sm:max-w-[70%] dark:text-white"
+              className="max-w-[65%] shrink-0 truncate font-bold text-base text-foreground transition-colors group-hover:text-accent sm:max-w-[70%]"
             >
               {tenant.name}
             </h4>
             <span
               title={tenant.domain}
-              className="hidden min-w-0 shrink truncate font-mono text-[10px] text-slate-400 sm:inline"
+              className="hidden min-w-0 shrink truncate font-mono text-muted-foreground text-xs sm:inline"
             >
               {tenant.domain}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-[10.5px] text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-2.5 text-muted-foreground text-xs">
             <span
               title={tenant.domain}
-              className="min-w-0 max-w-[110px] truncate font-mono text-[10px] text-slate-400 sm:hidden"
+              className="min-w-0 max-w-[120px] truncate font-mono text-muted-foreground text-xs sm:hidden"
             >
               {tenant.domain}
             </span>
             <span className="hidden sm:inline">{tenant.industry}</span>
             <span className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
-              <ShieldCheck className="h-3 w-3 shrink-0" aria-hidden="true" />
+              <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
               {getActiveSignalCount(tenant.statusBubbles)}/{TOTAL_TELEMETRY_SIGNALS} {m.LABEL_TELEMETRY_SUFFIX}
             </span>
           </div>
@@ -142,8 +150,8 @@ const TopLeaderCard = memo(({ tenant, idx, onInspect, m }: TopLeaderCardProps) =
 
       {/* Overall Score */}
       <div className="shrink-0 pl-3 text-right">
-        <span className="font-mono text-xl font-black text-slate-900 dark:text-white">{tenant.overallScore}%</span>
-        <p className="text-[9px] font-medium text-slate-400">{m.LABEL_OVERALL_SCORE}</p>
+        <span className="font-black font-mono text-2xl text-foreground">{tenant.overallScore}%</span>
+        <p className="font-semibold text-muted-foreground text-xs">{m.LABEL_OVERALL_SCORE}</p>
       </div>
     </Card>
   );
@@ -162,56 +170,47 @@ const TenantTableRow = memo(({ tenant, onInspect, m }: TenantTableRowProps) => {
   }, [onInspect, tenant.id]);
 
   return (
-    <tr className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-      <td className="px-4 py-3 font-mono font-bold text-slate-600 dark:text-slate-400">#{tenant.rank}</td>
+    <tr className="transition-colors hover:bg-muted/50">
+      <td className="px-4 py-3 font-bold font-mono text-muted-foreground text-sm">#{tenant.rank}</td>
       <td className="px-4 py-3">
-        <p className="font-bold text-slate-900 dark:text-white">{tenant.name}</p>
-        <p className="font-mono text-[10px] text-slate-400">{tenant.domain}</p>
+        <p className="font-bold text-foreground text-sm">{tenant.name}</p>
+        <p className="font-mono text-muted-foreground text-xs">{tenant.domain}</p>
       </td>
       <td className="px-4 py-3 text-center">
-        <span className="font-mono font-black text-sm text-slate-900 dark:text-white">{tenant.overallScore}%</span>
+        <span className="font-black font-mono text-base text-foreground">{tenant.overallScore}%</span>
       </td>
       <td className="px-4 py-3">
-        <div className="flex items-center justify-center gap-1">
+        <div className="flex items-center justify-center gap-1.5">
           <span
             title={m.LABEL_BUBBLE_SENTINEL}
-            className={cn(
-              'h-2 w-2 rounded-full',
-              tenant.statusBubbles.sentinel ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700',
-            )}
+            className={cn('h-2.5 w-2.5 rounded-full', tenant.statusBubbles.sentinel ? 'bg-emerald-500' : 'bg-muted')}
           />
           <span
             title={m.LABEL_BUBBLE_MDE}
-            className={cn(
-              'h-2 w-2 rounded-full',
-              tenant.statusBubbles.mde ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700',
-            )}
+            className={cn('h-2.5 w-2.5 rounded-full', tenant.statusBubbles.mde ? 'bg-emerald-500' : 'bg-muted')}
           />
           <span
             title={m.LABEL_BUBBLE_MDI}
-            className={cn(
-              'h-2 w-2 rounded-full',
-              tenant.statusBubbles.mdi ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700',
-            )}
+            className={cn('h-2.5 w-2.5 rounded-full', tenant.statusBubbles.mdi ? 'bg-emerald-500' : 'bg-muted')}
           />
           <span
             title={m.LABEL_BUBBLE_LOG}
             className={cn(
-              'h-2 w-2 rounded-full',
-              tenant.statusBubbles.logAnalytics ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700',
+              'h-2.5 w-2.5 rounded-full',
+              tenant.statusBubbles.logAnalytics ? 'bg-emerald-500' : 'bg-muted',
             )}
           />
         </div>
       </td>
-      <td className="px-4 py-3 text-right font-mono">{tenant.categories.device}%</td>
-      <td className="px-4 py-3 text-right font-mono">{tenant.categories.identities}%</td>
-      <td className="px-4 py-3 text-right font-mono">{tenant.categories.apps}%</td>
-      <td className="px-4 py-3 text-right font-mono">{tenant.categories.data}%</td>
+      <td className="px-4 py-3 text-right font-mono text-foreground text-sm">{tenant.categories.device}%</td>
+      <td className="px-4 py-3 text-right font-mono text-foreground text-sm">{tenant.categories.identities}%</td>
+      <td className="px-4 py-3 text-right font-mono text-foreground text-sm">{tenant.categories.apps}%</td>
+      <td className="px-4 py-3 text-right font-mono text-foreground text-sm">{tenant.categories.data}%</td>
       <td className="px-4 py-3 text-right">
         <button
           type="button"
           onClick={handleInspect}
-          className="cursor-pointer font-bold text-accent hover:underline text-xs"
+          className="cursor-pointer font-bold text-accent text-sm hover:underline"
         >
           {m.BTN_INSPECT}
         </button>
@@ -237,6 +236,10 @@ const MicrosoftView = memo(() => {
   const [sortOrder, setSortOrder] = useState<TenantSortOrder>('desc');
   const [page, setPage] = usePagination(1);
   const [pageSize, setPageSize] = useState(12);
+
+  const handleTabChange = useCallback((val: string) => {
+    setActiveTab(val as 'tiles' | 'charts' | 'table');
+  }, []);
 
   // Selected tenant ID for detailed modal inspection
   const [inspectingTenantId, setInspectingTenantId] = useState<string | null>(null);
@@ -440,10 +443,6 @@ const MicrosoftView = memo(() => {
     setInspectingTenantId(null);
   }, []);
 
-  const handleSelectTilesTab = useCallback(() => setActiveTab('tiles'), []);
-  const handleSelectChartsTab = useCallback(() => setActiveTab('charts'), []);
-  const handleSelectTableTab = useCallback(() => setActiveTab('table'), []);
-
   const handleToggleSortOrder = useCallback(() => {
     setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
   }, []);
@@ -479,8 +478,8 @@ const MicrosoftView = memo(() => {
         {/* Left Column: Posture Overview (3 Tiles, Height Aligned) */}
         <div className="flex flex-col space-y-2 lg:col-span-5">
           <div className="flex items-center gap-1.5">
-            <Shield className="h-3.5 w-3.5 text-blue-500" aria-hidden="true" />
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <Shield className="h-4 w-4 text-blue-500" aria-hidden="true" />
+            <h3 className="font-bold text-muted-foreground text-xs uppercase tracking-wider">
               {m.HEADING_OVERVIEW_POSTURE}
             </h3>
           </div>
@@ -493,13 +492,11 @@ const MicrosoftView = memo(() => {
               tabIndex={0}
               role="button"
               aria-label={`${m.BTN_INSPECT} ${globalKpis.topTenant?.name}`}
-              className="flex h-[68px] cursor-pointer select-none items-center justify-between px-3.5 py-2 transition-all hover:border-amber-400 hover:shadow-2xs active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-blue-600 dark:hover:border-amber-600"
+              className="flex min-h-[72px] cursor-pointer select-none items-center justify-between px-4 py-2.5 transition-all hover:border-amber-400 hover:shadow-2xs focus-visible:outline-2 focus-visible:outline-ring active:scale-[0.99]"
             >
               <div className="min-w-0 pr-2">
-                <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                  {m.HEADING_MANAGED_COUNT}
-                </span>
-                <p className="truncate text-[10px] text-slate-400 dark:text-slate-500">
+                <span className="font-bold text-foreground text-sm">{m.HEADING_MANAGED_COUNT}</span>
+                <p className="truncate text-muted-foreground text-xs">
                   {m.HEADING_TOP_TENANT}:{' '}
                   <strong className="font-semibold text-amber-600 dark:text-amber-400">
                     {globalKpis.topTenant?.name ?? APP_STRINGS.COMMON.TXT_NONE}
@@ -507,42 +504,36 @@ const MicrosoftView = memo(() => {
                 </p>
               </div>
               <div className="shrink-0 text-right">
-                <span className="font-mono text-xl font-black text-slate-900 dark:text-white">{tenants.length}</span>
-                <p className="text-[9px] font-medium text-slate-400">{m.LABEL_FLEET_UNITS}</p>
+                <span className="font-black font-mono text-2xl text-foreground">{tenants.length}</span>
+                <p className="font-semibold text-muted-foreground text-xs">{m.LABEL_FLEET_UNITS}</p>
               </div>
             </Card>
 
             {/* Tile 2: Terrain Average Score */}
-            <Card className="flex h-[68px] items-center justify-between px-3.5 py-2 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
+            <Card className="flex min-h-[72px] items-center justify-between px-4 py-2.5 transition-colors hover:border-border">
               <div className="min-w-0 pr-2">
-                <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                  {m.HEADING_GLOBAL_AVERAGE}
-                </span>
-                <p className="truncate text-[10px] text-slate-400 dark:text-slate-500">{m.TXT_TERRAIN_COVERAGE}</p>
+                <span className="font-bold text-foreground text-sm">{m.HEADING_GLOBAL_AVERAGE}</span>
+                <p className="truncate text-muted-foreground text-xs">{m.TXT_TERRAIN_COVERAGE}</p>
               </div>
               <div className="shrink-0 text-right">
-                <span className="font-mono text-xl font-black text-slate-900 dark:text-white">
-                  {globalKpis.avgScore}%
-                </span>
-                <p className="text-[9px] font-medium text-slate-400">{m.LABEL_BENCHMARK}</p>
+                <span className="font-black font-mono text-2xl text-foreground">{globalKpis.avgScore}%</span>
+                <p className="font-semibold text-muted-foreground text-xs">{m.LABEL_BENCHMARK}</p>
               </div>
             </Card>
 
             {/* Tile 3: Full Security Stack Adoption */}
-            <Card className="flex h-[68px] items-center justify-between px-3.5 py-2 transition-colors hover:border-slate-300 dark:hover:border-slate-700">
+            <Card className="flex min-h-[72px] items-center justify-between px-4 py-2.5 transition-colors hover:border-border">
               <div className="min-w-0 pr-2">
-                <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                  {m.HEADING_FULL_TELEMETRY}
-                </span>
-                <p className="truncate text-[10px] text-slate-400 dark:text-slate-500">
+                <span className="font-bold text-foreground text-sm">{m.HEADING_FULL_TELEMETRY}</span>
+                <p className="truncate text-muted-foreground text-xs">
                   {globalKpis.fullTelemetryCount} {m.TXT_PAGINATION_OF} {tenants.length} {m.TXT_FULL_STACK_STATUS}
                 </p>
               </div>
               <div className="shrink-0 text-right">
-                <span className="font-mono text-xl font-black text-blue-600 dark:text-blue-400">
+                <span className="font-black font-mono text-2xl text-blue-600 dark:text-blue-400">
                   {globalKpis.fullTelemetryPct}%
                 </span>
-                <p className="text-[9px] font-medium text-slate-400">{m.LABEL_ADOPTION_RATE}</p>
+                <p className="font-semibold text-muted-foreground text-xs">{m.LABEL_ADOPTION_RATE}</p>
               </div>
             </Card>
           </div>
@@ -551,8 +542,8 @@ const MicrosoftView = memo(() => {
         {/* Right Column: Leaderboard Top 3 (Height Aligned with Left Overview) */}
         <div className="flex flex-col space-y-2 lg:col-span-7">
           <div className="flex items-center gap-1.5">
-            <Trophy className="h-3.5 w-3.5 text-amber-500" aria-hidden="true" />
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <Trophy className="h-4 w-4 text-amber-500" aria-hidden="true" />
+            <h3 className="font-bold text-muted-foreground text-xs uppercase tracking-wider">
               {m.HEADING_TOP_THREE_LEADERBOARD}
             </h3>
           </div>
@@ -566,151 +557,126 @@ const MicrosoftView = memo(() => {
       </div>
 
       {/* View Layout Tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800">
-        <button
-          type="button"
-          onClick={handleSelectTilesTab}
-          className={cn(
-            'flex cursor-pointer select-none items-center gap-1.5 border-b-2 px-4 py-2 text-xs font-bold transition-colors',
-            activeTab === 'tiles'
-              ? 'border-accent text-accent font-semibold'
-              : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
-          )}
-        >
-          <LayoutGrid className="h-3.5 w-3.5" aria-hidden="true" />
-          <span>{m.TAB_TILES}</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={handleSelectChartsTab}
-          className={cn(
-            'flex cursor-pointer select-none items-center gap-1.5 border-b-2 px-4 py-2 text-xs font-bold transition-colors',
-            activeTab === 'charts'
-              ? 'border-accent text-accent font-semibold'
-              : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
-          )}
-        >
-          <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" />
-          <span>{m.TAB_CHARTS}</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={handleSelectTableTab}
-          className={cn(
-            'flex cursor-pointer select-none items-center gap-1.5 border-b-2 px-4 py-2 text-xs font-bold transition-colors',
-            activeTab === 'table'
-              ? 'border-accent text-accent font-semibold'
-              : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
-          )}
-        >
-          <List className="h-3.5 w-3.5" aria-hidden="true" />
-          <span>{m.TAB_TABLE}</span>
-        </button>
-      </div>
-
-      {/* Action Toolbar, Search & Filter Controls */}
-      <Card className="p-3">
-        <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
-          {/* Search bar */}
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              placeholder={m.INPUT_SEARCH_TENANTS}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50/60 py-1.5 pl-8 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:outline-none dark:border-slate-800 dark:bg-slate-800/60 dark:text-white"
-            />
-          </div>
-
-          {/* Filters & Sorting */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            {/* Telemetry Bubble Filter */}
-            <div className="flex items-center gap-1.5">
-              <Filter className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
-              <select
-                value={telemetryFilter}
-                onChange={handleTelemetryFilterChange}
-                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-              >
-                <option value="all">{m.OPT_FILTER_ALL}</option>
-                <option value="full">{m.OPT_FILTER_FULL_STACK}</option>
-                <option value="sentinel">{m.OPT_FILTER_SENTINEL}</option>
-                <option value="mde">{m.OPT_FILTER_MDE}</option>
-                <option value="mdi">{m.OPT_FILTER_MDI}</option>
-                <option value="logAnalytics">{m.OPT_FILTER_AUDIT}</option>
-              </select>
-            </div>
-
-            {/* Score Tier Filter */}
-            <select
-              value={selectedTier}
-              onChange={handleTierFilterChange}
-              className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-            >
-              <option value="all">{m.OPT_TIER_ALL}</option>
-              <option value="diamond">{m.OPT_TIER_DIAMOND}</option>
-              <option value="gold">{m.OPT_TIER_GOLD}</option>
-              <option value="silver">{m.OPT_TIER_SILVER}</option>
-              <option value="bronze">{m.OPT_TIER_BRONZE}</option>
-              <option value="critical">{m.OPT_TIER_CRITICAL}</option>
-            </select>
-
-            {/* Sort Field Selector */}
-            <div className="flex items-center gap-1.5">
-              <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
-              <select
-                value={sortField}
-                onChange={handleSortFieldChange}
-                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-              >
-                <option value="overallScore">
-                  {sortOrder === 'desc' ? m.OPT_SORT_SCORE_DESC : m.OPT_SORT_SCORE_ASC}
-                </option>
-                <option value="rank">{sortOrder === 'asc' ? m.OPT_SORT_RANK_ASC : m.OPT_SORT_RANK_DESC}</option>
-                <option value="name">{sortOrder === 'asc' ? m.OPT_SORT_NAME_ASC : m.OPT_SORT_NAME_DESC}</option>
-                <option value="device">{sortOrder === 'desc' ? m.OPT_SORT_DEVICE_DESC : m.OPT_SORT_DEVICE_ASC}</option>
-                <option value="identities">
-                  {sortOrder === 'desc' ? m.OPT_SORT_IDENTITIES_DESC : m.OPT_SORT_IDENTITIES_ASC}
-                </option>
-                <option value="apps">{sortOrder === 'desc' ? m.OPT_SORT_APPS_DESC : m.OPT_SORT_APPS_ASC}</option>
-                <option value="data">{sortOrder === 'desc' ? m.OPT_SORT_DATA_DESC : m.OPT_SORT_DATA_ASC}</option>
-              </select>
-            </div>
-
-            {/* Sort Order Toggle */}
-            <button
-              type="button"
-              onClick={handleToggleSortOrder}
-              title={`Toggle sort order: currently ${orderLabel}`}
-              aria-label={`Toggle sort order: currently ${orderLabel}`}
-              className="flex cursor-pointer select-none items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 active:scale-95 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-            >
-              {sortOrder === 'desc' ? (
-                <ArrowDown className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" aria-hidden="true" />
-              ) : (
-                <ArrowUp className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" aria-hidden="true" />
-              )}
-              <span>{orderLabel}</span>
-            </button>
-
-            {/* Reset Filters */}
-            {(searchQuery || telemetryFilter !== 'all' || selectedTier !== 'all' || sortField !== 'overallScore') && (
-              <Button onClick={handleResetFilters} icon={RotateCcw} variant="secondary">
-                {m.BTN_RESET_FILTERS}
-              </Button>
-            )}
-          </div>
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full gap-3.5">
+        <div className="flex border-border border-b pb-2">
+          <TabsList className="bg-muted p-1">
+            <TabsTrigger value="tiles" className="gap-2 px-3.5 py-1.5 font-semibold text-sm">
+              <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+              <span>{m.TAB_TILES}</span>
+            </TabsTrigger>
+            <TabsTrigger value="charts" className="gap-2 px-3.5 py-1.5 font-semibold text-sm">
+              <BarChart3 className="h-4 w-4" aria-hidden="true" />
+              <span>{m.TAB_CHARTS}</span>
+            </TabsTrigger>
+            <TabsTrigger value="table" className="gap-2 px-3.5 py-1.5 font-semibold text-sm">
+              <List className="h-4 w-4" aria-hidden="true" />
+              <span>{m.TAB_TABLE}</span>
+            </TabsTrigger>
+          </TabsList>
         </div>
-      </Card>
 
-      {/* TAB 1: TILE VIEW (Default) */}
-      {activeTab === 'tiles' && (
-        <div className="space-y-3.5">
+        {/* Action Toolbar, Search & Filter Controls */}
+        <Card className="p-3">
+          <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
+            {/* Search bar */}
+            <div className="relative flex-1">
+              <Search className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder={m.INPUT_SEARCH_TENANTS}
+                className="w-full rounded-lg border border-border bg-muted/60 py-2 pr-3.5 pl-9 text-foreground text-sm placeholder:text-muted-foreground focus:border-ring focus:outline-none"
+              />
+            </div>
+
+            {/* Filters & Sorting */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Telemetry Bubble Filter */}
+              <div className="flex items-center gap-1.5">
+                <Filter className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                <select
+                  value={telemetryFilter}
+                  onChange={handleTelemetryFilterChange}
+                  className="rounded-lg border border-border bg-card px-3 py-2 text-foreground text-sm"
+                >
+                  <option value="all">{m.OPT_FILTER_ALL}</option>
+                  <option value="full">{m.OPT_FILTER_FULL_STACK}</option>
+                  <option value="sentinel">{m.OPT_FILTER_SENTINEL}</option>
+                  <option value="mde">{m.OPT_FILTER_MDE}</option>
+                  <option value="mdi">{m.OPT_FILTER_MDI}</option>
+                  <option value="logAnalytics">{m.OPT_FILTER_AUDIT}</option>
+                </select>
+              </div>
+
+              {/* Score Tier Filter */}
+              <select
+                value={selectedTier}
+                onChange={handleTierFilterChange}
+                className="rounded-lg border border-border bg-card px-3 py-2 text-foreground text-sm"
+              >
+                <option value="all">{m.OPT_TIER_ALL}</option>
+                <option value="diamond">{m.OPT_TIER_DIAMOND}</option>
+                <option value="gold">{m.OPT_TIER_GOLD}</option>
+                <option value="silver">{m.OPT_TIER_SILVER}</option>
+                <option value="bronze">{m.OPT_TIER_BRONZE}</option>
+                <option value="critical">{m.OPT_TIER_CRITICAL}</option>
+              </select>
+
+              {/* Sort Field Selector */}
+              <div className="flex items-center gap-1.5">
+                <ArrowUpDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                <select
+                  value={sortField}
+                  onChange={handleSortFieldChange}
+                  className="rounded-lg border border-border bg-card px-3 py-2 text-foreground text-sm"
+                >
+                  <option value="overallScore">
+                    {sortOrder === 'desc' ? m.OPT_SORT_SCORE_DESC : m.OPT_SORT_SCORE_ASC}
+                  </option>
+                  <option value="rank">{sortOrder === 'asc' ? m.OPT_SORT_RANK_ASC : m.OPT_SORT_RANK_DESC}</option>
+                  <option value="name">{sortOrder === 'asc' ? m.OPT_SORT_NAME_ASC : m.OPT_SORT_NAME_DESC}</option>
+                  <option value="device">
+                    {sortOrder === 'desc' ? m.OPT_SORT_DEVICE_DESC : m.OPT_SORT_DEVICE_ASC}
+                  </option>
+                  <option value="identities">
+                    {sortOrder === 'desc' ? m.OPT_SORT_IDENTITIES_DESC : m.OPT_SORT_IDENTITIES_ASC}
+                  </option>
+                  <option value="apps">{sortOrder === 'desc' ? m.OPT_SORT_APPS_DESC : m.OPT_SORT_APPS_ASC}</option>
+                  <option value="data">{sortOrder === 'desc' ? m.OPT_SORT_DATA_DESC : m.OPT_SORT_DATA_ASC}</option>
+                </select>
+              </div>
+
+              {/* Sort Order Toggle */}
+              <button
+                type="button"
+                onClick={handleToggleSortOrder}
+                title={`Toggle sort order: currently ${orderLabel}`}
+                aria-label={`Toggle sort order: currently ${orderLabel}`}
+                className="flex cursor-pointer select-none items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 font-semibold text-foreground text-sm hover:bg-muted active:scale-95"
+              >
+                {sortOrder === 'desc' ? (
+                  <ArrowDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                ) : (
+                  <ArrowUp className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                )}
+                <span>{orderLabel}</span>
+              </button>
+
+              {/* Reset Filters */}
+              {(searchQuery || telemetryFilter !== 'all' || selectedTier !== 'all' || sortField !== 'overallScore') && (
+                <Button onClick={handleResetFilters} icon={RotateCcw} variant="secondary">
+                  {m.BTN_RESET_FILTERS}
+                </Button>
+              )}
+            </div>
+          </div>
+        </Card>
+
+        {/* TAB 1: TILE VIEW (Default) */}
+        <TabsContent value="tiles" className="mt-0 space-y-3.5">
           {processedTenants.length === 0 ? (
-            <Card className="p-12 text-center text-xs text-slate-500 dark:text-slate-400">{m.TXT_NO_TENANTS}</Card>
+            <Card className="p-12 text-center text-muted-foreground text-xs">{m.TXT_NO_TENANTS}</Card>
           ) : (
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
               {paginatedTenants.map((tenant) => (
@@ -721,23 +687,19 @@ const MicrosoftView = memo(() => {
 
           {/* Pagination Controls */}
           {processedTenants.length > 0 && (
-            <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-2.5 sm:flex-row dark:border-slate-800">
-              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <div className="flex flex-col items-center justify-between gap-4 border-border border-t pt-2.5 sm:flex-row">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
                 <span>
-                  {m.TXT_PAGINATION_SHOWING}{' '}
-                  <strong className="text-slate-900 dark:text-white">{(page - 1) * pageSize + 1}</strong> -{' '}
-                  <strong className="text-slate-900 dark:text-white">
-                    {Math.min(page * pageSize, processedTenants.length)}
-                  </strong>{' '}
-                  {m.TXT_PAGINATION_OF}{' '}
-                  <strong className="text-slate-900 dark:text-white">{processedTenants.length}</strong>{' '}
+                  {m.TXT_PAGINATION_SHOWING} <strong className="text-foreground">{(page - 1) * pageSize + 1}</strong> -{' '}
+                  <strong className="text-foreground">{Math.min(page * pageSize, processedTenants.length)}</strong>{' '}
+                  {m.TXT_PAGINATION_OF} <strong className="text-foreground">{processedTenants.length}</strong>{' '}
                   {m.TXT_PAGINATION_TENANTS}
                 </span>
 
                 <select
                   value={pageSize}
                   onChange={handlePageSizeChange}
-                  className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                  className="rounded-md border border-border bg-card px-2.5 py-1 text-foreground text-sm"
                 >
                   <option value={12}>12 / {m.TXT_PAGE.toLowerCase()}</option>
                   <option value={24}>24 / {m.TXT_PAGE.toLowerCase()}</option>
@@ -751,7 +713,7 @@ const MicrosoftView = memo(() => {
                   &larr; {m.BTN_PREVIOUS}
                 </Button>
 
-                <span className="px-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <span className="px-3 font-semibold text-foreground text-sm">
                   {m.TXT_PAGE} {page} {m.TXT_PAGINATION_OF} {totalPages}
                 </span>
 
@@ -761,58 +723,66 @@ const MicrosoftView = memo(() => {
               </div>
             </div>
           )}
-        </div>
-      )}
+        </TabsContent>
 
-      {/* TAB 2: LEADERBOARD CHART */}
-      {activeTab === 'charts' && (
-        <TenantLeaderboardChart
-          tenants={processedTenants}
-          selectedTier={selectedTier}
-          onSelectTier={setSelectedTier}
-          onInspectTenant={handleInspectTenant}
-        />
-      )}
+        {/* TAB 2: LEADERBOARD CHART */}
+        <TabsContent value="charts" className="mt-0">
+          <TenantLeaderboardChart
+            tenants={processedTenants}
+            selectedTier={selectedTier}
+            onSelectTier={setSelectedTier}
+            onInspectTenant={handleInspectTenant}
+          />
+        </TabsContent>
 
-      {/* TAB 3: LIST TABLE */}
-      {activeTab === 'table' && (
-        <Card className="overflow-hidden p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="border-b border-slate-200 bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-400">
-                <tr>
-                  <th className="px-4 py-3">{m.TH_RANK}</th>
-                  <th className="px-4 py-3">{m.TH_TENANT}</th>
-                  <th className="px-4 py-3 text-center">{m.TH_SCORE}</th>
-                  <th className="px-4 py-3 text-center">{m.LABEL_BUBBLES_SECTION}</th>
-                  <th className="px-4 py-3 text-right">
-                    <div>{m.CAT_DEVICE}</div>
-                    <span className="text-[9px] font-normal normal-case text-slate-400">({m.CAT_DEVICE_DESC})</span>
-                  </th>
-                  <th className="px-4 py-3 text-right">
-                    <div>{m.CAT_IDENTITIES}</div>
-                    <span className="text-[9px] font-normal normal-case text-slate-400">({m.CAT_IDENTITIES_DESC})</span>
-                  </th>
-                  <th className="px-4 py-3 text-right">
-                    <div>{m.CAT_APPS}</div>
-                    <span className="text-[9px] font-normal normal-case text-slate-400">({m.CAT_APPS_DESC})</span>
-                  </th>
-                  <th className="px-4 py-3 text-right">
-                    <div>{m.CAT_DATA}</div>
-                    <span className="text-[9px] font-normal normal-case text-slate-400">({m.CAT_DATA_DESC})</span>
-                  </th>
-                  <th className="px-4 py-3 text-right">{m.TH_ACTION}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {paginatedTenants.map((tenant) => (
-                  <TenantTableRow key={tenant.id} tenant={tenant} onInspect={handleInspectTenantById} m={m} />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      )}
+        {/* TAB 3: LIST TABLE */}
+        <TabsContent value="table" className="mt-0">
+          <Card className="overflow-hidden p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="border-border border-b bg-muted/60 font-bold text-muted-foreground text-xs uppercase tracking-wider">
+                  <tr>
+                    <th className="px-4 py-3">{m.TH_RANK}</th>
+                    <th className="px-4 py-3">{m.TH_TENANT}</th>
+                    <th className="px-4 py-3 text-center">{m.TH_SCORE}</th>
+                    <th className="px-4 py-3 text-center">{m.LABEL_BUBBLES_SECTION}</th>
+                    <th className="px-4 py-3 text-right">
+                      <div>{m.CAT_DEVICE}</div>
+                      <span className="font-normal text-[11px] text-muted-foreground normal-case">
+                        ({m.CAT_DEVICE_DESC})
+                      </span>
+                    </th>
+                    <th className="px-4 py-3 text-right">
+                      <div>{m.CAT_IDENTITIES}</div>
+                      <span className="font-normal text-[11px] text-muted-foreground normal-case">
+                        ({m.CAT_IDENTITIES_DESC})
+                      </span>
+                    </th>
+                    <th className="px-4 py-3 text-right">
+                      <div>{m.CAT_APPS}</div>
+                      <span className="font-normal text-[11px] text-muted-foreground normal-case">
+                        ({m.CAT_APPS_DESC})
+                      </span>
+                    </th>
+                    <th className="px-4 py-3 text-right">
+                      <div>{m.CAT_DATA}</div>
+                      <span className="font-normal text-[11px] text-muted-foreground normal-case">
+                        ({m.CAT_DATA_DESC})
+                      </span>
+                    </th>
+                    <th className="px-4 py-3 text-right">{m.TH_ACTION}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {paginatedTenants.map((tenant) => (
+                    <TenantTableRow key={tenant.id} tenant={tenant} onInspect={handleInspectTenantById} m={m} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Detailed Tenant Inspection Modal */}
       <TenantDetailModal

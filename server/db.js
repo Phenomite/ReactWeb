@@ -13,6 +13,8 @@ if (!existsSync(DB_DIR)) {
 }
 const DB_PATH = process.env.DATABASE_URL || join(DB_DIR, 'reactweb.db');
 
+const TABLE_IDENTIFIER_REGEX = /^[a-zA-Z0-9_]+$/;
+
 const db = new DatabaseSync(DB_PATH);
 
 // Configure SQLite for high concurrency and zero-loss durability
@@ -200,7 +202,6 @@ export function seedDatabaseIfEmpty() {
         );
       }
       db.exec('COMMIT;');
-      console.log(`[Database] Seeded ${rawData.length} tenant records into SQLite.`);
     }
   }
 
@@ -258,7 +259,6 @@ export function seedDatabaseIfEmpty() {
       );
     }
     db.exec('COMMIT;');
-    console.log(`[Database] Seeded ${initialIncidents.length} security incident records into SQLite.`);
   }
 }
 
@@ -489,7 +489,7 @@ export function updateIncidentStatus(id, status) {
 // Data-agnostic record updater scaling across any database table in SQLite
 export function updateGenericRecord(tableName, id, updates = {}, expectedVersion = null, updatedBy = 'admin') {
   // Validate table name to prevent SQL injection
-  if (!/^[a-zA-Z0-9_]+$/.test(tableName)) {
+  if (!TABLE_IDENTIFIER_REGEX.test(tableName)) {
     throw new Error('Invalid table identifier');
   }
 

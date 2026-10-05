@@ -20,9 +20,9 @@ const MetricRow = ({
   isLast?: boolean;
   valueClassName?: string;
 }) => (
-  <div className={cn('flex justify-between py-1.5', !isLast && 'border-b border-slate-100 dark:border-slate-800/60')}>
-    <span className="text-slate-500">{label}</span>
-    <span className={cn('font-mono font-medium text-slate-900 dark:text-slate-200', valueClassName)}>{value}</span>
+  <div className={cn('flex justify-between py-1.5', !isLast && 'border-border/60 border-b')}>
+    <span className="text-muted-foreground">{label}</span>
+    <span className={cn('font-medium font-mono text-foreground', valueClassName)}>{value}</span>
   </div>
 );
 
@@ -43,9 +43,9 @@ const DebugView = memo(() => {
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card className="p-5">
-          <div className="flex items-center gap-2 border-b border-slate-100 pb-3 dark:border-slate-800">
+          <div className="flex items-center gap-2 border-border border-b pb-3">
             <Cpu className="h-4 w-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{d.HEADING_SYSTEM_INFO}</h3>
+            <h3 className="font-semibold text-foreground text-sm">{d.HEADING_SYSTEM_INFO}</h3>
           </div>
           <div className="mt-4 space-y-1 text-xs">
             <MetricRow label={d.LABEL_FRAMEWORK} value={d.VAL_FRAMEWORK} />
@@ -57,9 +57,9 @@ const DebugView = memo(() => {
         </Card>
 
         <Card className="p-5">
-          <div className="flex items-center gap-2 border-b border-slate-100 pb-3 dark:border-slate-800">
+          <div className="flex items-center gap-2 border-border border-b pb-3">
             <Terminal className="h-4 w-4 text-purple-600 dark:text-purple-400" aria-hidden="true" />
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{d.HEADING_ACTIVE_STATE}</h3>
+            <h3 className="font-semibold text-foreground text-sm">{d.HEADING_ACTIVE_STATE}</h3>
           </div>
           <div className="mt-4 space-y-1 text-xs">
             <MetricRow
@@ -80,7 +80,7 @@ const DebugView = memo(() => {
 
       {/* Diagnostics Actions */}
       <Card className="p-5">
-        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <h3 className="mb-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider">
           {d.HEADING_DEBUG_ACTIONS}
         </h3>
         <div className="flex flex-wrap gap-3">

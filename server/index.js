@@ -20,6 +20,12 @@ const ENABLE_SIMULATOR = process.env.ENABLE_SIMULATOR !== 'false';
 // Seed database on startup
 seedDatabaseIfEmpty();
 
+// Route matching regular expressions
+const ROUTE_TENANT_REGEX = /^\/api\/tenants\/([^/]+)$/;
+const ROUTE_GENERIC_PATCH_REGEX = /^\/api\/([a-zA-Z0-9_]+)\/([^/]+)$/;
+const ROUTE_TENANT_SCORE_REGEX = /^\/api\/tenants\/([^/]+)\/score$/;
+const ROUTE_INCIDENT_STATUS_REGEX = /^\/api\/incidents\/([^/]+)\/status$/;
+
 // Active SSE client subscriptions (ReadableStreamDefaultController set)
 const activeClients = new Set();
 const textEncoder = new TextEncoder();
@@ -233,7 +239,7 @@ export const server = Bun.serve({
       }
 
       // Single Tenant
-      const tenantMatch = pathname.match(/^\/api\/tenants\/([^/]+)$/);
+      const tenantMatch = pathname.match(ROUTE_TENANT_REGEX);
       if (tenantMatch && method === 'GET') {
         const tenantId = tenantMatch[1];
         const tenant = getTenantById(tenantId);
@@ -244,7 +250,7 @@ export const server = Bun.serve({
       }
 
       // Data-Agnostic Entity Update (with Optimistic Concurrency Control & Real-Time Broadcast)
-      const genericPatchMatch = pathname.match(/^\/api\/([a-zA-Z0-9_]+)\/([^/]+)$/);
+      const genericPatchMatch = pathname.match(ROUTE_GENERIC_PATCH_REGEX);
       if (
         genericPatchMatch &&
         method === 'PATCH' &&
@@ -322,7 +328,7 @@ export const server = Bun.serve({
       }
 
       // Legacy Update Tenant Score (with Real-Time Broadcast)
-      const scoreMatch = pathname.match(/^\/api\/tenants\/([^/]+)\/score$/);
+      const scoreMatch = pathname.match(ROUTE_TENANT_SCORE_REGEX);
       if (scoreMatch && method === 'PATCH') {
         const tenantId = scoreMatch[1];
         const body = await parseJsonBody(req);
@@ -381,7 +387,7 @@ export const server = Bun.serve({
       }
 
       // Update Incident Status (with Real-Time Broadcast)
-      const incidentStatusMatch = pathname.match(/^\/api\/incidents\/([^/]+)\/status$/);
+      const incidentStatusMatch = pathname.match(ROUTE_INCIDENT_STATUS_REGEX);
       if (incidentStatusMatch && method === 'PATCH') {
         const incidentId = incidentStatusMatch[1];
         const body = await parseJsonBody(req);
@@ -458,7 +464,6 @@ if (ENABLE_SIMULATOR) {
 
 // Graceful shutdown handling
 function handleShutdown() {
-  console.log('[Server] Shutting down gracefully...');
   clearInterval(heartbeatTimer);
   if (simulatorTimer) clearInterval(simulatorTimer);
   for (const client of activeClients) {
@@ -468,12 +473,8 @@ function handleShutdown() {
   }
   activeClients.clear();
   server.stop(true);
-  console.log('[Server] Closed all connections.');
   process.exit(0);
 }
 
 process.on('SIGTERM', handleShutdown);
 process.on('SIGINT', handleShutdown);
-
-console.log(`[Server] Secure Real-Time Backend running on http://${HOST}:${PORT} (Bun ${Bun.version})`);
-console.log(`[Server] Real-time SSE event stream available at /api/events`);

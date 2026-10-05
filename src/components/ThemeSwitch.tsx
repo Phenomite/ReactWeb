@@ -13,13 +13,13 @@ interface ThemeSwitchProps {
 export const ThemeSwitch = memo(({ darkMode, onToggle, className }: ThemeSwitchProps) => (
   <div
     className={cn(
-      'flex select-none items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2.5 dark:border-slate-800 dark:bg-slate-800/60',
+      'flex select-none items-center justify-between rounded-lg border border-border bg-muted/60 px-3.5 py-2.5',
       className,
     )}
   >
-    <div className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-200">
+    <div className="flex items-center gap-2 font-medium text-foreground text-xs">
       {darkMode ? (
-        <Moon className="h-4 w-4 text-blue-400" aria-hidden="true" />
+        <Moon className="h-4 w-4 text-accent" aria-hidden="true" />
       ) : (
         <Sun className="h-4 w-4 text-amber-500" aria-hidden="true" />
       )}
@@ -32,8 +32,8 @@ export const ThemeSwitch = memo(({ darkMode, onToggle, className }: ThemeSwitchP
       onClick={onToggle}
       aria-label={APP_STRINGS.SIDEBAR.SWITCH_THEME_ARIA_LABEL}
       className={cn(
-        'relative inline-flex h-6 w-11 shrink-0 cursor-pointer select-none rounded-full border-2 border-transparent transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-blue-600 active:scale-95',
-        darkMode ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700',
+        'relative inline-flex h-6 w-11 shrink-0 cursor-pointer select-none rounded-full border-2 border-transparent transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-ring active:scale-95',
+        darkMode ? 'bg-primary' : 'bg-muted-foreground/30',
       )}
     >
       <span
