@@ -35,7 +35,7 @@ spec:
               tag: latest
             command:
               - bun
-              - scripts/k8s-telemetry-generator.js
+              - scripts/k8s-telemetry-generator.ts
             env:
               NODE_ENV: production
               BACKEND_URL: http://reactweb-database:3001

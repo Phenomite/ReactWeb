@@ -1,3 +1,5 @@
+import { file, serve } from 'bun';
+import type { SecurityIncident } from '../src/types';
 import {
   addIncident,
   batchUpdateTenants,
@@ -9,13 +11,14 @@ import {
   updateGenericRecord,
   updateIncidentStatus,
   updateTenantScore,
-} from './db.js';
+} from './db';
 
 // Configuration
-const PORT = Number.parseInt(process.env.PORT || '3001', 10);
-const HOST = process.env.HOST || '0.0.0.0';
-const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
-const ENABLE_SIMULATOR = process.env.ENABLE_SIMULATOR !== 'false';
+const PORT = Number.parseInt(process.env['PORT'] || '3001', 10);
+const HOST = process.env['HOST'] || '0.0.0.0';
+const CORS_ORIGIN = process.env['CORS_ORIGIN'] || '*';
+const ENABLE_SIMULATOR = process.env['ENABLE_SIMULATOR'] !== 'false';
+const STATIC_DIR = process.env['STATIC_DIR'] || './dist';
 
 // Seed database on startup
 seedDatabaseIfEmpty();
@@ -27,15 +30,19 @@ const ROUTE_TENANT_SCORE_REGEX = /^\/api\/tenants\/([^/]+)\/score$/;
 const ROUTE_INCIDENT_STATUS_REGEX = /^\/api\/incidents\/([^/]+)\/status$/;
 
 // Active SSE client subscriptions (ReadableStreamDefaultController set)
-const activeClients = new Set();
+const activeClients = new Set<ReadableStreamDefaultController<Uint8Array>>();
 const textEncoder = new TextEncoder();
 
 // Rate limiter storage: IP -> { count: number, resetAt: number }
-const rateLimitMap = new Map();
+interface RateLimitRecord {
+  count: number;
+  resetAt: number;
+}
+const rateLimitMap = new Map<string, RateLimitRecord>();
 const RATE_LIMIT_MAX = 100;
 const RATE_LIMIT_WINDOW_MS = 60000;
 
-function checkRateLimit(ip) {
+function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const record = rateLimitMap.get(ip) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
   if (now > record.resetAt) {
@@ -48,7 +55,7 @@ function checkRateLimit(ip) {
 }
 
 // DevSecOps Security Headers
-const SECURITY_HEADERS = {
+const SECURITY_HEADERS: Record<string, string> = {
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
   'X-XSS-Protection': '1; mode=block',
@@ -59,7 +66,7 @@ const SECURITY_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type, X-Namespace-Secret, X-Updater-Source, X-Admin-User',
 };
 
-function jsonResponse(data, status = 200, extraHeaders = {}) {
+function jsonResponse(data: unknown, status = 200, extraHeaders: Record<string, string> = {}): Response {
   return Response.json(data, {
     status,
     headers: {
@@ -70,7 +77,7 @@ function jsonResponse(data, status = 200, extraHeaders = {}) {
 }
 
 // Broadcast real-time SSE event to all connected browser visitors
-export function broadcastEvent(event, data) {
+export function broadcastEvent(event: string, data: unknown): void {
   const payload = textEncoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
   for (const client of activeClients) {
     try {
@@ -85,7 +92,7 @@ export function broadcastEvent(event, data) {
 const SIMULATED_ALERTS = [
   {
     title: 'Anomalous Cross-Origin PostMessage Telemetry Probe',
-    severity: 'high',
+    severity: 'high' as const,
     category: 'Cross-Context Isolation',
     source: 'Browser Window Messaging Guard',
     description:
@@ -94,7 +101,7 @@ const SIMULATED_ALERTS = [
   },
   {
     title: 'Anomalous API Rate Threshold Exceeded',
-    severity: 'critical',
+    severity: 'critical' as const,
     category: 'Traffic Anomaly',
     source: 'Rate Limiter Service',
     description: 'Automated rapid mutation requests flagged from external IP violating rate limit window.',
@@ -102,7 +109,7 @@ const SIMULATED_ALERTS = [
   },
   {
     title: 'Local Storage State Manipulation Flagged',
-    severity: 'medium',
+    severity: 'medium' as const,
     category: 'Data Integrity',
     source: 'Storage Event Listener',
     description: 'Direct console modification of local storage keys detected outside normal application hooks.',
@@ -110,7 +117,7 @@ const SIMULATED_ALERTS = [
   },
   {
     title: 'Sentinel Threat Intelligence Feeds Sync Completed',
-    severity: 'info',
+    severity: 'info' as const,
     category: 'Threat Intelligence',
     source: 'Azure Sentinel Connector',
     description: 'Successfully ingested 42 new IOC signatures from Microsoft Threat Intelligence.',
@@ -119,16 +126,16 @@ const SIMULATED_ALERTS = [
 ];
 
 // Helper to safely parse JSON body from standard Request
-async function parseJsonBody(req) {
+async function parseJsonBody(req: Request): Promise<Record<string, unknown>> {
   try {
-    return await req.json();
+    return (await req.json()) as Record<string, unknown>;
   } catch {
     return {};
   }
 }
 
 // Start native Bun HTTP server
-export const server = Bun.serve({
+export const server = serve({
   port: PORT,
   hostname: HOST,
   idleTimeout: 0,
@@ -172,8 +179,8 @@ export const server = Bun.serve({
 
       // Real-Time SSE Stream Endpoint
       if (pathname === '/api/events' && method === 'GET') {
-        let clientController = null;
-        const stream = new ReadableStream({
+        let clientController: ReadableStreamDefaultController<Uint8Array> | null = null;
+        const stream = new ReadableStream<Uint8Array>({
           start(controller) {
             clientController = controller;
             activeClients.add(controller);
@@ -241,7 +248,7 @@ export const server = Bun.serve({
       // Single Tenant
       const tenantMatch = pathname.match(ROUTE_TENANT_REGEX);
       if (tenantMatch && method === 'GET') {
-        const tenantId = tenantMatch[1];
+        const tenantId = tenantMatch[1] ?? '';
         const tenant = getTenantById(tenantId);
         if (!tenant) {
           return jsonResponse({ error: 'Tenant Not Found' }, 404);
@@ -257,13 +264,11 @@ export const server = Bun.serve({
         genericPatchMatch[2] !== 'pulse' &&
         genericPatchMatch[2] !== 'simulate'
       ) {
-        const resource = genericPatchMatch[1];
-        const entityId = genericPatchMatch[2];
+        const resource = genericPatchMatch[1] ?? '';
+        const entityId = genericPatchMatch[2] ?? '';
         const body = await parseJsonBody(req);
-        const adminUser =
-          (typeof req.headers?.get === 'function' ? req.headers.get('x-admin-user') : req.headers?.['x-admin-user']) ||
-          'system';
-        const expectedVersion = typeof body.expectedVersion === 'number' ? body.expectedVersion : null;
+        const adminUser = req.headers.get('x-admin-user') || 'system';
+        const expectedVersion = typeof body['expectedVersion'] === 'number' ? body['expectedVersion'] : null;
 
         const result = updateGenericRecord(resource, entityId, body, expectedVersion, adminUser);
 
@@ -307,10 +312,11 @@ export const server = Bun.serve({
       if (pathname === '/api/internal/batch-update-tenants' && method === 'POST') {
         const body = await parseJsonBody(req);
         const updatedBy =
-          body.updatedBy ||
-          (typeof req.headers?.get === 'function' ? req.headers.get('x-admin-user') : req.headers?.['x-admin-user']) ||
+          (typeof body['updatedBy'] === 'string' ? body['updatedBy'] : null) ||
+          req.headers.get('x-admin-user') ||
           'k8s-telemetry-generator';
-        const result = batchUpdateTenants(body.updates, updatedBy);
+        const updates = Array.isArray(body['updates']) ? body['updates'] : null;
+        const result = batchUpdateTenants(updates, updatedBy);
 
         // Broadcast batch event over SSE so all open browser tabs update instantly
         broadcastEvent('tenants_batch_updated', {
@@ -330,17 +336,17 @@ export const server = Bun.serve({
       // Legacy Update Tenant Score (with Real-Time Broadcast)
       const scoreMatch = pathname.match(ROUTE_TENANT_SCORE_REGEX);
       if (scoreMatch && method === 'PATCH') {
-        const tenantId = scoreMatch[1];
+        const tenantId = scoreMatch[1] ?? '';
         const body = await parseJsonBody(req);
-        const overallScore = Number.parseFloat(body.overallScore);
+        const overallScore = Number.parseFloat(String(body['overallScore']));
         if (Number.isNaN(overallScore) || overallScore < 0 || overallScore > 100) {
           return jsonResponse({ error: 'overallScore must be a number between 0 and 100' }, 400);
         }
 
-        const adminUser =
-          (typeof req.headers?.get === 'function' ? req.headers.get('x-admin-user') : req.headers?.['x-admin-user']) ||
-          'system';
-        const updated = updateTenantScore(tenantId, overallScore, body.categories || {}, adminUser);
+        const adminUser = req.headers.get('x-admin-user') || 'system';
+        const categories =
+          typeof body['categories'] === 'object' && body['categories'] !== null ? body['categories'] : {};
+        const updated = updateTenantScore(tenantId, overallScore, categories, adminUser);
         if (!updated) {
           return jsonResponse({ error: 'Tenant Not Found' }, 404);
         }
@@ -360,10 +366,10 @@ export const server = Bun.serve({
       // Create Incident (with Real-Time Broadcast)
       if (pathname === '/api/incidents' && method === 'POST') {
         const body = await parseJsonBody(req);
-        if (!body.title) {
+        if (!body['title']) {
           return jsonResponse({ error: 'title is required' }, 400);
         }
-        const created = addIncident(body);
+        const created = addIncident(body as Partial<SecurityIncident>);
 
         // Broadcast real-time incident event to all connected visitors
         broadcastEvent('incident_created', created);
@@ -389,12 +395,13 @@ export const server = Bun.serve({
       // Update Incident Status (with Real-Time Broadcast)
       const incidentStatusMatch = pathname.match(ROUTE_INCIDENT_STATUS_REGEX);
       if (incidentStatusMatch && method === 'PATCH') {
-        const incidentId = incidentStatusMatch[1];
+        const incidentId = incidentStatusMatch[1] ?? '';
         const body = await parseJsonBody(req);
-        if (!['active', 'investigating', 'resolved'].includes(body.status)) {
+        const status = String(body['status']);
+        if (!['active', 'investigating', 'resolved'].includes(status)) {
           return jsonResponse({ error: 'Invalid status' }, 400);
         }
-        const updated = updateIncidentStatus(incidentId, body.status);
+        const updated = updateIncidentStatus(incidentId, status as SecurityIncident['status']);
 
         // Broadcast to all connected visitors
         broadcastEvent('incident_status_updated', updated);
@@ -406,23 +413,43 @@ export const server = Bun.serve({
       if (pathname === '/api/telemetry/pulse' && method === 'POST') {
         const tenants = getAllTenants();
         if (tenants.length > 0) {
-          // Randomly select one tenant and gently nudge score (+/- 1-2 points)
           const randomTenant = tenants[Math.floor(Math.random() * tenants.length)];
-          const delta = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 2) + 1);
-          const newScore = Math.min(100, Math.max(20, Math.round((randomTenant.overallScore + delta) * 10) / 10));
-          const adminUser =
-            (typeof req.headers?.get === 'function'
-              ? req.headers.get('x-admin-user')
-              : req.headers?.['x-admin-user']) || 'system';
-          const updated = updateTenantScore(randomTenant.id, newScore, {}, adminUser);
-          if (updated) {
-            broadcastEvent('tenant_updated', updated);
+          if (randomTenant) {
+            const delta = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 2) + 1);
+            const newScore = Math.min(100, Math.max(20, Math.round((randomTenant.overallScore + delta) * 10) / 10));
+            const adminUser = req.headers.get('x-admin-user') || 'system';
+            const updated = updateTenantScore(randomTenant.id, newScore, {}, adminUser);
+            if (updated) {
+              broadcastEvent('tenant_updated', updated);
+            }
           }
         }
         return jsonResponse({ status: 'pulse_dispatched', activeVisitors: activeClients.size });
       }
 
-      // Default Not Found
+      // --- REACT SPA SERVING & STATIC ASSETS ---
+      if (!pathname.startsWith('/api/')) {
+        const filePath = `${STATIC_DIR}${pathname === '/' ? '/index.html' : pathname}`;
+        const staticFile = file(filePath);
+
+        // If static asset exists (CSS, JS, SVG, image), serve it
+        if (await staticFile.exists()) {
+          return new Response(staticFile);
+        }
+
+        // SPA fallback: serve index.html for client-side hash and history routing
+        const indexFile = file(`${STATIC_DIR}/index.html`);
+        if (await indexFile.exists()) {
+          return new Response(indexFile, {
+            headers: {
+              'Content-Type': 'text/html; charset=utf-8',
+              'Cache-Control': 'no-cache, must-revalidate',
+            },
+          });
+        }
+      }
+
+      // Default Not Found for unmatched API routes
       return jsonResponse({ error: 'Endpoint Not Found' }, 404);
     } catch (err) {
       console.error('[API Error]', err);
@@ -444,18 +471,20 @@ const heartbeatTimer = setInterval(() => {
 }, 15000);
 
 // Gentle background telemetry simulator: keeps the leaderboard dynamic and alive for visitors
-let simulatorTimer = null;
+let simulatorTimer: ReturnType<typeof setInterval> | null = null;
 if (ENABLE_SIMULATOR) {
   simulatorTimer = setInterval(() => {
     if (activeClients.size > 0) {
       const tenants = getAllTenants();
       if (tenants.length > 0) {
         const randomTenant = tenants[Math.floor(Math.random() * tenants.length)];
-        const delta = Math.random() > 0.45 ? 0.5 : -0.5;
-        const newScore = Math.min(100, Math.max(20, Math.round((randomTenant.overallScore + delta) * 10) / 10));
-        const updated = updateTenantScore(randomTenant.id, newScore);
-        if (updated) {
-          broadcastEvent('tenant_updated', updated);
+        if (randomTenant) {
+          const delta = Math.random() > 0.45 ? 0.5 : -0.5;
+          const newScore = Math.min(100, Math.max(20, Math.round((randomTenant.overallScore + delta) * 10) / 10));
+          const updated = updateTenantScore(randomTenant.id, newScore);
+          if (updated) {
+            broadcastEvent('tenant_updated', updated);
+          }
         }
       }
     }
@@ -463,13 +492,15 @@ if (ENABLE_SIMULATOR) {
 }
 
 // Graceful shutdown handling
-function handleShutdown() {
+function handleShutdown(): void {
   clearInterval(heartbeatTimer);
   if (simulatorTimer) clearInterval(simulatorTimer);
   for (const client of activeClients) {
     try {
       client.close();
-    } catch {}
+    } catch {
+      // Ignore closing errors on shutdown
+    }
   }
   activeClients.clear();
   server.stop(true);
@@ -478,3 +509,6 @@ function handleShutdown() {
 
 process.on('SIGTERM', handleShutdown);
 process.on('SIGINT', handleShutdown);
+
+console.log(`[Server] Secure Real-Time Backend running on http://${HOST}:${PORT} (Bun ${Bun.version})`);
+console.log(`[Server] Real-time SSE event stream available at /api/events`);

@@ -11,13 +11,24 @@
  */
 
 import fs from 'node:fs';
+import type { TenantRecord } from '../src/types';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://127.0.0.1:3001';
-const INTERVAL_MS = Number.parseInt(process.env.UPDATE_INTERVAL_MS || '60000', 10);
+const BACKEND_URL = process.env['BACKEND_URL'] || 'http://127.0.0.1:3001';
+const INTERVAL_MS = Number.parseInt(process.env['UPDATE_INTERVAL_MS'] || '60000', 10);
 const RUN_ONCE = process.argv.includes('--once');
-const HEALTH_FILE = process.env.HEALTH_FILE || '/tmp/healthy';
+const HEALTH_FILE = process.env['HEALTH_FILE'] || '/tmp/healthy';
 
-async function runBatchUpdate() {
+console.log('[Telemetry Generator] Target Backend URL:', BACKEND_URL);
+console.log('[Telemetry Generator] Mode:', RUN_ONCE ? 'One-Shot' : `Continuous Loop (${INTERVAL_MS / 1000}s)`);
+
+interface BatchUpdateResponse {
+  status: string;
+  updatedCount: number;
+  timestamp: number;
+  tenants?: TenantRecord[];
+}
+
+async function runBatchUpdate(): Promise<boolean> {
   const startTime = Date.now();
   try {
     // 1. Verify backend health
@@ -44,8 +55,9 @@ async function runBatchUpdate() {
       throw new Error(`Batch update failed: HTTP ${batchRes.status} - ${errBody}`);
     }
 
-    const _data = await batchRes.json();
-    const _durationMs = Date.now() - startTime;
+    const data = (await batchRes.json()) as BatchUpdateResponse;
+    const durationMs = Date.now() - startTime;
+    console.log(`[${new Date().toISOString()}] Successfully updated ${data.updatedCount} tenants in ${durationMs}ms.`);
     try {
       fs.writeFileSync(HEALTH_FILE, Math.floor(Date.now() / 1000).toString(), 'utf8');
     } catch {
@@ -53,12 +65,13 @@ async function runBatchUpdate() {
     }
     return true;
   } catch (err) {
-    console.error(`[${new Date().toISOString()}] Batch update error:`, err.message);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`[${new Date().toISOString()}] Batch update error:`, message);
     return false;
   }
 }
 
-async function main() {
+async function main(): Promise<void> {
   if (RUN_ONCE) {
     const ok = await runBatchUpdate();
     process.exit(ok ? 0 : 1);
@@ -71,7 +84,8 @@ async function main() {
       await runBatchUpdate();
     }, INTERVAL_MS);
 
-    function cleanup() {
+    function cleanup(): void {
+      console.log('[Telemetry Generator] Terminating generator gracefully...');
       clearInterval(timer);
       process.exit(0);
     }

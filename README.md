@@ -218,7 +218,7 @@ multiple administrators simultaneously:
 
 ### 2. In-Cluster Telemetry Generator (Processing Pod Daemon)
 
-A Kubernetes-native telemetry generator script ([`scripts/k8s-telemetry-generator.js`](scripts/k8s-telemetry-generator.js))
+A Kubernetes-native telemetry generator script ([`scripts/k8s-telemetry-generator.ts`](scripts/k8s-telemetry-generator.ts))
 runs directly inside the cluster namespace:
 
 - **Schedule**: Deployed via Flux [`HelmRelease`](deploy/processing/helmrelease.yaml)

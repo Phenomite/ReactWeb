@@ -19,7 +19,10 @@
       "data": 91.3
     },
     "overallScore": 93.9,
-    "rank": 1
+    "rank": 1,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-143",
@@ -41,7 +44,10 @@
       "data": 90.1
     },
     "overallScore": 89,
-    "rank": 2
+    "rank": 2,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-067",
@@ -63,7 +69,10 @@
       "data": 71.9
     },
     "overallScore": 88.8,
-    "rank": 3
+    "rank": 3,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-024",
@@ -85,7 +94,10 @@
       "data": 89.6
     },
     "overallScore": 88.3,
-    "rank": 4
+    "rank": 4,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-014",
@@ -107,7 +119,10 @@
       "data": 85.7
     },
     "overallScore": 87.6,
-    "rank": 5
+    "rank": 5,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-132",
@@ -129,7 +144,10 @@
       "data": 65.2
     },
     "overallScore": 86.7,
-    "rank": 6
+    "rank": 6,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-086",
@@ -151,7 +169,10 @@
       "data": 81.6
     },
     "overallScore": 86.6,
-    "rank": 7
+    "rank": 7,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-027",
@@ -173,7 +194,10 @@
       "data": 93
     },
     "overallScore": 86.2,
-    "rank": 8
+    "rank": 8,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-051",
@@ -195,7 +219,10 @@
       "data": 72.7
     },
     "overallScore": 86.2,
-    "rank": 9
+    "rank": 9,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-089",
@@ -217,7 +244,10 @@
       "data": 91.8
     },
     "overallScore": 86,
-    "rank": 10
+    "rank": 10,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-042",
@@ -239,7 +269,10 @@
       "data": 82.3
     },
     "overallScore": 85.7,
-    "rank": 11
+    "rank": 11,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-015",
@@ -261,7 +294,10 @@
       "data": 82.5
     },
     "overallScore": 85.5,
-    "rank": 12
+    "rank": 12,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-031",
@@ -283,7 +319,10 @@
       "data": 83.3
     },
     "overallScore": 85.4,
-    "rank": 13
+    "rank": 13,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-003",
@@ -305,7 +344,10 @@
       "data": 79.1
     },
     "overallScore": 85.2,
-    "rank": 14
+    "rank": 14,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-021",
@@ -327,7 +369,10 @@
       "data": 80.2
     },
     "overallScore": 85.2,
-    "rank": 15
+    "rank": 15,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-029",
@@ -349,7 +394,10 @@
       "data": 70.8
     },
     "overallScore": 84.9,
-    "rank": 16
+    "rank": 16,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-036",
@@ -371,7 +419,10 @@
       "data": 76.6
     },
     "overallScore": 84.8,
-    "rank": 17
+    "rank": 17,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-119",
@@ -393,7 +444,10 @@
       "data": 77.1
     },
     "overallScore": 84.8,
-    "rank": 18
+    "rank": 18,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-054",
@@ -415,7 +469,10 @@
       "data": 69.5
     },
     "overallScore": 84.6,
-    "rank": 19
+    "rank": 19,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-030",
@@ -437,7 +494,10 @@
       "data": 81.2
     },
     "overallScore": 84.5,
-    "rank": 20
+    "rank": 20,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-056",
@@ -459,7 +519,10 @@
       "data": 74.3
     },
     "overallScore": 84,
-    "rank": 21
+    "rank": 21,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-019",
@@ -481,7 +544,10 @@
       "data": 76.9
     },
     "overallScore": 83.9,
-    "rank": 22
+    "rank": 22,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-069",
@@ -503,7 +569,10 @@
       "data": 89.1
     },
     "overallScore": 83.6,
-    "rank": 23
+    "rank": 23,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-007",
@@ -525,7 +594,10 @@
       "data": 74.6
     },
     "overallScore": 83.4,
-    "rank": 24
+    "rank": 24,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-006",
@@ -547,7 +619,10 @@
       "data": 81.3
     },
     "overallScore": 83.3,
-    "rank": 25
+    "rank": 25,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-071",
@@ -569,7 +644,10 @@
       "data": 90.4
     },
     "overallScore": 83.2,
-    "rank": 26
+    "rank": 26,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-037",
@@ -591,7 +669,10 @@
       "data": 74.5
     },
     "overallScore": 83.1,
-    "rank": 27
+    "rank": 27,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-139",
@@ -613,7 +694,10 @@
       "data": 74
     },
     "overallScore": 83,
-    "rank": 28
+    "rank": 28,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-033",
@@ -635,7 +719,10 @@
       "data": 79.6
     },
     "overallScore": 82.9,
-    "rank": 29
+    "rank": 29,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-088",
@@ -657,7 +744,10 @@
       "data": 74.8
     },
     "overallScore": 82.9,
-    "rank": 30
+    "rank": 30,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-039",
@@ -679,7 +769,10 @@
       "data": 83.8
     },
     "overallScore": 82.7,
-    "rank": 31
+    "rank": 31,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-097",
@@ -701,7 +794,10 @@
       "data": 88.7
     },
     "overallScore": 82.7,
-    "rank": 32
+    "rank": 32,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-106",
@@ -723,7 +819,10 @@
       "data": 82.3
     },
     "overallScore": 82.7,
-    "rank": 33
+    "rank": 33,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-048",
@@ -745,7 +844,10 @@
       "data": 70.8
     },
     "overallScore": 82.4,
-    "rank": 34
+    "rank": 34,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-064",
@@ -767,7 +869,10 @@
       "data": 91.1
     },
     "overallScore": 82.3,
-    "rank": 35
+    "rank": 35,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-096",
@@ -789,7 +894,10 @@
       "data": 76.6
     },
     "overallScore": 82.3,
-    "rank": 36
+    "rank": 36,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-052",
@@ -811,7 +919,10 @@
       "data": 79
     },
     "overallScore": 82,
-    "rank": 37
+    "rank": 37,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-002",
@@ -833,7 +944,10 @@
       "data": 92.7
     },
     "overallScore": 81.6,
-    "rank": 38
+    "rank": 38,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-004",
@@ -855,7 +969,10 @@
       "data": 88.2
     },
     "overallScore": 81.3,
-    "rank": 39
+    "rank": 39,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-010",
@@ -877,7 +994,10 @@
       "data": 73.8
     },
     "overallScore": 81.3,
-    "rank": 40
+    "rank": 40,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-009",
@@ -899,7 +1019,10 @@
       "data": 85.8
     },
     "overallScore": 81.2,
-    "rank": 41
+    "rank": 41,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-053",
@@ -921,7 +1044,10 @@
       "data": 48.3
     },
     "overallScore": 81,
-    "rank": 42
+    "rank": 42,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-008",
@@ -943,7 +1069,10 @@
       "data": 68
     },
     "overallScore": 80.7,
-    "rank": 43
+    "rank": 43,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-099",
@@ -965,7 +1094,10 @@
       "data": 66.2
     },
     "overallScore": 80.7,
-    "rank": 44
+    "rank": 44,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-170",
@@ -987,7 +1119,10 @@
       "data": 76.9
     },
     "overallScore": 80.6,
-    "rank": 45
+    "rank": 45,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-083",
@@ -1009,7 +1144,10 @@
       "data": 68.1
     },
     "overallScore": 80.5,
-    "rank": 46
+    "rank": 46,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-092",
@@ -1031,7 +1169,10 @@
       "data": 76.5
     },
     "overallScore": 80.2,
-    "rank": 47
+    "rank": 47,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-114",
@@ -1053,7 +1194,10 @@
       "data": 83.5
     },
     "overallScore": 80.2,
-    "rank": 48
+    "rank": 48,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-081",
@@ -1075,7 +1219,10 @@
       "data": 79.6
     },
     "overallScore": 79.7,
-    "rank": 49
+    "rank": 49,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-028",
@@ -1097,7 +1244,10 @@
       "data": 78.7
     },
     "overallScore": 79.5,
-    "rank": 50
+    "rank": 50,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-176",
@@ -1119,7 +1269,10 @@
       "data": 69.6
     },
     "overallScore": 79.5,
-    "rank": 51
+    "rank": 51,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-013",
@@ -1141,7 +1294,10 @@
       "data": 72.5
     },
     "overallScore": 79.4,
-    "rank": 52
+    "rank": 52,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-057",
@@ -1163,7 +1319,10 @@
       "data": 84.9
     },
     "overallScore": 79.2,
-    "rank": 53
+    "rank": 53,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-011",
@@ -1185,7 +1344,10 @@
       "data": 88.7
     },
     "overallScore": 79,
-    "rank": 54
+    "rank": 54,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-128",
@@ -1207,7 +1369,10 @@
       "data": 46.4
     },
     "overallScore": 79,
-    "rank": 55
+    "rank": 55,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-050",
@@ -1229,7 +1394,10 @@
       "data": 45.4
     },
     "overallScore": 78.8,
-    "rank": 56
+    "rank": 56,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-084",
@@ -1251,7 +1419,10 @@
       "data": 74.5
     },
     "overallScore": 78.8,
-    "rank": 57
+    "rank": 57,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-113",
@@ -1273,7 +1444,10 @@
       "data": 66.7
     },
     "overallScore": 78.5,
-    "rank": 58
+    "rank": 58,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-049",
@@ -1295,7 +1469,10 @@
       "data": 80
     },
     "overallScore": 78.3,
-    "rank": 59
+    "rank": 59,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-177",
@@ -1317,7 +1494,10 @@
       "data": 79.2
     },
     "overallScore": 78.3,
-    "rank": 60
+    "rank": 60,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-188",
@@ -1339,7 +1519,10 @@
       "data": 78.9
     },
     "overallScore": 78.2,
-    "rank": 61
+    "rank": 61,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-090",
@@ -1361,7 +1544,10 @@
       "data": 84.3
     },
     "overallScore": 78.1,
-    "rank": 62
+    "rank": 62,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-063",
@@ -1383,7 +1569,10 @@
       "data": 76.8
     },
     "overallScore": 77.4,
-    "rank": 63
+    "rank": 63,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-026",
@@ -1405,7 +1594,10 @@
       "data": 68.2
     },
     "overallScore": 77.2,
-    "rank": 64
+    "rank": 64,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-043",
@@ -1427,7 +1619,10 @@
       "data": 86.3
     },
     "overallScore": 77,
-    "rank": 65
+    "rank": 65,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-038",
@@ -1449,7 +1644,10 @@
       "data": 69.3
     },
     "overallScore": 76.8,
-    "rank": 66
+    "rank": 66,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-148",
@@ -1471,7 +1669,10 @@
       "data": 75.3
     },
     "overallScore": 76.8,
-    "rank": 67
+    "rank": 67,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-066",
@@ -1493,7 +1694,10 @@
       "data": 86.4
     },
     "overallScore": 76.7,
-    "rank": 68
+    "rank": 68,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-018",
@@ -1515,7 +1719,10 @@
       "data": 85
     },
     "overallScore": 76.4,
-    "rank": 69
+    "rank": 69,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-046",
@@ -1537,7 +1744,10 @@
       "data": 71.7
     },
     "overallScore": 76,
-    "rank": 70
+    "rank": 70,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-111",
@@ -1559,7 +1769,10 @@
       "data": 44
     },
     "overallScore": 76,
-    "rank": 71
+    "rank": 71,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-022",
@@ -1581,7 +1794,10 @@
       "data": 67.7
     },
     "overallScore": 75.9,
-    "rank": 72
+    "rank": 72,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-065",
@@ -1603,7 +1819,10 @@
       "data": 65.6
     },
     "overallScore": 75.9,
-    "rank": 73
+    "rank": 73,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-172",
@@ -1625,7 +1844,10 @@
       "data": 49.7
     },
     "overallScore": 75.6,
-    "rank": 74
+    "rank": 74,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-025",
@@ -1647,7 +1869,10 @@
       "data": 83.4
     },
     "overallScore": 75.5,
-    "rank": 75
+    "rank": 75,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-055",
@@ -1669,7 +1894,10 @@
       "data": 50
     },
     "overallScore": 75.3,
-    "rank": 76
+    "rank": 76,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-158",
@@ -1691,7 +1919,10 @@
       "data": 72.3
     },
     "overallScore": 75.3,
-    "rank": 77
+    "rank": 77,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-167",
@@ -1713,7 +1944,10 @@
       "data": 82.9
     },
     "overallScore": 75.3,
-    "rank": 78
+    "rank": 78,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-059",
@@ -1735,7 +1969,10 @@
       "data": 83.4
     },
     "overallScore": 75.1,
-    "rank": 79
+    "rank": 79,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-005",
@@ -1757,7 +1994,10 @@
       "data": 86.2
     },
     "overallScore": 74.3,
-    "rank": 80
+    "rank": 80,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-072",
@@ -1779,7 +2019,10 @@
       "data": 41.7
     },
     "overallScore": 74.2,
-    "rank": 81
+    "rank": 81,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-074",
@@ -1801,7 +2044,10 @@
       "data": 40.7
     },
     "overallScore": 74,
-    "rank": 82
+    "rank": 82,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-189",
@@ -1823,7 +2069,10 @@
       "data": 77.7
     },
     "overallScore": 74,
-    "rank": 83
+    "rank": 83,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-035",
@@ -1845,7 +2094,10 @@
       "data": 79.8
     },
     "overallScore": 73.9,
-    "rank": 84
+    "rank": 84,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-145",
@@ -1867,7 +2119,10 @@
       "data": 73.8
     },
     "overallScore": 73.9,
-    "rank": 85
+    "rank": 85,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-017",
@@ -1889,7 +2144,10 @@
       "data": 84.8
     },
     "overallScore": 73.6,
-    "rank": 86
+    "rank": 86,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-061",
@@ -1911,7 +2169,10 @@
       "data": 26.5
     },
     "overallScore": 73.4,
-    "rank": 87
+    "rank": 87,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-080",
@@ -1933,7 +2194,10 @@
       "data": 25.9
     },
     "overallScore": 73.4,
-    "rank": 88
+    "rank": 88,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-060",
@@ -1955,7 +2219,10 @@
       "data": 73.2
     },
     "overallScore": 73.3,
-    "rank": 89
+    "rank": 89,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-180",
@@ -1977,7 +2244,10 @@
       "data": 51.4
     },
     "overallScore": 72.7,
-    "rank": 90
+    "rank": 90,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-041",
@@ -1999,7 +2269,10 @@
       "data": 89.4
     },
     "overallScore": 72.6,
-    "rank": 91
+    "rank": 91,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-012",
@@ -2021,7 +2294,10 @@
       "data": 80.7
     },
     "overallScore": 72.5,
-    "rank": 92
+    "rank": 92,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-129",
@@ -2043,7 +2319,10 @@
       "data": 33.7
     },
     "overallScore": 72.3,
-    "rank": 93
+    "rank": 93,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-156",
@@ -2065,7 +2344,10 @@
       "data": 77.3
     },
     "overallScore": 72.1,
-    "rank": 94
+    "rank": 94,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-115",
@@ -2087,7 +2369,10 @@
       "data": 72.5
     },
     "overallScore": 71.8,
-    "rank": 95
+    "rank": 95,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-082",
@@ -2109,7 +2394,10 @@
       "data": 82.5
     },
     "overallScore": 71.1,
-    "rank": 96
+    "rank": 96,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-040",
@@ -2131,7 +2419,10 @@
       "data": 51
     },
     "overallScore": 70.9,
-    "rank": 97
+    "rank": 97,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-077",
@@ -2153,7 +2444,10 @@
       "data": 88.2
     },
     "overallScore": 70.7,
-    "rank": 98
+    "rank": 98,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-023",
@@ -2175,7 +2469,10 @@
       "data": 80.4
     },
     "overallScore": 70.6,
-    "rank": 99
+    "rank": 99,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-174",
@@ -2197,7 +2494,10 @@
       "data": 29.8
     },
     "overallScore": 70.3,
-    "rank": 100
+    "rank": 100,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-104",
@@ -2219,7 +2519,10 @@
       "data": 34.5
     },
     "overallScore": 70.2,
-    "rank": 101
+    "rank": 101,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-079",
@@ -2241,7 +2544,10 @@
       "data": 32.7
     },
     "overallScore": 69.7,
-    "rank": 102
+    "rank": 102,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-126",
@@ -2263,7 +2569,10 @@
       "data": 87.7
     },
     "overallScore": 69.5,
-    "rank": 103
+    "rank": 103,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-137",
@@ -2285,7 +2594,10 @@
       "data": 76.4
     },
     "overallScore": 69.4,
-    "rank": 104
+    "rank": 104,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-192",
@@ -2307,7 +2619,10 @@
       "data": 34.9
     },
     "overallScore": 69.3,
-    "rank": 105
+    "rank": 105,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-100",
@@ -2329,7 +2644,10 @@
       "data": 76.5
     },
     "overallScore": 69.1,
-    "rank": 106
+    "rank": 106,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-108",
@@ -2351,7 +2669,10 @@
       "data": 78.6
     },
     "overallScore": 69.1,
-    "rank": 107
+    "rank": 107,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-147",
@@ -2373,7 +2694,10 @@
       "data": 75.4
     },
     "overallScore": 69,
-    "rank": 108
+    "rank": 108,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-047",
@@ -2395,7 +2719,10 @@
       "data": 91.1
     },
     "overallScore": 68.8,
-    "rank": 109
+    "rank": 109,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-001",
@@ -2417,7 +2744,10 @@
       "data": 68.5
     },
     "overallScore": 68.7,
-    "rank": 110
+    "rank": 110,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-200",
@@ -2439,7 +2769,10 @@
       "data": 63
     },
     "overallScore": 68.7,
-    "rank": 111
+    "rank": 111,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-110",
@@ -2461,7 +2794,10 @@
       "data": 69.2
     },
     "overallScore": 68.6,
-    "rank": 112
+    "rank": 112,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-032",
@@ -2483,7 +2819,10 @@
       "data": 28.5
     },
     "overallScore": 68,
-    "rank": 113
+    "rank": 113,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-163",
@@ -2505,7 +2844,10 @@
       "data": 65.7
     },
     "overallScore": 67.6,
-    "rank": 114
+    "rank": 114,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-103",
@@ -2527,7 +2869,10 @@
       "data": 22.3
     },
     "overallScore": 67.2,
-    "rank": 115
+    "rank": 115,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-075",
@@ -2549,7 +2894,10 @@
       "data": 32.8
     },
     "overallScore": 67.1,
-    "rank": 116
+    "rank": 116,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-153",
@@ -2571,7 +2919,10 @@
       "data": 61.9
     },
     "overallScore": 67.1,
-    "rank": 117
+    "rank": 117,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-073",
@@ -2593,7 +2944,10 @@
       "data": 78.5
     },
     "overallScore": 66.1,
-    "rank": 118
+    "rank": 118,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-125",
@@ -2615,7 +2969,10 @@
       "data": 32.6
     },
     "overallScore": 66.1,
-    "rank": 119
+    "rank": 119,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-020",
@@ -2637,7 +2994,10 @@
       "data": 68.8
     },
     "overallScore": 65.8,
-    "rank": 120
+    "rank": 120,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-117",
@@ -2659,7 +3019,10 @@
       "data": 75.1
     },
     "overallScore": 65.7,
-    "rank": 121
+    "rank": 121,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-144",
@@ -2681,7 +3044,10 @@
       "data": 38.7
     },
     "overallScore": 65.7,
-    "rank": 122
+    "rank": 122,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-155",
@@ -2703,7 +3069,10 @@
       "data": 62.2
     },
     "overallScore": 65.7,
-    "rank": 123
+    "rank": 123,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-105",
@@ -2725,7 +3094,10 @@
       "data": 90
     },
     "overallScore": 65.6,
-    "rank": 124
+    "rank": 124,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-102",
@@ -2747,7 +3119,10 @@
       "data": 91.5
     },
     "overallScore": 65.5,
-    "rank": 125
+    "rank": 125,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-183",
@@ -2769,7 +3144,10 @@
       "data": 42.9
     },
     "overallScore": 65.5,
-    "rank": 126
+    "rank": 126,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-085",
@@ -2791,7 +3169,10 @@
       "data": 39.8
     },
     "overallScore": 64.9,
-    "rank": 127
+    "rank": 127,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-118",
@@ -2813,7 +3194,10 @@
       "data": 72.1
     },
     "overallScore": 64.8,
-    "rank": 128
+    "rank": 128,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-193",
@@ -2835,7 +3219,10 @@
       "data": 28.6
     },
     "overallScore": 64.5,
-    "rank": 129
+    "rank": 129,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-062",
@@ -2857,7 +3244,10 @@
       "data": 34.9
     },
     "overallScore": 64.4,
-    "rank": 130
+    "rank": 130,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-112",
@@ -2879,7 +3269,10 @@
       "data": 51.2
     },
     "overallScore": 64.3,
-    "rank": 131
+    "rank": 131,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-045",
@@ -2901,7 +3294,10 @@
       "data": 72.2
     },
     "overallScore": 64.1,
-    "rank": 132
+    "rank": 132,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-122",
@@ -2923,7 +3319,10 @@
       "data": 75.3
     },
     "overallScore": 64,
-    "rank": 133
+    "rank": 133,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-034",
@@ -2945,7 +3344,10 @@
       "data": 22.2
     },
     "overallScore": 63.7,
-    "rank": 134
+    "rank": 134,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-136",
@@ -2967,7 +3369,10 @@
       "data": 76.5
     },
     "overallScore": 63.5,
-    "rank": 135
+    "rank": 135,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-124",
@@ -2989,7 +3394,10 @@
       "data": 45.9
     },
     "overallScore": 63.3,
-    "rank": 136
+    "rank": 136,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-121",
@@ -3011,7 +3419,10 @@
       "data": 81.7
     },
     "overallScore": 63,
-    "rank": 137
+    "rank": 137,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-168",
@@ -3033,7 +3444,10 @@
       "data": 21.3
     },
     "overallScore": 63,
-    "rank": 138
+    "rank": 138,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-161",
@@ -3055,7 +3469,10 @@
       "data": 44.3
     },
     "overallScore": 62.7,
-    "rank": 139
+    "rank": 139,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-134",
@@ -3077,7 +3494,10 @@
       "data": 65.4
     },
     "overallScore": 62.6,
-    "rank": 140
+    "rank": 140,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-127",
@@ -3099,7 +3519,10 @@
       "data": 49.1
     },
     "overallScore": 62.5,
-    "rank": 141
+    "rank": 141,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-107",
@@ -3121,7 +3544,10 @@
       "data": 63
     },
     "overallScore": 62.4,
-    "rank": 142
+    "rank": 142,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-166",
@@ -3143,7 +3569,10 @@
       "data": 78.1
     },
     "overallScore": 62.4,
-    "rank": 143
+    "rank": 143,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-094",
@@ -3165,7 +3594,10 @@
       "data": 70.6
     },
     "overallScore": 62.3,
-    "rank": 144
+    "rank": 144,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-109",
@@ -3187,7 +3619,10 @@
       "data": 86.8
     },
     "overallScore": 62.3,
-    "rank": 145
+    "rank": 145,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-140",
@@ -3209,7 +3644,10 @@
       "data": 54.1
     },
     "overallScore": 62.3,
-    "rank": 146
+    "rank": 146,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-116",
@@ -3231,7 +3669,10 @@
       "data": 66.4
     },
     "overallScore": 62.2,
-    "rank": 147
+    "rank": 147,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-133",
@@ -3253,7 +3694,10 @@
       "data": 66.7
     },
     "overallScore": 62.1,
-    "rank": 148
+    "rank": 148,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-151",
@@ -3275,7 +3719,10 @@
       "data": 85.9
     },
     "overallScore": 62.1,
-    "rank": 149
+    "rank": 149,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-131",
@@ -3297,7 +3744,10 @@
       "data": 78.8
     },
     "overallScore": 61.8,
-    "rank": 150
+    "rank": 150,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-130",
@@ -3319,7 +3769,10 @@
       "data": 63.6
     },
     "overallScore": 61.6,
-    "rank": 151
+    "rank": 151,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-044",
@@ -3341,7 +3794,10 @@
       "data": 77.2
     },
     "overallScore": 61.4,
-    "rank": 152
+    "rank": 152,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443733
   },
   {
     "id": "tenant-190",
@@ -3363,7 +3819,10 @@
       "data": 74.5
     },
     "overallScore": 61.3,
-    "rank": 153
+    "rank": 153,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-123",
@@ -3385,7 +3844,10 @@
       "data": 81.1
     },
     "overallScore": 61,
-    "rank": 154
+    "rank": 154,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-076",
@@ -3407,7 +3869,10 @@
       "data": 52.9
     },
     "overallScore": 60.8,
-    "rank": 155
+    "rank": 155,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-098",
@@ -3429,7 +3894,10 @@
       "data": 80.3
     },
     "overallScore": 60.3,
-    "rank": 156
+    "rank": 156,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-179",
@@ -3451,7 +3919,10 @@
       "data": 88.2
     },
     "overallScore": 60.1,
-    "rank": 157
+    "rank": 157,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-197",
@@ -3473,7 +3944,10 @@
       "data": 45
     },
     "overallScore": 59.7,
-    "rank": 158
+    "rank": 158,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-078",
@@ -3495,7 +3969,10 @@
       "data": 86
     },
     "overallScore": 59,
-    "rank": 159
+    "rank": 159,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-087",
@@ -3517,7 +3994,10 @@
       "data": 77.8
     },
     "overallScore": 58.8,
-    "rank": 160
+    "rank": 160,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-154",
@@ -3539,7 +4019,10 @@
       "data": 70.9
     },
     "overallScore": 58.7,
-    "rank": 161
+    "rank": 161,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-120",
@@ -3561,7 +4044,10 @@
       "data": 63.6
     },
     "overallScore": 58.6,
-    "rank": 162
+    "rank": 162,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-149",
@@ -3583,7 +4069,10 @@
       "data": 31.7
     },
     "overallScore": 58.6,
-    "rank": 163
+    "rank": 163,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-150",
@@ -3605,7 +4094,10 @@
       "data": 66.6
     },
     "overallScore": 58,
-    "rank": 164
+    "rank": 164,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-198",
@@ -3627,7 +4119,10 @@
       "data": 45.1
     },
     "overallScore": 57.9,
-    "rank": 165
+    "rank": 165,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-141",
@@ -3649,7 +4144,10 @@
       "data": 53.4
     },
     "overallScore": 57.8,
-    "rank": 166
+    "rank": 166,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-171",
@@ -3671,7 +4169,10 @@
       "data": 47.1
     },
     "overallScore": 57.8,
-    "rank": 167
+    "rank": 167,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-058",
@@ -3693,7 +4194,10 @@
       "data": 83
     },
     "overallScore": 57.7,
-    "rank": 168
+    "rank": 168,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-175",
@@ -3715,7 +4219,10 @@
       "data": 69.4
     },
     "overallScore": 57.6,
-    "rank": 169
+    "rank": 169,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-196",
@@ -3737,7 +4244,10 @@
       "data": 75.1
     },
     "overallScore": 57.5,
-    "rank": 170
+    "rank": 170,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-070",
@@ -3759,7 +4269,10 @@
       "data": 83.8
     },
     "overallScore": 55.7,
-    "rank": 171
+    "rank": 171,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-184",
@@ -3781,7 +4294,10 @@
       "data": 64.8
     },
     "overallScore": 55.7,
-    "rank": 172
+    "rank": 172,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-165",
@@ -3803,7 +4319,10 @@
       "data": 72.2
     },
     "overallScore": 55.6,
-    "rank": 173
+    "rank": 173,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-157",
@@ -3825,7 +4344,10 @@
       "data": 63.4
     },
     "overallScore": 55.3,
-    "rank": 174
+    "rank": 174,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-138",
@@ -3847,7 +4369,10 @@
       "data": 67.8
     },
     "overallScore": 55.2,
-    "rank": 175
+    "rank": 175,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-146",
@@ -3869,7 +4394,10 @@
       "data": 81.5
     },
     "overallScore": 54.2,
-    "rank": 176
+    "rank": 176,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-095",
@@ -3891,7 +4419,10 @@
       "data": 26.1
     },
     "overallScore": 54.1,
-    "rank": 177
+    "rank": 177,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-142",
@@ -3913,7 +4444,10 @@
       "data": 73.9
     },
     "overallScore": 53.9,
-    "rank": 178
+    "rank": 178,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-068",
@@ -3935,7 +4469,10 @@
       "data": 69.4
     },
     "overallScore": 52.8,
-    "rank": 179
+    "rank": 179,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-159",
@@ -3957,7 +4494,10 @@
       "data": 75.2
     },
     "overallScore": 51.9,
-    "rank": 180
+    "rank": 180,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-191",
@@ -3979,7 +4519,10 @@
       "data": 29.5
     },
     "overallScore": 51.8,
-    "rank": 181
+    "rank": 181,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-091",
@@ -4001,7 +4544,10 @@
       "data": 82.4
     },
     "overallScore": 51.5,
-    "rank": 182
+    "rank": 182,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-162",
@@ -4023,7 +4569,10 @@
       "data": 28.8
     },
     "overallScore": 50.7,
-    "rank": 183
+    "rank": 183,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-093",
@@ -4045,7 +4594,10 @@
       "data": 79
     },
     "overallScore": 50.5,
-    "rank": 184
+    "rank": 184,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-164",
@@ -4067,7 +4619,10 @@
       "data": 35.4
     },
     "overallScore": 49.8,
-    "rank": 185
+    "rank": 185,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-185",
@@ -4089,7 +4644,10 @@
       "data": 31.3
     },
     "overallScore": 49.2,
-    "rank": 186
+    "rank": 186,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-169",
@@ -4111,7 +4669,10 @@
       "data": 68.3
     },
     "overallScore": 48.8,
-    "rank": 187
+    "rank": 187,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-186",
@@ -4133,7 +4694,10 @@
       "data": 46.5
     },
     "overallScore": 48.4,
-    "rank": 188
+    "rank": 188,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-181",
@@ -4155,7 +4719,10 @@
       "data": 49.6
     },
     "overallScore": 48.3,
-    "rank": 189
+    "rank": 189,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-194",
@@ -4177,7 +4744,10 @@
       "data": 45.3
     },
     "overallScore": 48.3,
-    "rank": 190
+    "rank": 190,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-199",
@@ -4199,7 +4769,10 @@
       "data": 38.2
     },
     "overallScore": 47.2,
-    "rank": 191
+    "rank": 191,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-173",
@@ -4221,7 +4794,10 @@
       "data": 20.1
     },
     "overallScore": 46,
-    "rank": 192
+    "rank": 192,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-195",
@@ -4243,7 +4819,10 @@
       "data": 35.6
     },
     "overallScore": 45,
-    "rank": 193
+    "rank": 193,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-182",
@@ -4265,7 +4844,10 @@
       "data": 51.2
     },
     "overallScore": 43.7,
-    "rank": 194
+    "rank": 194,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-101",
@@ -4287,7 +4869,10 @@
       "data": 69.7
     },
     "overallScore": 41.7,
-    "rank": 195
+    "rank": 195,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-152",
@@ -4309,7 +4894,10 @@
       "data": 38.4
     },
     "overallScore": 40.3,
-    "rank": 196
+    "rank": 196,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-160",
@@ -4331,7 +4919,10 @@
       "data": 21.1
     },
     "overallScore": 37.8,
-    "rank": 197
+    "rank": 197,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-135",
@@ -4353,7 +4944,10 @@
       "data": 54.1
     },
     "overallScore": 35.1,
-    "rank": 198
+    "rank": 198,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-187",
@@ -4375,7 +4969,10 @@
       "data": 29.4
     },
     "overallScore": 35.1,
-    "rank": 199
+    "rank": 199,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   },
   {
     "id": "tenant-178",
@@ -4397,6 +4994,9 @@
       "data": 39.9
     },
     "overallScore": 34.4,
-    "rank": 200
+    "rank": 200,
+    "version": 1,
+    "lastUpdatedBy": "system_seed",
+    "updatedAt": 1791205443734
   }
 ]

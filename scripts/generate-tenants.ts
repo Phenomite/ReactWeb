@@ -1,9 +1,10 @@
 #!/usr/bin/env bun
 import fs from 'node:fs';
 import path from 'node:path';
+import type { TenantRecord } from '../src/types';
 
 // Seed enterprise names and prefixes/suffixes to create 200 distinct enterprise tenants
-const COMPANY_BASES = [
+const COMPANY_BASES: readonly string[] = [
   'Contoso',
   'Fabrikam',
   'Woodgrove',
@@ -58,7 +59,7 @@ const COMPANY_BASES = [
   'Horizon Financial',
 ];
 
-const MODIFIERS = [
+const MODIFIERS: readonly string[] = [
   'Global',
   'Enterprises',
   'Technologies',
@@ -79,7 +80,7 @@ const MODIFIERS = [
   'Robotics',
 ];
 
-const INDUSTRIES = [
+const INDUSTRIES: readonly string[] = [
   'Financial Services',
   'Healthcare & Life Sciences',
   'Manufacturing & Robotics',
@@ -94,7 +95,7 @@ const INDUSTRIES = [
   'Government & Public Sector',
 ];
 
-const REGIONS = [
+const REGIONS: readonly string[] = [
   'East US',
   'West US 2',
   'Central US',
@@ -111,29 +112,29 @@ const REGIONS = [
 
 // Pseudo-random deterministic generator using linear congruential generator
 let seed = 20260905;
-function rand() {
+function rand(): number {
   seed = (seed * 1664525 + 1013904223) % 4294967296;
   return seed / 4294967296;
 }
 
-function randInt(min, max) {
+function randInt(min: number, max: number): number {
   return Math.floor(rand() * (max - min + 1)) + min;
 }
 
-function randFloat(min, max, decimals = 1) {
+function randFloat(min: number, max: number, decimals = 1): number {
   const val = rand() * (max - min) + min;
   return Number(val.toFixed(decimals));
 }
 
 // Generate 200 distinct tenant names
-const tenantNames = [];
-const usedNames = new Set();
+const tenantNames: string[] = [];
+const usedNames = new Set<string>();
 
 let baseIdx = 0;
 let modIdx = 0;
 while (tenantNames.length < 200) {
-  const base = COMPANY_BASES[baseIdx % COMPANY_BASES.length];
-  const mod = MODIFIERS[modIdx % MODIFIERS.length];
+  const base = COMPANY_BASES[baseIdx % COMPANY_BASES.length] ?? 'Contoso';
+  const mod = MODIFIERS[modIdx % MODIFIERS.length] ?? 'Enterprises';
   let name = `${base} ${mod}`;
 
   if (usedNames.has(name)) {
@@ -153,14 +154,14 @@ while (tenantNames.length < 200) {
 }
 
 // Generate 200 tenant objects
-const rawTenants = tenantNames.map((name, index) => {
+const rawTenants: TenantRecord[] = tenantNames.map((name, index) => {
   const cleanSlug = name
     .toLowerCase()
     .replace(/[^a-z0-9]/g, '')
     .slice(0, 18);
   const domain = `${cleanSlug}.onmicrosoft.com`;
-  const industry = INDUSTRIES[randInt(0, INDUSTRIES.length - 1)];
-  const region = REGIONS[randInt(0, REGIONS.length - 1)];
+  const industry = INDUSTRIES[randInt(0, INDUSTRIES.length - 1)] ?? 'Technology & SaaS';
+  const region = REGIONS[randInt(0, REGIONS.length - 1)] ?? 'East US';
   const seatCount = randInt(1200, 95000);
 
   // Distribution tier factor (0 = lowest security posture, 1 = elite tier)
@@ -221,6 +222,9 @@ const rawTenants = tenantNames.map((name, index) => {
     },
     overallScore,
     rank: 0,
+    version: 1,
+    lastUpdatedBy: 'system_seed',
+    updatedAt: Date.now(),
   };
 });
 
@@ -237,3 +241,4 @@ if (!fs.existsSync(outDir)) {
 
 const outPath = path.join(outDir, 'tenants.json');
 fs.writeFileSync(outPath, JSON.stringify(rawTenants, null, 2), 'utf-8');
+console.log(`[Tenants Generator] Successfully seeded 200 distinct enterprise tenants into ${outPath}`);

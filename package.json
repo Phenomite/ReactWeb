@@ -6,17 +6,17 @@
   "scripts": {
     "build": "pnpm run lint && vite build",
     "check": "biome check --write . && pnpm knip",
-    "dev:modify": "bun scripts/dev-modify-db.js",
+    "dev:modify": "bun scripts/dev-modify-db.ts",
     "dev": "vite",
     "format": "biome format --write .",
     "lint:md": "markdownlint-cli2 \"**/*.md\" !node_modules !.agents --fix",
     "lint": "tsc --noEmit && biome lint --write . && pnpm run lint:md",
     "preview": "vite preview",
-    "server:dev": "bun --watch server/index.js",
-    "server": "bun server/index.js",
-    "telemetry:cron:once": "bun scripts/k8s-telemetry-generator.js --once",
-    "telemetry:cron": "bun scripts/k8s-telemetry-generator.js",
-    "tenants:generate": "bun scripts/generate-tenants.js",
+    "server:dev": "bun --watch server/index.ts",
+    "server": "bun server/index.ts",
+    "telemetry:cron:once": "bun scripts/k8s-telemetry-generator.ts --once",
+    "telemetry:cron": "bun scripts/k8s-telemetry-generator.ts",
+    "tenants:generate": "bun scripts/generate-tenants.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

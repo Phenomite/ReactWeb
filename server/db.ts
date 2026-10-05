@@ -1,21 +1,22 @@
+import { Database, type SQLQueryBindings } from 'bun:sqlite';
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { DatabaseSync } from 'node:sqlite';
 import { fileURLToPath } from 'node:url';
+import type { SecurityIncident, TenantRecord, TenantScoreCategories, TenantStatusBubbles } from '../src/types';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Database path resolution with environment override for Kubernetes PVC
-const DB_DIR = process.env.DATA_DIR || join(__dirname, '../data');
+const DB_DIR = process.env['DATA_DIR'] || join(__dirname, '../data');
 if (!existsSync(DB_DIR)) {
   mkdirSync(DB_DIR, { recursive: true });
 }
-const DB_PATH = process.env.DATABASE_URL || join(DB_DIR, 'reactweb.db');
+const DB_PATH = process.env['DATABASE_URL'] || join(DB_DIR, 'reactweb.db');
 
 const TABLE_IDENTIFIER_REGEX = /^[a-zA-Z0-9_]+$/;
 
-const db = new DatabaseSync(DB_PATH);
+const db = new Database(DB_PATH, { create: true });
 
 // Configure SQLite for high concurrency and zero-loss durability
 db.exec(`
@@ -73,10 +74,7 @@ db.exec(`
 
 // Migration safety: Ensure version and lastUpdatedBy columns exist on pre-existing tables
 try {
-  const columns = db
-    .prepare('PRAGMA table_info(tenants)')
-    .all()
-    .map((c) => c.name);
+  const columns = (db.prepare('PRAGMA table_info(tenants)').all() as Array<{ name: string }>).map((c) => c.name);
   if (!columns.includes('version')) {
     db.exec('ALTER TABLE tenants ADD COLUMN version INTEGER NOT NULL DEFAULT 1');
   }
@@ -140,8 +138,42 @@ const stmtUpdateIncidentStatus = db.prepare(`
 const stmtCountTenants = db.prepare('SELECT COUNT(*) as count FROM tenants');
 const stmtCountIncidents = db.prepare('SELECT COUNT(*) as count FROM incidents');
 
+interface RawTenantRow {
+  id: string;
+  name: string;
+  domain: string;
+  industry: string;
+  region: string;
+  seatCount: number;
+  sentinel: number;
+  mde: number;
+  mdi: number;
+  logAnalytics: number;
+  device: number;
+  identities: number;
+  apps: number;
+  data: number;
+  overallScore: number;
+  rank: number;
+  version: number;
+  lastUpdatedBy: string;
+  updatedAt: number;
+}
+
+interface RawIncidentRow {
+  id: string;
+  title: string;
+  severity: SecurityIncident['severity'];
+  status: SecurityIncident['status'];
+  category: string;
+  source: string;
+  timestamp: number;
+  description: string;
+  recommendation: string;
+}
+
 // Map database row to TenantRecord format
-function rowToTenant(row) {
+function rowToTenant(row: RawTenantRow): TenantRecord {
   return {
     id: row.id,
     name: row.name,
@@ -170,12 +202,13 @@ function rowToTenant(row) {
 }
 
 // Seed initial tenants and incidents if database is empty
-export function seedDatabaseIfEmpty() {
-  const tenantCount = stmtCountTenants.get().count;
+export function seedDatabaseIfEmpty(): void {
+  const countRow = stmtCountTenants.get() as { count: number } | undefined;
+  const tenantCount = countRow?.count ?? 0;
   if (tenantCount === 0) {
     const tenantsJsonPath = join(__dirname, '../src/data/tenants.json');
     if (existsSync(tenantsJsonPath)) {
-      const rawData = JSON.parse(readFileSync(tenantsJsonPath, 'utf8'));
+      const rawData = JSON.parse(readFileSync(tenantsJsonPath, 'utf8')) as TenantRecord[];
       const now = Date.now();
       db.exec('BEGIN IMMEDIATE;');
       for (const t of rawData) {
@@ -186,14 +219,14 @@ export function seedDatabaseIfEmpty() {
           t.industry,
           t.region,
           t.seatCount,
-          t.statusBubbles?.sentinel ? 1 : 0,
-          t.statusBubbles?.mde ? 1 : 0,
-          t.statusBubbles?.mdi ? 1 : 0,
-          t.statusBubbles?.logAnalytics ? 1 : 0,
-          t.categories?.device ?? 0,
-          t.categories?.identities ?? 0,
-          t.categories?.apps ?? 0,
-          t.categories?.data ?? 0,
+          t.statusBubbles.sentinel ? 1 : 0,
+          t.statusBubbles.mde ? 1 : 0,
+          t.statusBubbles.mdi ? 1 : 0,
+          t.statusBubbles.logAnalytics ? 1 : 0,
+          t.categories.device,
+          t.categories.identities,
+          t.categories.apps,
+          t.categories.data,
           t.overallScore,
           t.rank,
           1,
@@ -202,12 +235,14 @@ export function seedDatabaseIfEmpty() {
         );
       }
       db.exec('COMMIT;');
+      console.log(`[Database] Seeded ${rawData.length} tenant records into SQLite.`);
     }
   }
 
-  const incidentCount = stmtCountIncidents.get().count;
+  const incidentCountRow = stmtCountIncidents.get() as { count: number } | undefined;
+  const incidentCount = incidentCountRow?.count ?? 0;
   if (incidentCount === 0) {
-    const initialIncidents = [
+    const initialIncidents: SecurityIncident[] = [
       {
         id: 'inc-101',
         title: 'Anomalous API Rate Threshold Exceeded',
@@ -259,25 +294,46 @@ export function seedDatabaseIfEmpty() {
       );
     }
     db.exec('COMMIT;');
+    console.log(`[Database] Seeded ${initialIncidents.length} security incident records into SQLite.`);
   }
 }
 
 // Read queries
-export function getAllTenants() {
-  const rows = stmtSelectAllTenants.all();
+export function getAllTenants(): TenantRecord[] {
+  const rows = stmtSelectAllTenants.all() as RawTenantRow[];
   return rows.map(rowToTenant);
 }
 
-export function getTenantById(id) {
-  const row = stmtSelectTenantById.get(id);
+export function getTenantById(id: string): TenantRecord | null {
+  const row = stmtSelectTenantById.get(id) as RawTenantRow | undefined;
   return row ? rowToTenant(row) : null;
 }
 
-// Multi-admin safe tenant update with optimistic concurrency control
-function publishTenantUpdate(id, updates = {}, expectedVersion = null, updatedBy = 'admin') {
+interface TenantUpdatePayload {
+  overallScore?: number;
+  seatCount?: number;
+  statusBubbles?: Partial<TenantStatusBubbles>;
+  categories?: Partial<TenantScoreCategories>;
+}
+
+interface TenantUpdateResult {
+  success?: boolean;
+  notFound?: boolean;
+  conflict?: boolean;
+  current?: TenantRecord | null;
+  tenant?: TenantRecord | null;
+}
+
+// Multi-operator safe tenant update with optimistic concurrency control
+function publishTenantUpdate(
+  id: string,
+  updates: TenantUpdatePayload = {},
+  expectedVersion: number | null = null,
+  updatedBy = 'admin',
+): TenantUpdateResult {
   db.exec('BEGIN IMMEDIATE;');
   try {
-    const existing = stmtSelectTenantById.get(id);
+    const existing = stmtSelectTenantById.get(id) as RawTenantRow | undefined;
     if (!existing) {
       db.exec('ROLLBACK;');
       return { notFound: true };
@@ -362,13 +418,34 @@ function publishTenantUpdate(id, updates = {}, expectedVersion = null, updatedBy
 }
 
 // Legacy simple score update
-export function updateTenantScore(id, overallScore, categories = {}, updatedBy = 'system') {
+export function updateTenantScore(
+  id: string,
+  overallScore: number,
+  categories: Partial<TenantScoreCategories> = {},
+  updatedBy = 'system',
+): TenantRecord | null {
   const result = publishTenantUpdate(id, { overallScore, categories }, null, updatedBy);
-  return result.tenant || null;
+  return result.tenant ?? null;
+}
+
+export interface BatchTenantItem {
+  id: string;
+  overallScore?: number;
+  categories?: Partial<TenantScoreCategories>;
+  statusBubbles?: Partial<TenantStatusBubbles>;
+}
+
+export interface BatchUpdateResult {
+  updatedCount: number;
+  tenants: TenantRecord[];
+  timestamp: number;
 }
 
 // Batch update from in-cluster telemetry generators or CronJobs
-export function batchUpdateTenants(updates = null, updatedBy = 'k8s-telemetry-generator') {
+export function batchUpdateTenants(
+  updates: BatchTenantItem[] | null = null,
+  updatedBy = 'k8s-telemetry-generator',
+): BatchUpdateResult {
   db.exec('BEGIN IMMEDIATE;');
   try {
     const now = Date.now();
@@ -393,7 +470,7 @@ export function batchUpdateTenants(updates = null, updatedBy = 'k8s-telemetry-ge
 
     if (Array.isArray(updates) && updates.length > 0) {
       for (const u of updates) {
-        const existing = stmtSelectTenantById.get(u.id);
+        const existing = stmtSelectTenantById.get(u.id) as RawTenantRow | undefined;
         if (!existing) continue;
 
         const score = typeof u.overallScore === 'number' ? u.overallScore : existing.overallScore;
@@ -412,20 +489,17 @@ export function batchUpdateTenants(updates = null, updatedBy = 'k8s-telemetry-ge
         updatedCount += 1;
       }
     } else {
-      // Automatic realistic random perturbation across all tenants (random number generator simulation)
-      const allRows = stmtSelectAllTenants.all();
+      // Automatic realistic random perturbation across all tenants
+      const allRows = stmtSelectAllTenants.all() as RawTenantRow[];
       for (const row of allRows) {
-        // Random score adjustment [-1.5, +1.5]
         const delta = Math.round((Math.random() * 3 - 1.5) * 10) / 10;
         const newScore = Math.min(100, Math.max(10, Math.round((row.overallScore + delta) * 10) / 10));
 
-        // Category adjustments
         const newDev = Math.min(100, Math.max(10, Math.round((row.device + (Math.random() * 2 - 1)) * 10) / 10));
         const newIden = Math.min(100, Math.max(10, Math.round((row.identities + (Math.random() * 2 - 1)) * 10) / 10));
         const newApp = Math.min(100, Math.max(10, Math.round((row.apps + (Math.random() * 2 - 1)) * 10) / 10));
         const newData = Math.min(100, Math.max(10, Math.round((row.data + (Math.random() * 2 - 1)) * 10) / 10));
 
-        // Rare toggle of telemetry signal (5% chance)
         const sent = Math.random() < 0.05 ? (row.sentinel ? 0 : 1) : row.sentinel;
         const mde = Math.random() < 0.05 ? (row.mde ? 0 : 1) : row.mde;
         const mdi = Math.random() < 0.05 ? (row.mdi ? 0 : 1) : row.mdi;
@@ -450,77 +524,105 @@ export function batchUpdateTenants(updates = null, updatedBy = 'k8s-telemetry-ge
   }
 }
 
-export function getAllIncidents() {
-  return stmtSelectAllIncidents.all();
+export function getAllIncidents(): SecurityIncident[] {
+  const rows = stmtSelectAllIncidents.all() as RawIncidentRow[];
+  return rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    severity: row.severity,
+    status: row.status,
+    category: row.category,
+    source: row.source,
+    timestamp: row.timestamp,
+    description: row.description,
+    recommendation: row.recommendation,
+  }));
 }
 
-export function addIncident(incident) {
+export function addIncident(incident: Partial<SecurityIncident>): SecurityIncident {
   const id = incident.id || `inc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
   const timestamp = incident.timestamp || Date.now();
-  stmtInsertIncident.run(
-    id,
-    incident.title,
-    incident.severity || 'medium',
-    incident.status || 'active',
-    incident.category || 'General',
-    incident.source || 'Sentinel Engine',
-    timestamp,
-    incident.description || '',
-    incident.recommendation || '',
-  );
+  const severity = incident.severity || 'medium';
+  const status = incident.status || 'active';
+  const category = incident.category || 'General';
+  const source = incident.source || 'Sentinel Engine';
+  const title = incident.title || 'Untitled Incident';
+  const description = incident.description || '';
+  const recommendation = incident.recommendation || '';
+
+  stmtInsertIncident.run(id, title, severity, status, category, source, timestamp, description, recommendation);
+
   return {
     id,
-    title: incident.title,
-    severity: incident.severity || 'medium',
-    status: incident.status || 'active',
-    category: incident.category || 'General',
-    source: incident.source || 'Sentinel Engine',
+    title,
+    severity,
+    status,
+    category,
+    source,
     timestamp,
-    description: incident.description || '',
-    recommendation: incident.recommendation || '',
+    description,
+    recommendation,
   };
 }
 
-export function updateIncidentStatus(id, status) {
+export function updateIncidentStatus(
+  id: string,
+  status: SecurityIncident['status'],
+): { id: string; status: SecurityIncident['status'] } {
   stmtUpdateIncidentStatus.run(status, id);
   return { id, status };
 }
 
+export interface GenericUpdateResult {
+  success?: boolean;
+  notFound?: boolean;
+  conflict?: boolean;
+  error?: string;
+  current?: Record<string, unknown> | TenantRecord | null;
+  record?: Record<string, unknown> | TenantRecord | null;
+  tenant?: TenantRecord | null;
+}
+
 // Data-agnostic record updater scaling across any database table in SQLite
-export function updateGenericRecord(tableName, id, updates = {}, expectedVersion = null, updatedBy = 'admin') {
-  // Validate table name to prevent SQL injection
+export function updateGenericRecord(
+  tableName: string,
+  id: string,
+  updates: Record<string, unknown> = {},
+  expectedVersion: number | null = null,
+  updatedBy = 'admin',
+): GenericUpdateResult {
   if (!TABLE_IDENTIFIER_REGEX.test(tableName)) {
     throw new Error('Invalid table identifier');
   }
 
-  // Delegate domain-specific tenants table to its specialized handler with rank recalculation
   if (tableName === 'tenants') {
-    const res = publishTenantUpdate(id, updates, expectedVersion, updatedBy);
+    const res = publishTenantUpdate(id, updates as TenantUpdatePayload, expectedVersion, updatedBy);
     return {
       ...res,
-      record: res.tenant,
+      record: res.tenant ?? null,
     };
   }
 
   db.exec('BEGIN IMMEDIATE;');
   try {
-    const columnsInfo = db.prepare(`PRAGMA table_info(${tableName})`).all();
+    const columnsInfo = db.prepare(`PRAGMA table_info(${tableName})`).all() as Array<{ name: string }> | undefined;
     if (!columnsInfo || columnsInfo.length === 0) {
       db.exec('ROLLBACK;');
       return { notFound: true, error: `Table '${tableName}' does not exist` };
     }
 
     const columnSet = new Set(columnsInfo.map((c) => c.name));
-    const existing = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(id);
+    const existing = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(id) as
+      | Record<string, unknown>
+      | undefined;
 
     if (!existing) {
       db.exec('ROLLBACK;');
       return { notFound: true };
     }
 
-    // Verify optimistic concurrency version if version column exists
     if (columnSet.has('version') && expectedVersion !== null && expectedVersion !== undefined) {
-      if (existing.version !== expectedVersion) {
+      if (existing['version'] !== expectedVersion) {
         db.exec('ROLLBACK;');
         return {
           conflict: true,
@@ -529,13 +631,13 @@ export function updateGenericRecord(tableName, id, updates = {}, expectedVersion
       }
     }
 
-    const assignments = [];
-    const params = [];
+    const assignments: string[] = [];
+    const params: SQLQueryBindings[] = [];
 
     for (const [key, value] of Object.entries(updates)) {
       if (key !== 'id' && columnSet.has(key)) {
         assignments.push(`${key} = ?`);
-        params.push(value);
+        params.push(value as SQLQueryBindings);
       }
     }
 
@@ -558,10 +660,12 @@ export function updateGenericRecord(tableName, id, updates = {}, expectedVersion
 
     db.exec('COMMIT;');
 
-    const updated = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(id);
+    const updated = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(id) as
+      | Record<string, unknown>
+      | undefined;
     return {
       success: true,
-      record: updated,
+      record: updated ?? null,
     };
   } catch (err) {
     db.exec('ROLLBACK;');
@@ -569,13 +673,23 @@ export function updateGenericRecord(tableName, id, updates = {}, expectedVersion
   }
 }
 
-export function getDatabaseStats() {
-  const tenantCount = stmtCountTenants.get().count;
-  const incidentCount = stmtCountIncidents.get().count;
-  const avgRow = db.prepare('SELECT AVG(overallScore) as avgScore FROM tenants').get();
+export interface DatabaseStats {
+  tenantCount: number;
+  incidentCount: number;
+  avgScore: number;
+  dbPath: string;
+}
+
+export function getDatabaseStats(): DatabaseStats {
+  const tenantRow = stmtCountTenants.get() as { count: number } | undefined;
+  const incidentRow = stmtCountIncidents.get() as { count: number } | undefined;
+  const avgRow = db.prepare('SELECT AVG(overallScore) as avgScore FROM tenants').get() as
+    | { avgScore: number | null }
+    | undefined;
+
   return {
-    tenantCount,
-    incidentCount,
+    tenantCount: tenantRow?.count ?? 0,
+    incidentCount: incidentRow?.count ?? 0,
     avgScore: avgRow?.avgScore ? Math.round(avgRow.avgScore * 10) / 10 : 0,
     dbPath: DB_PATH,
   };
