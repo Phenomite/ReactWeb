@@ -80,17 +80,20 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // Build updates payload
-  const updates: Record<string, unknown> = {};
+  interface DevRecordUpdates {
+    overallScore?: number;
+    [key: string]: unknown;
+  }
+  const updates: DevRecordUpdates = {};
   if (opts.collection === 'tenants') {
-    if (opts.score !== null) updates['overallScore'] = opts.score;
+    if (opts.score !== null) updates.overallScore = opts.score;
   }
   if (opts.field && opts.value !== null) {
     updates[opts.field] = opts.value;
   }
   if (Object.keys(updates).length === 0) {
     // Default demo nudge
-    updates['overallScore'] = 97.5;
+    updates.overallScore = 97.5;
   }
 
   const headers = {
@@ -127,7 +130,9 @@ async function main(): Promise<void> {
 
     const result = (await res.json()) as { data?: unknown; tenant?: unknown };
     const record = result.data || result.tenant || result;
-    console.log(`[Success] Successfully updated ${opts.collection}/${opts.id}:`, record);
+    process.stdout.write(
+      `[Success] Successfully updated ${opts.collection}/${opts.id}: ${JSON.stringify(record, null, 2)}\n`,
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error('[Connection Error]', message);

@@ -1,7 +1,9 @@
+import { isAbsolute, relative, resolve, sep } from 'node:path';
 import { file, serve } from 'bun';
 import type { SecurityIncident } from '../src/types';
 import {
   addIncident,
+  type BatchTenantItem,
   batchUpdateTenants,
   getAllIncidents,
   getAllTenants,
@@ -13,21 +15,42 @@ import {
   updateTenantScore,
 } from './db';
 
-// Configuration
 const PORT = Number.parseInt(process.env['PORT'] || '3001', 10);
 const HOST = process.env['HOST'] || '0.0.0.0';
 const CORS_ORIGIN = process.env['CORS_ORIGIN'] || '*';
 const ENABLE_SIMULATOR = process.env['ENABLE_SIMULATOR'] !== 'false';
 const STATIC_DIR = process.env['STATIC_DIR'] || './dist';
+const SAFE_ROOT = resolve(STATIC_DIR);
+
+type PathValidationResult = { ok: true; targetPath: string } | { ok: false; error: string };
+
+// Path traversal check against SAFE_ROOT
+function validatePath(pathname: string): PathValidationResult {
+  try {
+    const decodedPath = decodeURIComponent(pathname);
+    const targetPath = resolve(SAFE_ROOT, `.${decodedPath === '/' ? '/index.html' : decodedPath}`);
+    const rel = relative(SAFE_ROOT, targetPath);
+    const isContained =
+      !rel.startsWith('..') && !isAbsolute(rel) && (targetPath === SAFE_ROOT || targetPath.startsWith(SAFE_ROOT + sep));
+    if (!isContained) {
+      return { ok: false, error: 'Invalid path' };
+    }
+    // Path is safe to use
+    return { ok: true, targetPath };
+  } catch {
+    return { ok: false, error: 'Malicious or malformed URL' };
+  }
+}
 
 // Seed database on startup
-seedDatabaseIfEmpty();
+await seedDatabaseIfEmpty();
 
 // Route matching regular expressions
 const ROUTE_TENANT_REGEX = /^\/api\/tenants\/([^/]+)$/;
 const ROUTE_GENERIC_PATCH_REGEX = /^\/api\/([a-zA-Z0-9_]+)\/([^/]+)$/;
 const ROUTE_TENANT_SCORE_REGEX = /^\/api\/tenants\/([^/]+)\/score$/;
 const ROUTE_INCIDENT_STATUS_REGEX = /^\/api\/incidents\/([^/]+)\/status$/;
+const STATIC_ASSET_REGEX = /\.[a-zA-Z0-9]+$/;
 
 // Active SSE client subscriptions (ReadableStreamDefaultController set)
 const activeClients = new Set<ReadableStreamDefaultController<Uint8Array>>();
@@ -81,7 +104,11 @@ export function broadcastEvent(event: string, data: unknown): void {
   const payload = textEncoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
   for (const client of activeClients) {
     try {
-      client.enqueue(payload);
+      if (client.desiredSize === null) {
+        activeClients.delete(client);
+      } else {
+        client.enqueue(payload);
+      }
     } catch {
       activeClients.delete(client);
     }
@@ -125,13 +152,15 @@ const SIMULATED_ALERTS = [
   },
 ];
 
-// Helper to safely parse JSON body from standard Request
-async function parseJsonBody(req: Request): Promise<Record<string, unknown>> {
-  try {
-    return (await req.json()) as Record<string, unknown>;
-  } catch {
-    return {};
-  }
+interface ApiRequestBody {
+  expectedVersion?: number;
+  updatedBy?: string;
+  updates?: BatchTenantItem[];
+  overallScore?: number | string;
+  categories?: Record<string, unknown>;
+  title?: string;
+  status?: SecurityIncident['status'];
+  [key: string]: unknown;
 }
 
 // Start native Bun HTTP server
@@ -266,9 +295,9 @@ export const server = serve({
       ) {
         const resource = genericPatchMatch[1] ?? '';
         const entityId = genericPatchMatch[2] ?? '';
-        const body = await parseJsonBody(req);
+        const body = ((await req.json().catch(() => ({}))) as ApiRequestBody) ?? {};
         const adminUser = req.headers.get('x-admin-user') || 'system';
-        const expectedVersion = typeof body['expectedVersion'] === 'number' ? body['expectedVersion'] : null;
+        const expectedVersion = typeof body.expectedVersion === 'number' ? body.expectedVersion : null;
 
         const result = updateGenericRecord(resource, entityId, body, expectedVersion, adminUser);
 
@@ -310,12 +339,12 @@ export const server = serve({
 
       // High-Throughput Batch Update for In-Cluster Scripts & CronJobs
       if (pathname === '/api/internal/batch-update-tenants' && method === 'POST') {
-        const body = await parseJsonBody(req);
+        const body = ((await req.json().catch(() => ({}))) as ApiRequestBody) ?? {};
         const updatedBy =
-          (typeof body['updatedBy'] === 'string' ? body['updatedBy'] : null) ||
+          (typeof body.updatedBy === 'string' ? body.updatedBy : null) ||
           req.headers.get('x-admin-user') ||
           'k8s-telemetry-generator';
-        const updates = Array.isArray(body['updates']) ? body['updates'] : null;
+        const updates = Array.isArray(body.updates) ? body.updates : null;
         const result = batchUpdateTenants(updates, updatedBy);
 
         // Broadcast batch event over SSE so all open browser tabs update instantly
@@ -337,15 +366,14 @@ export const server = serve({
       const scoreMatch = pathname.match(ROUTE_TENANT_SCORE_REGEX);
       if (scoreMatch && method === 'PATCH') {
         const tenantId = scoreMatch[1] ?? '';
-        const body = await parseJsonBody(req);
-        const overallScore = Number.parseFloat(String(body['overallScore']));
+        const body = ((await req.json().catch(() => ({}))) as ApiRequestBody) ?? {};
+        const overallScore = Number.parseFloat(String(body.overallScore));
         if (Number.isNaN(overallScore) || overallScore < 0 || overallScore > 100) {
           return jsonResponse({ error: 'overallScore must be a number between 0 and 100' }, 400);
         }
 
         const adminUser = req.headers.get('x-admin-user') || 'system';
-        const categories =
-          typeof body['categories'] === 'object' && body['categories'] !== null ? body['categories'] : {};
+        const categories = typeof body.categories === 'object' && body.categories !== null ? body.categories : {};
         const updated = updateTenantScore(tenantId, overallScore, categories, adminUser);
         if (!updated) {
           return jsonResponse({ error: 'Tenant Not Found' }, 404);
@@ -365,8 +393,8 @@ export const server = serve({
 
       // Create Incident (with Real-Time Broadcast)
       if (pathname === '/api/incidents' && method === 'POST') {
-        const body = await parseJsonBody(req);
-        if (!body['title']) {
+        const body = ((await req.json().catch(() => ({}))) as ApiRequestBody) ?? {};
+        if (!body.title) {
           return jsonResponse({ error: 'title is required' }, 400);
         }
         const created = addIncident(body as Partial<SecurityIncident>);
@@ -396,12 +424,15 @@ export const server = serve({
       const incidentStatusMatch = pathname.match(ROUTE_INCIDENT_STATUS_REGEX);
       if (incidentStatusMatch && method === 'PATCH') {
         const incidentId = incidentStatusMatch[1] ?? '';
-        const body = await parseJsonBody(req);
-        const status = String(body['status']);
+        const body = ((await req.json().catch(() => ({}))) as ApiRequestBody) ?? {};
+        const status = String(body.status);
         if (!['active', 'investigating', 'resolved'].includes(status)) {
           return jsonResponse({ error: 'Invalid status' }, 400);
         }
         const updated = updateIncidentStatus(incidentId, status as SecurityIncident['status']);
+        if (!updated) {
+          return jsonResponse({ error: 'Incident Not Found' }, 404);
+        }
 
         // Broadcast to all connected visitors
         broadcastEvent('incident_status_updated', updated);
@@ -429,16 +460,29 @@ export const server = serve({
 
       // --- REACT SPA SERVING & STATIC ASSETS ---
       if (!pathname.startsWith('/api/')) {
-        const filePath = `${STATIC_DIR}${pathname === '/' ? '/index.html' : pathname}`;
-        const staticFile = file(filePath);
-
-        // If static asset exists (CSS, JS, SVG, image), serve it
-        if (await staticFile.exists()) {
-          return new Response(staticFile);
+        const validation = validatePath(pathname);
+        if (!validation.ok) {
+          return jsonResponse({ error: validation.error }, 400);
         }
 
-        // SPA fallback: serve index.html for client-side hash and history routing
-        const indexFile = file(`${STATIC_DIR}/index.html`);
+        const targetPath = validation.targetPath;
+        try {
+          const staticFile = file(targetPath);
+          // If static asset exists (CSS, JS, SVG, image), serve it
+          if (await staticFile.exists()) {
+            return new Response(staticFile);
+          }
+        } catch {
+          return jsonResponse({ error: 'Invalid path' }, 400);
+        }
+
+        // Never serve index.html for missing assets (.js, .css, .woff2, images, etc.)
+        if (STATIC_ASSET_REGEX.test(pathname)) {
+          return jsonResponse({ error: 'Asset Not Found' }, 404);
+        }
+
+        // SPA fallback: serve index.html for client-side navigation routes
+        const indexFile = file(resolve(SAFE_ROOT, 'index.html'));
         if (await indexFile.exists()) {
           return new Response(indexFile, {
             headers: {
@@ -458,15 +502,31 @@ export const server = serve({
   },
 });
 
-// Periodic heartbeat keepalive (every 15s) to sustain SSE connections through firewalls
+// Global keep-alive comment ping (every 15s) to prune ghost connections and sustain active SSE streams
 const heartbeatTimer = setInterval(() => {
-  const payload = textEncoder.encode(': heartbeat\n\n');
+  const pingPayload = textEncoder.encode(': ping\n\n');
+  let prunedCount = 0;
+
   for (const client of activeClients) {
     try {
-      client.enqueue(payload);
+      if (client.desiredSize === null) {
+        activeClients.delete(client);
+        prunedCount++;
+      } else {
+        client.enqueue(pingPayload);
+      }
     } catch {
       activeClients.delete(client);
+      prunedCount++;
     }
+  }
+
+  // If dead clients were pruned, broadcast updated visitor count to surviving connections
+  if (prunedCount > 0 && activeClients.size > 0) {
+    broadcastEvent('visitors', {
+      activeVisitors: activeClients.size,
+      timestamp: Date.now(),
+    });
   }
 }, 15000);
 
@@ -509,6 +569,3 @@ function handleShutdown(): void {
 
 process.on('SIGTERM', handleShutdown);
 process.on('SIGINT', handleShutdown);
-
-console.log(`[Server] Secure Real-Time Backend running on http://${HOST}:${PORT} (Bun ${Bun.version})`);
-console.log(`[Server] Real-time SSE event stream available at /api/events`);

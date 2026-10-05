@@ -18,7 +18,8 @@
         "noNoninteractiveElementInteractions": "warn"
       },
       "complexity": {
-        "noForEach": "warn"
+        "noForEach": "warn",
+        "useLiteralKeys": "off"
       },
       "suspicious": {
         "noExplicitAny": "error",

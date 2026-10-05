@@ -1,17 +1,11 @@
 import { Database, type SQLQueryBindings } from 'bun:sqlite';
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { mkdirSync } from 'node:fs';
+import { join } from 'node:path';
 import type { SecurityIncident, TenantRecord, TenantScoreCategories, TenantStatusBubbles } from '../src/types';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 // Database path resolution with environment override for Kubernetes PVC
-const DB_DIR = process.env['DATA_DIR'] || join(__dirname, '../data');
-if (!existsSync(DB_DIR)) {
-  mkdirSync(DB_DIR, { recursive: true });
-}
+const DB_DIR = process.env['DATA_DIR'] || join(import.meta.dir, '../data');
+mkdirSync(DB_DIR, { recursive: true });
 const DB_PATH = process.env['DATABASE_URL'] || join(DB_DIR, 'reactweb.db');
 
 const TABLE_IDENTIFIER_REGEX = /^[a-zA-Z0-9_]+$/;
@@ -19,12 +13,12 @@ const TABLE_IDENTIFIER_REGEX = /^[a-zA-Z0-9_]+$/;
 const db = new Database(DB_PATH, { create: true });
 
 // Configure SQLite for high concurrency and zero-loss durability
-db.exec(`
-  PRAGMA journal_mode = WAL;
-  PRAGMA synchronous = NORMAL;
-  PRAGMA foreign_keys = ON;
-  PRAGMA busy_timeout = 5000;
+db.run('PRAGMA journal_mode = WAL;');
+db.run('PRAGMA synchronous = NORMAL;');
+db.run('PRAGMA foreign_keys = ON;');
+db.run('PRAGMA busy_timeout = 5000;');
 
+db.run(`
   CREATE TABLE IF NOT EXISTS tenants (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -46,10 +40,12 @@ db.exec(`
     lastUpdatedBy TEXT NOT NULL DEFAULT 'system',
     updatedAt INTEGER NOT NULL
   );
+`);
 
-  CREATE INDEX IF NOT EXISTS idx_tenants_score ON tenants (overallScore DESC);
-  CREATE INDEX IF NOT EXISTS idx_tenants_rank ON tenants (rank ASC);
+db.run('CREATE INDEX IF NOT EXISTS idx_tenants_score ON tenants (overallScore DESC);');
+db.run('CREATE INDEX IF NOT EXISTS idx_tenants_rank ON tenants (rank ASC);');
 
+db.run(`
   CREATE TABLE IF NOT EXISTS incidents (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
@@ -61,10 +57,12 @@ db.exec(`
     description TEXT NOT NULL,
     recommendation TEXT NOT NULL
   );
+`);
 
-  CREATE INDEX IF NOT EXISTS idx_incidents_status ON incidents (status);
-  CREATE INDEX IF NOT EXISTS idx_incidents_timestamp ON incidents (timestamp DESC);
+db.run('CREATE INDEX IF NOT EXISTS idx_incidents_status ON incidents (status);');
+db.run('CREATE INDEX IF NOT EXISTS idx_incidents_timestamp ON incidents (timestamp DESC);');
 
+db.run(`
   CREATE TABLE IF NOT EXISTS site_metrics (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL,
@@ -74,41 +72,41 @@ db.exec(`
 
 // Migration safety: Ensure version and lastUpdatedBy columns exist on pre-existing tables
 try {
-  const columns = (db.prepare('PRAGMA table_info(tenants)').all() as Array<{ name: string }>).map((c) => c.name);
+  const columns = (db.query('PRAGMA table_info(tenants)').all() as Array<{ name: string }>).map((c) => c.name);
   if (!columns.includes('version')) {
-    db.exec('ALTER TABLE tenants ADD COLUMN version INTEGER NOT NULL DEFAULT 1');
+    db.run('ALTER TABLE tenants ADD COLUMN version INTEGER NOT NULL DEFAULT 1');
   }
   if (!columns.includes('lastUpdatedBy')) {
-    db.exec("ALTER TABLE tenants ADD COLUMN lastUpdatedBy TEXT NOT NULL DEFAULT 'system'");
+    db.run("ALTER TABLE tenants ADD COLUMN lastUpdatedBy TEXT NOT NULL DEFAULT 'system'");
   }
 } catch {
   // Columns already present
 }
 
-// Prepared statements
-const stmtInsertTenant = db.prepare(`
+// Cached statements via db.query()
+const stmtInsertTenant = db.query(`
   INSERT INTO tenants (
     id, name, domain, industry, region, seatCount,
     sentinel, mde, mdi, logAnalytics,
     device, identities, apps, data,
     overallScore, rank, version, lastUpdatedBy, updatedAt
   ) VALUES (
-    ?, ?, ?, ?, ?, ?,
-    ?, ?, ?, ?,
-    ?, ?, ?, ?,
-    ?, ?, ?, ?, ?
+    $id, $name, $domain, $industry, $region, $seatCount,
+    $sentinel, $mde, $mdi, $logAnalytics,
+    $device, $identities, $apps, $data,
+    $overallScore, $rank, $version, $lastUpdatedBy, $updatedAt
   )
 `);
 
-const stmtSelectAllTenants = db.prepare(`
+const stmtSelectAllTenants = db.query(`
   SELECT * FROM tenants ORDER BY rank ASC
 `);
 
-const stmtSelectTenantById = db.prepare(`
+const stmtSelectTenantById = db.query(`
   SELECT * FROM tenants WHERE id = ?
 `);
 
-const stmtRecalculateRanks = db.prepare(`
+const stmtRecalculateRanks = db.query(`
   WITH Ranked AS (
     SELECT id, ROW_NUMBER() OVER (ORDER BY overallScore DESC) as newRank
     FROM tenants
@@ -117,26 +115,66 @@ const stmtRecalculateRanks = db.prepare(`
   SET rank = (SELECT newRank FROM Ranked WHERE Ranked.id = tenants.id)
 `);
 
-const stmtSelectAllIncidents = db.prepare(`
+const stmtSelectAllIncidents = db.query(`
   SELECT * FROM incidents ORDER BY timestamp DESC
 `);
 
-const stmtInsertIncident = db.prepare(`
+const stmtSelectIncidentById = db.query(`
+  SELECT * FROM incidents WHERE id = ?
+`);
+
+const stmtInsertIncident = db.query(`
   INSERT INTO incidents (
     id, title, severity, status, category, source, timestamp, description, recommendation
   ) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?, ?
+    $id, $title, $severity, $status, $category, $source, $timestamp, $description, $recommendation
   )
 `);
 
-const stmtUpdateIncidentStatus = db.prepare(`
+const stmtUpdateIncidentStatus = db.query(`
   UPDATE incidents
   SET status = ?
   WHERE id = ?
 `);
 
-const stmtCountTenants = db.prepare('SELECT COUNT(*) as count FROM tenants');
-const stmtCountIncidents = db.prepare('SELECT COUNT(*) as count FROM incidents');
+const stmtUpdateTenant = db.query(`
+  UPDATE tenants
+  SET overallScore = $overallScore,
+      device = $device,
+      identities = $identities,
+      apps = $apps,
+      data = $data,
+      seatCount = $seatCount,
+      sentinel = $sentinel,
+      mde = $mde,
+      mdi = $mdi,
+      logAnalytics = $logAnalytics,
+      version = $version,
+      lastUpdatedBy = $lastUpdatedBy,
+      updatedAt = $updatedAt
+  WHERE id = $id
+`);
+
+const stmtBatchUpdateTenant = db.query(`
+  UPDATE tenants
+  SET overallScore = $overallScore,
+      device = $device,
+      identities = $identities,
+      apps = $apps,
+      data = $data,
+      sentinel = $sentinel,
+      mde = $mde,
+      mdi = $mdi,
+      logAnalytics = $logAnalytics,
+      version = version + 1,
+      lastUpdatedBy = $lastUpdatedBy,
+      updatedAt = $updatedAt
+  WHERE id = $id
+`);
+
+const stmtCountTenants = db.query('SELECT COUNT(*) as count FROM tenants');
+const stmtCountIncidents = db.query('SELECT COUNT(*) as count FROM incidents');
+const stmtAvgScore = db.query('SELECT AVG(overallScore) as avgScore FROM tenants');
 
 interface RawTenantRow {
   id: string;
@@ -201,41 +239,59 @@ function rowToTenant(row: RawTenantRow): TenantRecord {
   };
 }
 
+const seedTenantsTx = db.transaction((tenants: TenantRecord[], now: number) => {
+  for (const t of tenants) {
+    stmtInsertTenant.run({
+      $id: t.id,
+      $name: t.name,
+      $domain: t.domain,
+      $industry: t.industry,
+      $region: t.region,
+      $seatCount: t.seatCount,
+      $sentinel: t.statusBubbles.sentinel ? 1 : 0,
+      $mde: t.statusBubbles.mde ? 1 : 0,
+      $mdi: t.statusBubbles.mdi ? 1 : 0,
+      $logAnalytics: t.statusBubbles.logAnalytics ? 1 : 0,
+      $device: t.categories.device,
+      $identities: t.categories.identities,
+      $apps: t.categories.apps,
+      $data: t.categories.data,
+      $overallScore: t.overallScore,
+      $rank: t.rank,
+      $version: 1,
+      $lastUpdatedBy: 'system_seed',
+      $updatedAt: now,
+    });
+  }
+});
+
+const seedIncidentsTx = db.transaction((incidents: SecurityIncident[]) => {
+  for (const inc of incidents) {
+    stmtInsertIncident.run({
+      $id: inc.id,
+      $title: inc.title,
+      $severity: inc.severity,
+      $status: inc.status,
+      $category: inc.category,
+      $source: inc.source,
+      $timestamp: inc.timestamp,
+      $description: inc.description,
+      $recommendation: inc.recommendation,
+    });
+  }
+});
+
 // Seed initial tenants and incidents if database is empty
-export function seedDatabaseIfEmpty(): void {
+export async function seedDatabaseIfEmpty(): Promise<void> {
   const countRow = stmtCountTenants.get() as { count: number } | undefined;
   const tenantCount = countRow?.count ?? 0;
   if (tenantCount === 0) {
-    const tenantsJsonPath = join(__dirname, '../src/data/tenants.json');
-    if (existsSync(tenantsJsonPath)) {
-      const rawData = JSON.parse(readFileSync(tenantsJsonPath, 'utf8')) as TenantRecord[];
+    const tenantsJsonPath = join(import.meta.dir, '../src/data/tenants.json');
+    const tenantsFile = Bun.file(tenantsJsonPath);
+    if (await tenantsFile.exists()) {
+      const rawData = (await tenantsFile.json()) as TenantRecord[];
       const now = Date.now();
-      db.exec('BEGIN IMMEDIATE;');
-      for (const t of rawData) {
-        stmtInsertTenant.run(
-          t.id,
-          t.name,
-          t.domain,
-          t.industry,
-          t.region,
-          t.seatCount,
-          t.statusBubbles.sentinel ? 1 : 0,
-          t.statusBubbles.mde ? 1 : 0,
-          t.statusBubbles.mdi ? 1 : 0,
-          t.statusBubbles.logAnalytics ? 1 : 0,
-          t.categories.device,
-          t.categories.identities,
-          t.categories.apps,
-          t.categories.data,
-          t.overallScore,
-          t.rank,
-          1,
-          'system_seed',
-          now,
-        );
-      }
-      db.exec('COMMIT;');
-      console.log(`[Database] Seeded ${rawData.length} tenant records into SQLite.`);
+      seedTenantsTx.immediate(rawData, now);
     }
   }
 
@@ -279,22 +335,7 @@ export function seedDatabaseIfEmpty(): void {
       },
     ];
 
-    db.exec('BEGIN IMMEDIATE;');
-    for (const inc of initialIncidents) {
-      stmtInsertIncident.run(
-        inc.id,
-        inc.title,
-        inc.severity,
-        inc.status,
-        inc.category,
-        inc.source,
-        inc.timestamp,
-        inc.description,
-        inc.recommendation,
-      );
-    }
-    db.exec('COMMIT;');
-    console.log(`[Database] Seeded ${initialIncidents.length} security incident records into SQLite.`);
+    seedIncidentsTx.immediate(initialIncidents);
   }
 }
 
@@ -324,24 +365,15 @@ interface TenantUpdateResult {
   tenant?: TenantRecord | null;
 }
 
-// Multi-operator safe tenant update with optimistic concurrency control
-function publishTenantUpdate(
-  id: string,
-  updates: TenantUpdatePayload = {},
-  expectedVersion: number | null = null,
-  updatedBy = 'admin',
-): TenantUpdateResult {
-  db.exec('BEGIN IMMEDIATE;');
-  try {
+const publishTenantTx = db.transaction(
+  (id: string, updates: TenantUpdatePayload, expectedVersion: number | null, updatedBy: string): TenantUpdateResult => {
     const existing = stmtSelectTenantById.get(id) as RawTenantRow | undefined;
     if (!existing) {
-      db.exec('ROLLBACK;');
       return { notFound: true };
     }
 
     // Check optimistic concurrency conflict
     if (expectedVersion !== null && expectedVersion !== undefined && existing.version !== expectedVersion) {
-      db.exec('ROLLBACK;');
       return {
         conflict: true,
         current: rowToTenant(existing),
@@ -366,55 +398,65 @@ function publishTenantUpdate(
           : 0
         : existing.logAnalytics;
 
+    const hasChanges =
+      nextScore !== existing.overallScore ||
+      nextDevice !== existing.device ||
+      nextIdentities !== existing.identities ||
+      nextApps !== existing.apps ||
+      nextData !== existing.data ||
+      nextSeatCount !== existing.seatCount ||
+      nextSentinel !== existing.sentinel ||
+      nextMde !== existing.mde ||
+      nextMdi !== existing.mdi ||
+      nextLog !== existing.logAnalytics;
+
+    // Save write if no actual fields were updated
+    if (!hasChanges) {
+      return {
+        success: true,
+        tenant: rowToTenant(existing),
+      };
+    }
+
     const nextVersion = (existing.version || 1) + 1;
     const now = Date.now();
 
-    const stmtUpdate = db.prepare(`
-      UPDATE tenants
-      SET overallScore = ?,
-          device = ?,
-          identities = ?,
-          apps = ?,
-          data = ?,
-          seatCount = ?,
-          sentinel = ?,
-          mde = ?,
-          mdi = ?,
-          logAnalytics = ?,
-          version = ?,
-          lastUpdatedBy = ?,
-          updatedAt = ?
-      WHERE id = ?
-    `);
+    stmtUpdateTenant.run({
+      $overallScore: nextScore,
+      $device: nextDevice,
+      $identities: nextIdentities,
+      $apps: nextApps,
+      $data: nextData,
+      $seatCount: nextSeatCount,
+      $sentinel: nextSentinel,
+      $mde: nextMde,
+      $mdi: nextMdi,
+      $logAnalytics: nextLog,
+      $version: nextVersion,
+      $lastUpdatedBy: updatedBy,
+      $updatedAt: now,
+      $id: id,
+    });
 
-    stmtUpdate.run(
-      nextScore,
-      nextDevice,
-      nextIdentities,
-      nextApps,
-      nextData,
-      nextSeatCount,
-      nextSentinel,
-      nextMde,
-      nextMdi,
-      nextLog,
-      nextVersion,
-      updatedBy,
-      now,
-      id,
-    );
-
-    stmtRecalculateRanks.run();
-    db.exec('COMMIT;');
+    if (nextScore !== existing.overallScore) {
+      stmtRecalculateRanks.run();
+    }
 
     return {
       success: true,
       tenant: getTenantById(id),
     };
-  } catch (err) {
-    db.exec('ROLLBACK;');
-    throw err;
-  }
+  },
+);
+
+// Multi-operator safe tenant update with optimistic concurrency control
+function publishTenantUpdate(
+  id: string,
+  updates: TenantUpdatePayload = {},
+  expectedVersion: number | null = null,
+  updatedBy = 'admin',
+): TenantUpdateResult {
+  return publishTenantTx.immediate(id, updates, expectedVersion, updatedBy);
 }
 
 // Legacy simple score update
@@ -441,34 +483,15 @@ export interface BatchUpdateResult {
   timestamp: number;
 }
 
-// Batch update from in-cluster telemetry generators or CronJobs
-export function batchUpdateTenants(
-  updates: BatchTenantItem[] | null = null,
-  updatedBy = 'k8s-telemetry-generator',
-): BatchUpdateResult {
-  db.exec('BEGIN IMMEDIATE;');
-  try {
-    const now = Date.now();
+const batchUpdateTx = db.transaction(
+  (updates: BatchTenantItem[] | null, updatedBy: string, now: number): { updatedCount: number } => {
     let updatedCount = 0;
 
-    const stmtUpdate = db.prepare(`
-      UPDATE tenants
-      SET overallScore = ?,
-          device = ?,
-          identities = ?,
-          apps = ?,
-          data = ?,
-          sentinel = ?,
-          mde = ?,
-          mdi = ?,
-          logAnalytics = ?,
-          version = version + 1,
-          lastUpdatedBy = ?,
-          updatedAt = ?
-      WHERE id = ?
-    `);
+    if (Array.isArray(updates)) {
+      if (updates.length === 0) {
+        return { updatedCount: 0 };
+      }
 
-    if (Array.isArray(updates) && updates.length > 0) {
       for (const u of updates) {
         const existing = stmtSelectTenantById.get(u.id) as RawTenantRow | undefined;
         if (!existing) continue;
@@ -485,7 +508,35 @@ export function batchUpdateTenants(
         const log =
           u.statusBubbles?.logAnalytics !== undefined ? (u.statusBubbles.logAnalytics ? 1 : 0) : existing.logAnalytics;
 
-        stmtUpdate.run(score, dev, iden, app, dat, sent, mde, mdi, log, updatedBy, now, u.id);
+        const hasChange =
+          score !== existing.overallScore ||
+          dev !== existing.device ||
+          iden !== existing.identities ||
+          app !== existing.apps ||
+          dat !== existing.data ||
+          sent !== existing.sentinel ||
+          mde !== existing.mde ||
+          mdi !== existing.mdi ||
+          log !== existing.logAnalytics;
+
+        if (!hasChange) {
+          continue;
+        }
+
+        stmtBatchUpdateTenant.run({
+          $overallScore: score,
+          $device: dev,
+          $identities: iden,
+          $apps: app,
+          $data: dat,
+          $sentinel: sent,
+          $mde: mde,
+          $mdi: mdi,
+          $logAnalytics: log,
+          $lastUpdatedBy: updatedBy,
+          $updatedAt: now,
+          $id: u.id,
+        });
         updatedCount += 1;
       }
     } else {
@@ -505,23 +556,44 @@ export function batchUpdateTenants(
         const mdi = Math.random() < 0.05 ? (row.mdi ? 0 : 1) : row.mdi;
         const log = Math.random() < 0.05 ? (row.logAnalytics ? 0 : 1) : row.logAnalytics;
 
-        stmtUpdate.run(newScore, newDev, newIden, newApp, newData, sent, mde, mdi, log, updatedBy, now, row.id);
+        stmtBatchUpdateTenant.run({
+          $overallScore: newScore,
+          $device: newDev,
+          $identities: newIden,
+          $apps: newApp,
+          $data: newData,
+          $sentinel: sent,
+          $mde: mde,
+          $mdi: mdi,
+          $logAnalytics: log,
+          $lastUpdatedBy: updatedBy,
+          $updatedAt: now,
+          $id: row.id,
+        });
         updatedCount += 1;
       }
     }
 
-    stmtRecalculateRanks.run();
-    db.exec('COMMIT;');
+    if (updatedCount > 0) {
+      stmtRecalculateRanks.run();
+    }
+    return { updatedCount };
+  },
+);
 
-    return {
-      updatedCount,
-      tenants: getAllTenants(),
-      timestamp: now,
-    };
-  } catch (err) {
-    db.exec('ROLLBACK;');
-    throw err;
-  }
+// Batch update from in-cluster telemetry generators or CronJobs
+export function batchUpdateTenants(
+  updates: BatchTenantItem[] | null = null,
+  updatedBy = 'k8s-telemetry-generator',
+): BatchUpdateResult {
+  const now = Date.now();
+  const { updatedCount } = batchUpdateTx.immediate(updates, updatedBy, now);
+
+  return {
+    updatedCount,
+    tenants: getAllTenants(),
+    timestamp: now,
+  };
 }
 
 export function getAllIncidents(): SecurityIncident[] {
@@ -550,7 +622,17 @@ export function addIncident(incident: Partial<SecurityIncident>): SecurityIncide
   const description = incident.description || '';
   const recommendation = incident.recommendation || '';
 
-  stmtInsertIncident.run(id, title, severity, status, category, source, timestamp, description, recommendation);
+  stmtInsertIncident.run({
+    $id: id,
+    $title: title,
+    $severity: severity,
+    $status: status,
+    $category: category,
+    $source: source,
+    $timestamp: timestamp,
+    $description: description,
+    $recommendation: recommendation,
+  });
 
   return {
     id,
@@ -565,12 +647,25 @@ export function addIncident(incident: Partial<SecurityIncident>): SecurityIncide
   };
 }
 
+const updateIncidentStatusTx = db.transaction(
+  (id: string, status: SecurityIncident['status']): { id: string; status: SecurityIncident['status'] } | null => {
+    const existing = stmtSelectIncidentById.get(id) as RawIncidentRow | undefined;
+    if (!existing) {
+      return null;
+    }
+    if (existing.status === status) {
+      return { id, status };
+    }
+    stmtUpdateIncidentStatus.run(status, id);
+    return { id, status };
+  },
+);
+
 export function updateIncidentStatus(
   id: string,
   status: SecurityIncident['status'],
-): { id: string; status: SecurityIncident['status'] } {
-  stmtUpdateIncidentStatus.run(status, id);
-  return { id, status };
+): { id: string; status: SecurityIncident['status'] } | null {
+  return updateIncidentStatusTx.immediate(id, status);
 }
 
 export interface GenericUpdateResult {
@@ -603,27 +698,26 @@ export function updateGenericRecord(
     };
   }
 
-  db.exec('BEGIN IMMEDIATE;');
-  try {
-    const columnsInfo = db.prepare(`PRAGMA table_info(${tableName})`).all() as Array<{ name: string }> | undefined;
-    if (!columnsInfo || columnsInfo.length === 0) {
-      db.exec('ROLLBACK;');
-      return { notFound: true, error: `Table '${tableName}' does not exist` };
-    }
+  const columnsInfo = db.query(`PRAGMA table_info(${tableName})`).all() as Array<{ name: string }>;
+  if (columnsInfo.length === 0) {
+    return { notFound: true, error: `Table '${tableName}' does not exist` };
+  }
 
-    const columnSet = new Set(columnsInfo.map((c) => c.name));
-    const existing = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(id) as
-      | Record<string, unknown>
-      | undefined;
+  const columnSet = new Set(columnsInfo.map((c) => c.name));
+  interface GenericRecordRow {
+    version?: number;
+    [key: string]: unknown;
+  }
+
+  const updateGenericTx = db.transaction((): GenericUpdateResult => {
+    const existing = db.query(`SELECT * FROM ${tableName} WHERE id = ?`).get(id) as GenericRecordRow | undefined;
 
     if (!existing) {
-      db.exec('ROLLBACK;');
       return { notFound: true };
     }
 
     if (columnSet.has('version') && expectedVersion !== null && expectedVersion !== undefined) {
-      if (existing['version'] !== expectedVersion) {
-        db.exec('ROLLBACK;');
+      if (existing.version !== expectedVersion) {
         return {
           conflict: true,
           current: existing,
@@ -635,10 +729,20 @@ export function updateGenericRecord(
     const params: SQLQueryBindings[] = [];
 
     for (const [key, value] of Object.entries(updates)) {
-      if (key !== 'id' && columnSet.has(key)) {
-        assignments.push(`${key} = ?`);
-        params.push(value as SQLQueryBindings);
+      if (key !== 'id' && columnSet.has(key) && TABLE_IDENTIFIER_REGEX.test(key)) {
+        if (existing[key] !== value) {
+          assignments.push(`${key} = ?`);
+          params.push(value as SQLQueryBindings);
+        }
       }
+    }
+
+    // If nothing changed, return existing record early to save unnecessary write and version bump
+    if (assignments.length === 0) {
+      return {
+        success: true,
+        record: existing,
+      };
     }
 
     if (columnSet.has('version')) {
@@ -653,24 +757,18 @@ export function updateGenericRecord(
       params.push(updatedBy);
     }
 
-    if (assignments.length > 0) {
-      params.push(id);
-      db.prepare(`UPDATE ${tableName} SET ${assignments.join(', ')} WHERE id = ?`).run(...params);
-    }
+    params.push(id);
+    // Use db.prepare() instead of db.query() for dynamic SQL to avoid polluting Bun's statement cache
+    db.prepare(`UPDATE ${tableName} SET ${assignments.join(', ')} WHERE id = ?`).run(...params);
 
-    db.exec('COMMIT;');
-
-    const updated = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(id) as
-      | Record<string, unknown>
-      | undefined;
+    const updated = db.query(`SELECT * FROM ${tableName} WHERE id = ?`).get(id) as Record<string, unknown> | undefined;
     return {
       success: true,
       record: updated ?? null,
     };
-  } catch (err) {
-    db.exec('ROLLBACK;');
-    throw err;
-  }
+  });
+
+  return updateGenericTx.immediate();
 }
 
 export interface DatabaseStats {
@@ -683,9 +781,7 @@ export interface DatabaseStats {
 export function getDatabaseStats(): DatabaseStats {
   const tenantRow = stmtCountTenants.get() as { count: number } | undefined;
   const incidentRow = stmtCountIncidents.get() as { count: number } | undefined;
-  const avgRow = db.prepare('SELECT AVG(overallScore) as avgScore FROM tenants').get() as
-    | { avgScore: number | null }
-    | undefined;
+  const avgRow = stmtAvgScore.get() as { avgScore: number | null } | undefined;
 
   return {
     tenantCount: tenantRow?.count ?? 0,

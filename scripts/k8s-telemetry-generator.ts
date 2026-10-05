@@ -9,17 +9,12 @@
  *  - Inside Kubernetes as a standalone Daemon Deployment running a 60s loop
  *  - Locally via 'pnpm run telemetry:cron'
  */
-
-import fs from 'node:fs';
 import type { TenantRecord } from '../src/types';
 
 const BACKEND_URL = process.env['BACKEND_URL'] || 'http://127.0.0.1:3001';
 const INTERVAL_MS = Number.parseInt(process.env['UPDATE_INTERVAL_MS'] || '60000', 10);
 const RUN_ONCE = process.argv.includes('--once');
 const HEALTH_FILE = process.env['HEALTH_FILE'] || '/tmp/healthy';
-
-console.log('[Telemetry Generator] Target Backend URL:', BACKEND_URL);
-console.log('[Telemetry Generator] Mode:', RUN_ONCE ? 'One-Shot' : `Continuous Loop (${INTERVAL_MS / 1000}s)`);
 
 interface BatchUpdateResponse {
   status: string;
@@ -57,9 +52,11 @@ async function runBatchUpdate(): Promise<boolean> {
 
     const data = (await batchRes.json()) as BatchUpdateResponse;
     const durationMs = Date.now() - startTime;
-    console.log(`[${new Date().toISOString()}] Successfully updated ${data.updatedCount} tenants in ${durationMs}ms.`);
+    process.stdout.write(
+      `[${new Date().toISOString()}] Successfully updated ${data.updatedCount} tenants in ${durationMs}ms.\n`,
+    );
     try {
-      fs.writeFileSync(HEALTH_FILE, Math.floor(Date.now() / 1000).toString(), 'utf8');
+      await Bun.write(HEALTH_FILE, Math.floor(Date.now() / 1000).toString());
     } catch {
       // Non-fatal if running outside container without write permissions
     }
@@ -85,7 +82,6 @@ async function main(): Promise<void> {
     }, INTERVAL_MS);
 
     function cleanup(): void {
-      console.log('[Telemetry Generator] Terminating generator gracefully...');
       clearInterval(timer);
       process.exit(0);
     }

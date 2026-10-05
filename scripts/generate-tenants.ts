@@ -1,6 +1,4 @@
-#!/usr/bin/env bun
-import fs from 'node:fs';
-import path from 'node:path';
+import { join } from 'node:path';
 import type { TenantRecord } from '../src/types';
 
 // Seed enterprise names and prefixes/suffixes to create 200 distinct enterprise tenants
@@ -234,11 +232,6 @@ rawTenants.forEach((tenant, idx) => {
   tenant.rank = idx + 1;
 });
 
-const outDir = path.resolve('src/data');
-if (!fs.existsSync(outDir)) {
-  fs.mkdirSync(outDir, { recursive: true });
-}
-
-const outPath = path.join(outDir, 'tenants.json');
-fs.writeFileSync(outPath, JSON.stringify(rawTenants, null, 2), 'utf-8');
-console.log(`[Tenants Generator] Successfully seeded 200 distinct enterprise tenants into ${outPath}`);
+const outPath = join(import.meta.dir, '../src/data/tenants.json');
+await Bun.write(outPath, JSON.stringify(rawTenants, null, 2));
+process.stdout.write(`[Tenants Generator] Successfully seeded 200 distinct enterprise tenants into ${outPath}\n`);
